@@ -1,5 +1,22 @@
 \subsection{Other datasets}
-Table~\ref{tab:other} repeats the two basic concept-shift scenarios on MNIST and CIFAR-10 with the same hyperparameters. On MNIST, DisCo-CFL again matches the Oracle: 98.5\% (rotation) and 98.7\% (label swap), with no conflicting merges. Its concept accuracy is 97--98\%, against at most 91.6\% for any baseline. In the MNIST rotation scenario one seed returns an extra cluster (ARI $0.97$), a split of one group into two conflict-free parts, which does not change accuracy.
+Table~\ref{tab:other} repeats the two basic concept-shift scenarios on MNIST and CIFAR-10 with the same hyperparameters. On MNIST, DisCo-CFL again matches the Oracle: 98.5\% (rotation) and 98.7\% (label swap), with no conflicting merges. Its concept accuracy is 97--98\%, against at most 91.6\% for any baseline. In the MNIST rotation scenario two seeds leave one or two clients in singleton clusters (flagged as anomalous; mean ARI $0.97$, $K=5.0$); these clients train alone, and the mean accuracy still equals the Oracle's.
+
+CIFAR-10 is harder, and here DisCo-CFL is not the best method on every metric. With the default 10 warm-up rounds, the reference model is only about 40\% accurate. Its class-conditional gradients hardly depend on the orientation of most natural-image classes (mean between-group similarity 0.83--0.90; only vehicle classes separate clearly). The separation $\Delta$ of Assumption~\ref{ass:sep} is then small, and DisCo-CFL reaches only ARI $0.38$, although its concept accuracy (41.0\%) is already the best among the baselines. The theory points to the remedy, a more informative reference model. With 30 warm-up rounds (DisCo-T30; the reference accuracy stays near 39\%, but orientation-sensitive features emerge), ARI rises to $0.74$, conflicting merges drop from 24.6\% to 4.2\%, and concept accuracy reaches 44.8\%, the best of all non-oracle methods. Table~\ref{tab:warm} gives the clustering-only trend. CFL/MTCFL has the highest \emph{local} accuracy on CIFAR-10 (67.0\%, above the Oracle's 64.2\%). It splits the federation into 35 clusters, i.e.\ it personalises to each client's label mix with the small CNN, and its concept accuracy is the lowest of the clustered methods (38.2\%).
+
+\begin{table}[t]
+\centering
+\caption{CIFAR-10 rotation, clustering step only: effect of the warm-up length $T_0$ (3 seeds).}\label{tab:warm}
+\small
+\begin{tabular}{lccc}
+\toprule
+$T_0$ & ARI & $K$ & conflict\% \\
+\midrule
+10 & 0.37 & 3.7 & 24.8 \\
+20 & 0.64 & 5.0 & 8.9 \\
+30 & 0.74 & 4.7 & 4.2 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \begin{table}[t]
 \centering

@@ -145,5 +145,33 @@ against 35.7% for FedAvg, 51.9% for CFL, 67.3% for IFCA and 74.5% for FL+HC.
 ![dp](results/figures/dp.png)
 ![tau](results/figures/tau_sensitivity.png)
 
-MORE_RESULTS_PLACEHOLDER
+### Other datasets
+
+| Dataset / scenario | DisCo Acc | best baseline Acc | DisCo concept acc | best baseline concept acc | DisCo ARI | Oracle Acc |
+|---|---|---|---|---|---|---|
+| MNIST rotation | **98.5** | 96.9 (IFCA) | **97.1** | 91.6 | 0.97 | 98.5 |
+| MNIST label swap | **98.7** | 97.1 (Local) | **97.8** | 87.9 | 1.00 | 98.7 |
+| CIFAR-10 rotation (warm-up 10) | 60.5 | **67.0** (CFL, 35 clusters) | 41.0 | 38.2 | 0.38 | 64.2 |
+| CIFAR-10 rotation (warm-up 30) | 62.0 | **67.0** (CFL, 35 clusters) | **44.8** | 38.2 | 0.74 | 64.2 |
+
+### Ablation (Fashion-MNIST, ARI / K)
+
+| Variant | Rotation | Label swap | Rot + QS | Mixed + QS | Label only |
+|---|---|---|---|---|---|
+| DisCo-CFL | 1.00 / 4.0 | 1.00 / 4.0 | 1.00 / 4.0 | 0.94 / 4.0 | K = 1.3 |
+| without disattenuation | 0.87 / 6.7 | 0.87 / 6.0 | 0.83 / 7.0 | 0.85 / 5.7 | K = 4.0 |
+| without class conditioning | 0.15 / 23.3 | 0.15 / 17.7 | 0.16 / 22.3 | 0.09 / 22.3 | K = 13.0 |
+| mean instead of bottleneck linkage | 1.00 / 4.0 | 0.80 / 4.0 | 0.92 / 4.0 | 0.69 / 4.0 | K = 1.0 |
+| without per-sample clipping | 0.94 / 5.0 | 1.00 / 4.0 | 0.91 / 5.7 | 0.88 / 5.3 | K = 3.0 |
+
+### Limitations
+
+* The class supports of each client are revealed to the server; DP protects records, not the label histogram.
+* Signatures are only as informative as the reference model. On CIFAR-10 a 10-round warm-up
+  gives weak separation (ARI 0.38). With 30 rounds, ARI reaches 0.74 and DisCo-CFL has the best
+  concept accuracy, but CFL, which fragments the federation into 35 clusters, keeps the highest
+  local accuracy.
+* The theory assumes sub-Gaussian per-sample signatures (ensured by clipping) and does not cover
+  the attachment heuristics; the upper bound exceeds the lower bound by a factor 1/Δ.
+* Experiments use small CNNs and synthetic concept groups built from public image datasets.
 

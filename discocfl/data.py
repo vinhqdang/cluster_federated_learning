@@ -56,8 +56,17 @@ def _load_idx_dataset(folder):
 def _load_cifar10(root):
     folder = os.path.join(root, "cifar-10-batches-py")
     if not os.path.isdir(folder):
+        # extract to a private directory and rename atomically, so that parallel
+        # workers never see a half-extracted folder
+        tmp = os.path.join(root, f".cifar_extract_{os.getpid()}")
         with tarfile.open(os.path.join(root, "cifar-10-python.tar.gz")) as tar:
-            tar.extractall(root)
+            tar.extractall(tmp)
+        try:
+            os.rename(os.path.join(tmp, "cifar-10-batches-py"), folder)
+        except OSError:
+            pass  # another worker finished first
+        import shutil
+        shutil.rmtree(tmp, ignore_errors=True)
 
     def batch(name):
         with open(os.path.join(folder, name), "rb") as f:

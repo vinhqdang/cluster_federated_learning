@@ -1,0 +1,92 @@
+[
+ {
+  "scenario": "cifar_rot",
+  "warmup": 10,
+  "seed": 0,
+  "ref_acc": 0.3985833331942558,
+  "ari": 0.3009271523178808,
+  "k": 5,
+  "conflict_merge_rate": 0.19,
+  "compatible_split_rate": 0.49444444444444446
+ },
+ {
+  "scenario": "cifar_rot",
+  "warmup": 10,
+  "seed": 1,
+  "ref_acc": 0.4065000005066395,
+  "ari": 0.403117101937658,
+  "k": 3,
+  "conflict_merge_rate": 0.31833333333333336,
+  "compatible_split_rate": 0.15
+ },
+ {
+  "scenario": "cifar_rot",
+  "warmup": 10,
+  "seed": 2,
+  "ref_acc": 0.394250001758337,
+  "ari": 0.411875589066918,
+  "k": 3,
+  "conflict_merge_rate": 0.23666666666666666,
+  "compatible_split_rate": 0.2777777777777778
+ },
+ {
+  "scenario": "cifar_rot",
+  "warmup": 20,
+  "seed": 0,
+  "ref_acc": 0.4027499996125698,
+  "ari": 0.7489760093622001,
+  "k": 6,
+  "conflict_merge_rate": 0.03333333333333333,
+  "compatible_split_rate": 0.25555555555555554
+ },
+ {
+  "scenario": "cifar_rot",
+  "warmup": 20,
+  "seed": 1,
+  "ref_acc": 0.41274999752640723,
+  "ari": 0.6530949105914718,
+  "k": 5,
+  "conflict_merge_rate": 0.085,
+  "compatible_split_rate": 0.25555555555555554
+ },
+ {
+  "scenario": "cifar_rot",
+  "warmup": 20,
+  "seed": 2,
+  "ref_acc": 0.3923333346843719,
+  "ari": 0.52500647836227,
+  "k": 4,
+  "conflict_merge_rate": 0.14833333333333334,
+  "compatible_split_rate": 0.28888888888888886
+ },
+ {
+  "scenario": "cifar_rot",
+  "warmup": 30,
+  "seed": 0,
+  "ref_acc": 0.39141666479408743,
+  "ari": 0.9403669724770642,
+  "k": 5,
+  "conflict_merge_rate": 0.0,
+  "compatible_split_rate": 0.08888888888888889
+ },
+ {
+  "scenario": "cifar_rot",
+  "warmup": 30,
+  "seed": 1,
+  "ref_acc": 0.3980000004172325,
+  "ari": 0.5476904619076185,
+  "k": 5,
+  "conflict_merge_rate": 0.065,
+  "compatible_split_rate": 0.42777777777777776
+ },
+ {
+  "scenario": "cifar_rot",
+  "warmup": 30,
+  "seed": 2,
+  "ref_acc": 0.38399999812245367,
+  "ari": 0.7450980392156863,
+  "k": 4,
+  "conflict_merge_rate": 0.06166666666666667,
+  "compatible_split_rate": 0.18888888888888888
+ }
+]
