@@ -57,7 +57,7 @@ Federated learning (FL) trains a model across clients that keep their data local
 \item \textbf{Evaluation is performance-only.} Methods are compared on accuracy. The \emph{quality} of the clustering decision is rarely scrutinised, and neither is its fairness towards small groups or its explainability to the participants.
 \end{enumerate}
 
-\paragraph{Our idea.} The key observation is simple. At a fixed reference model $w$, the expected gradient of the loss restricted to class $c$ depends on a client only through its \emph{class-conditional} distribution $\cP_i(X\mid Y=c)$. It is therefore unaffected by the client's label proportions and dataset size. Both kinds of concept shift change it: a feature shift (e.g.\ rotated inputs) changes $\cP(X\mid Y=c)$ for every class, and a target shift (e.g.\ swapped labels) changes it for the affected classes. Estimated class-conditional gradients, however, are noisy, and noise \emph{attenuates} cosine similarities: two clients with the same concept but few samples look dissimilar. We borrow a century-old idea from psychometrics, Spearman's correction for attenuation~\citep{spearman1904,spearman1910,brown1910}. Every client splits the samples of each class into two halves, and the agreement between the halves measures the reliability of the signature. Dividing the cross-client cosine by the geometric mean of the two reliabilities gives an estimator of the \emph{population} similarity, on a scale where $1$ means ``same concept'' for every client regardless of how much data it has or how much privacy noise was added.
+\paragraph{Our idea.} At a fixed reference model $w$, the expected gradient of the loss restricted to class $c$ depends on a client only through its \emph{class-conditional} distribution $\cP_i(X\mid Y=c)$. It is therefore unaffected by the client's label proportions and dataset size. Both kinds of concept shift change it: a feature shift (e.g.\ rotated inputs) changes $\cP(X\mid Y=c)$ for every class, and a target shift (e.g.\ swapped labels) changes it for the affected classes. Estimated class-conditional gradients, however, are noisy, and noise \emph{attenuates} cosine similarities: two clients with the same concept but few samples look dissimilar. We borrow a century-old idea from psychometrics, Spearman's correction for attenuation~\citep{spearman1904,spearman1910,brown1910}. Every client splits the samples of each class into two halves, and the agreement between the halves measures the reliability of the signature. Dividing the cross-client cosine by the geometric mean of the two reliabilities gives an estimator of the \emph{population} similarity, on a scale where $1$ means ``same concept'' for every client regardless of how much data it has or how much privacy noise was added.
 
 \paragraph{Contributions.}
 \begin{itemize}[leftmargin=*,itemsep=1pt]
@@ -108,7 +108,7 @@ The \emph{minimum} over classes encodes the definition of concept equivalence: t
 \begin{algorithmic}[1]
 \State Warm-up: $T_0$ rounds of FedAvg on all clients $\to$ reference model $w$; broadcast $w$ and sketch seed
 \For{each client $i$ \textbf{in parallel}} \Comment{once}
- \For{$c\in S_i$} split class-$c$ samples into halves, send $(a_i^c,b_i^c)$ (clipped and noised if DP) \EndFor
+ \For{$c\in S_i$} split class-$c$ samples into halves, send $(a_i^c,b_i^c)$ (per-sample clipped; noised if DP) \EndFor
 \EndFor
 \State Server: $R_i^c$ by~\eqref{eq:rel}; $\rhohat^c_{ij},W^c_{ij}$ by~\eqref{eq:disatt}
 \State Clusters $\gets$ singletons of clients with enough evidence
@@ -214,7 +214,7 @@ Theorem~\ref{thm:rec} covers the merging phase. The attachment of low-evidence c
 \input{discussion.tex}
 
 \section{Conclusion}
-DisCo-CFL replaces ad hoc similarity heuristics in clustered FL with a \emph{calibrated} statistic: the disattenuated cosine between class-conditional gradients. This single change yields invariance to label and quantity skew, a threshold with a fixed meaning (and hence an automatic $K$), recovery guarantees that do not depend on group size, consistency under privacy noise, and explanations whose fidelity can be proven. The algorithm reports assignment certificates, an audit log, anomaly flags and class-level explanations together with the clusters, which extends the evaluation of CFL from accuracy alone to fairness, accountability, transparency and privacy.
+DisCo-CFL replaces ad hoc similarity heuristics in clustered FL with a \emph{calibrated} statistic: the disattenuated cosine between class-conditional gradients. The statistic is invariant to label and quantity skew and stays consistent under privacy noise. Its threshold has a fixed meaning, which gives an automatic $K$, and the resulting clustering has recovery guarantees that do not depend on group size and explanations whose fidelity is proven. The algorithm reports assignment certificates, an audit log, anomaly flags and class-level explanations together with the clusters, which extends the evaluation of CFL from accuracy alone to fairness, accountability, transparency and privacy.
 
 \bibliographystyle{plainnat}
 \bibliography{refs}

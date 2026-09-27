@@ -1,4 +1,4 @@
-# DisCo-CFL — Disattenuated Class-Conditional Clustered Federated Learning
+# DisCo-CFL: Disattenuated Class-Conditional Clustered Federated Learning
 
 DisCo-CFL is a clustered federated learning (CFL) algorithm. It groups clients by
 **concept** (the class-conditional distribution P(X | Y)), not by label distribution or
@@ -121,24 +121,24 @@ against 35.7% for FedAvg, 51.9% for CFL, 67.3% for IFCA and 74.5% for FL+HC.
 
 ### Beyond accuracy
 
-* **Transparency.** For label-swap groups, the divergent classes the server reports are
+* Transparency. For label-swap groups, the divergent classes the server reports are
   *exactly* the swapped classes in 100% of cluster pairs, and the diagnosis ("class-specific
   concept shift") is always correct. For rotations, precision is 1.00 and recall 0.93; all
   misses are 0° vs. 180° pairs on items that are nearly invariant under 180° rotation.
-* **Accountability.** 93–97% of clients receive a *confident* assignment certificate; these
+* Accountability. 93–97% of clients receive a *confident* assignment certificate; these
   are 100% conflict-free on rotation and swap, and 91.9% (vs. 77.8% for *uncertain*
   certificates) in the hardest mixed scenario. Newcomers are assigned correctly in 96–100% of
   cases, and 100% of newcomers with an unseen concept are flagged as *novel*.
-* **Fairness.** Minority groups of 1, 2, 3 and 5 clients are recovered with recall and purity
+* Fairness. Minority groups of 1, 2, 3 and 5 clients are recovered with recall and purity
   1.00 and no conflicting merges. FL+HC merges 81% of the conflicting pairs, and PACFL misses
   the minority entirely.
-* **Privacy.** With (ε, δ = 1e-5)-DP signatures, the raw cosine collapses to ARI ≈ 0 at every
+* Privacy. With (ε, δ = 1e-5)-DP signatures, the raw cosine collapses to ARI ≈ 0 at every
   noise level, while DisCo-CFL degrades gracefully: with 1,500 samples per client, ARI is
   0.92 (rotation) and 0.77 (swap) at ε = 4.4, and 0.68 / 0.60 at ε = 2.
-* **Calibration.** The same-group similarity is 0.98–0.99 for every client size from 50 to
+* Calibration. The same-group similarity is 0.98–0.99 for every client size from 50 to
   800 samples, and τ ∈ [0.75, 0.85] works in all concept-shift scenarios. λ has almost no
   effect between 0.02 and 1.
-* **Cost.** One upload of about 1.2·10⁴ floats per client, independent of the model size;
+* Cost. One upload of about 1.2·10⁴ floats per client, independent of the model size;
   0.15 s per client to compute; 2.3 s of server time for 320 clients.
 
 ![theory](results/figures/theory_recovery.png)

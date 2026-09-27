@@ -1,0 +1,8 @@
+\subsection{Other datasets}
+Table~\ref{tab:other} repeats the two basic concept-shift scenarios on MNIST and CIFAR-10 with the same hyperparameters. On MNIST, DisCo-CFL again matches the Oracle: 98.5\% (rotation) and 98.7\% (label swap), with no conflicting merges. Its concept accuracy is 97--98\%, against at most 91.6\% for any baseline. In the MNIST rotation scenario one seed returns an extra cluster (ARI $0.97$), a split of one group into two conflict-free parts, which does not change accuracy.
+
+\begin{table}[t]
+\centering
+\caption{MNIST and CIFAR-10 (40 clients, 3 seeds, same settings and columns as Table~\ref{tab:main}).}\label{tab:other}
+\input{table_other_datasets.tex}
+\end{table}
