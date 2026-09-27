@@ -90,8 +90,12 @@ def job_tau(args):
     for dis in (True, False):
         for tau in np.round(np.arange(0.5, 0.96, 0.05), 2):
             r = disco_cluster(sigs, tau=float(tau), disattenuate=dis)
-            rows.append(dict(scenario=scen, seed=seed, tau=float(tau), disattenuate=dis,
+            rows.append(dict(scenario=scen, seed=seed, tau=float(tau), disattenuate=dis, lam=0.5,
                              **cluster_scores(fed, r.labels)))
+    for lam in (0.02, 0.1, 0.2, 1.0):
+        r = disco_cluster(sigs, tau=0.8, lam=lam)
+        rows.append(dict(scenario=scen, seed=seed, tau=0.8, disattenuate=True, lam=lam,
+                         **cluster_scores(fed, r.labels)))
     return rows
 
 
@@ -101,7 +105,7 @@ def job_dp(args):
     from run import SCENARIOS
     from discocfl.disco import disco_cluster, gaussian_dp_epsilon
     fed, tr, w = prepare(base(**dict(SCENARIOS[scen], mean_size=size)), seed)
-    sigs = signatures(fed, tr, w, seed, dp_sigma=sigma, dp_clip=1.0,
+    sigs = signatures(fed, tr, w, seed, dp_sigma=sigma, dp_clip=0.5,
                       max_per_class=10 ** 6)
     rows = []
     for dis in (True, False):

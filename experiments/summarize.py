@@ -184,7 +184,8 @@ def figures():
                 # label scenario: ARI undefined (single group), plot 1-compatible split rate
                 y = []
                 for t in taus:
-                    rr = [r for r in rows if r["scenario"] == s and r["disattenuate"] == dis and r["tau"] == t]
+                    rr = [r for r in rows if r["scenario"] == s and r["disattenuate"] == dis and r["tau"] == t
+                          and r.get("lam", 0.5) == 0.5]
                     y.append(np.mean([(1.0 if r["k"] == 1 else 0.0) if s == "label" else r["ari"] for r in rr]))
                 ax.plot(taus, y, "-o", color=col, lw=2, ms=3, label=SCEN_NAMES[s])
             ax.axvline(0.8, color=INK2, lw=0.8, ls="--")

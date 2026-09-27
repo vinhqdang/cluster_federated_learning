@@ -51,7 +51,8 @@ SUITES = {
     "cifar": dict(scenarios=["cifar_rot"], methods=METHODS, seeds=[0, 1, 2]),
     # ablations of the DisCo components
     "ablation": dict(scenarios=["rot", "swap", "rot_qs", "mixed_qs", "label"],
-                     methods=["DisCo-noDisatt", "DisCo-noClass", "DisCo-mean", "DisCo-linkorder"],
+                     methods=["DisCo-noDisatt", "DisCo-noClass", "DisCo-mean", "DisCo-linkorder",
+                              "DisCo-noClip"],
                      seeds=[0, 1, 2]),
 }
 
@@ -60,6 +61,7 @@ VARIANTS = {
     "DisCo-noClass": dict(class_conditional=False),
     "DisCo-mean": dict(linkage="mean"),
     "DisCo-linkorder": dict(order="link"),
+    "DisCo-noClip": dict(clip=0.0),
 }
 
 

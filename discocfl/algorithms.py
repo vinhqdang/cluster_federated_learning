@@ -56,7 +56,8 @@ def run_disco(fed, tr, cfg, return_details=False):
     w_ref = _fedavg_rounds(tr, fed, tr.get(), cfg["warmup"])
     scfg = SignatureConfig(sketch_dim=cfg.get("sketch_dim", 1024),
                            class_conditional=cfg.get("class_conditional", True),
-                           dp_sigma=cfg.get("dp_sigma", 0.0), dp_clip=cfg.get("dp_clip", 1.0),
+                           clip=cfg.get("clip", 0.5),
+                           dp_sigma=cfg.get("dp_sigma", 0.0), dp_clip=cfg.get("dp_clip", 0.5),
                            seed=cfg["seed"])
     sketch = CountSketch(tr.dim, scfg.sketch_dim, seed=cfg["seed"])
     rng = np.random.default_rng(cfg["seed"] + 7)

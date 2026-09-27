@@ -64,8 +64,9 @@ class SignatureConfig:
     min_per_class: int = 4          # classes with fewer samples are not reported
     max_per_class: int = 200        # subsample large classes (compute budget)
     class_conditional: bool = True  # ablation: False = one signature over all data
+    clip: float = 0.5               # per-sample clipping norm in sketch space (0 = none)
     dp_sigma: float = 0.0           # Gaussian noise multiplier (0 = no DP)
-    dp_clip: float = 1.0            # per-sample clipping norm in sketch space
+    dp_clip: float = 0.5            # per-sample clipping norm used with DP
     seed: int = 0
 
 
@@ -104,6 +105,11 @@ def client_signature(trainer, ref_vec, client, sketch, cfg: SignatureConfig, rng
         vecs = []
         for part in halves:
             g = _per_sample_sketched_grads(model, params, client.x[part], client.y[part], sketch)
+            if cfg.clip > 0 and cfg.dp_sigma <= 0:
+                # bounded per-sample signatures: robust to heavy-tailed gradients;
+                # the expected clipped gradient is still a functional of P(X|Y=c)
+                norms = g.norm(dim=1, keepdim=True).clamp_min(1e-12)
+                g = g * torch.clamp(cfg.clip / norms, max=1.0)
             if cfg.dp_sigma > 0:
                 norms = g.norm(dim=1, keepdim=True).clamp_min(1e-12)
                 g = g * torch.clamp(cfg.dp_clip / norms, max=1.0)
