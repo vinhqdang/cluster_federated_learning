@@ -19,7 +19,9 @@ C1, C2, C3, C4, C5, C6, C7, C8 = ("#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#
                                   "#008300", "#4a3aa7", "#e34948")
 INK, INK2, GRID = "#0b0b0b", "#52514e", "#e4e3df"
 
-METHOD_ORDER = ["FedAvg", "Local", "IFCA", "MTCFL", "FL+HC", "PACFL", "DisCo", "DisCo-T30", "Oracle"]
+METHOD_ORDER = ["FedAvg", "Local", "FedAvg-FT", "IFCA", "FeSEM", "MTCFL", "FL+HC", "PACFL", "DisCo", "DisCo-T30",
+                "Oracle"]
+ABLATION_ORDER = ["DisCo", "DisCo-noDisatt", "DisCo-noClass", "DisCo-mean", "DisCo-linkorder", "DisCo-noClip"]
 SCEN_NAMES = {"rot": "Rotation", "swap": "Label swap", "rot_qs": "Rotation + QS",
               "mixed_qs": "Mixed + QS", "label": "Label skew only", "minority": "Minority groups",
               "mnist_rot": "MNIST rotation", "mnist_swap": "MNIST label swap",
@@ -42,7 +44,9 @@ def fmt(m, s, pct=True, d=1):
     return f"{m:.2f}±{s:.2f}"
 
 
-def main_tables(rows, scenarios, name):
+def main_tables(rows, scenarios, name, methods_allowed=None):
+    if methods_allowed is not None:
+        rows = [r for r in rows if r["method"] in methods_allowed]
     by = defaultdict(list)
     for r in rows:
         by[(r["scenario"], r["method"])].append(r)
@@ -222,6 +226,9 @@ def figures():
                 ax.plot(sizes, y, "-o", color=col, lw=2, ms=4, label=f"same-group sim ({lab})")
                 ax.plot(sizes, a, "--s", color=col, lw=1.5, ms=4, label=f"ARI ({lab})")
             ax.set_xscale("log")
+            ax.set_xticks(sizes)
+            ax.set_xticklabels([str(n) for n in sizes])
+            ax.minorticks_off()
             ax.set_xlabel("samples per client")
             ax.set_title(SCEN_NAMES["rot" if g == "rotation" else "swap"], color=INK)
             _style(ax)
@@ -342,8 +349,13 @@ def study_tables():
 
 if __name__ == "__main__":
     rows = load_raw()
-    print(main_tables(rows, ["rot", "swap", "rot_qs", "mixed_qs", "label", "minority"], "main"))
-    print(main_tables(rows, ["mnist_rot", "mnist_swap", "cifar_rot"], "other_datasets"))
+    base = [m for m in METHOD_ORDER if m != "DisCo-T30"]
+    print(main_tables(rows, ["rot", "swap", "rot_qs", "mixed_qs", "label", "minority"], "main", base))
+    print(main_tables(rows, ["mnist_rot", "mnist_swap", "svhn_rot", "svhn_swap", "cifar_rot", "cifar_swap"],
+                      "other_datasets", METHOD_ORDER))
+    print(main_tables(rows, ["angle15", "angle30", "angle45", "rot"], "strength", METHOD_ORDER))
+    print(main_tables(rows, ["perm2", "swap", "perm8"], "groups", METHOD_ORDER))
+    print(main_tables(rows, ["rot_part30", "swap_part30", "rot_n200"], "participation", METHOD_ORDER))
     abl = [r for r in rows if r["method"].startswith("DisCo")]
     print(main_tables(abl, ["rot", "swap", "rot_qs", "mixed_qs", "label"], "ablation"))
     print(study_tables())

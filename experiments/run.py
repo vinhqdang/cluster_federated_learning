@@ -38,17 +38,48 @@ SCENARIOS = {
     "mnist_rot": dict(dataset="mnist", groups="rotation"),
     "mnist_swap": dict(dataset="mnist", groups="swap"),
     "cifar_rot": dict(dataset="cifar10", groups="rotation", mean_size=500),
+    "cifar_swap": dict(dataset="cifar10", groups="swap", mean_size=500),
+    "svhn_rot": dict(dataset="svhn", groups="rotation", mean_size=500),
+    "svhn_swap": dict(dataset="svhn", groups="swap", mean_size=500),
+    # heterogeneity strength: 4 groups rotated by 0, a, 2a, 3a degrees
+    "angle15": dict(groups="angle15"),
+    "angle30": dict(groups="angle30"),
+    "angle45": dict(groups="angle45"),
+    # number of concept groups (label permutations)
+    "perm2": dict(groups="perm2", clients_per_group=20),
+    "perm8": dict(groups="perm8", clients_per_group=5),
+    # partial participation: 30% of the clients per round
+    "rot_part30": dict(groups="rotation", _train=dict(participation=0.3)),
+    "swap_part30": dict(groups="swap", _train=dict(participation=0.3)),
+    # more clients
+    "rot_n200": dict(groups="rotation", clients_per_group=50, mean_size=200),
 }
 
 TRAIN = dict(rounds=50, warmup=10, lr=0.05, batch_size=32, local_epochs=1)
 
 METHODS = ["FedAvg", "Local", "IFCA", "MTCFL", "FL+HC", "PACFL", "DisCo", "Oracle"]
+NEW_BASELINES = ["FeSEM", "FedAvg-FT"]
+ALL = METHODS + NEW_BASELINES
+SWEEP = ["FedAvg", "IFCA", "FL+HC", "PACFL", "FeSEM", "DisCo", "Oracle"]
 
 SUITES = {
     "main": dict(scenarios=["rot", "swap", "rot_qs", "mixed_qs", "label", "minority"],
                  methods=METHODS, seeds=[0, 1, 2]),
     "mnist": dict(scenarios=["mnist_rot", "mnist_swap"], methods=METHODS, seeds=[0, 1, 2]),
     "cifar": dict(scenarios=["cifar_rot"], methods=METHODS, seeds=[0, 1, 2]),
+    # second round of experiments
+    "color": dict(scenarios=["svhn_rot", "svhn_swap", "cifar_swap"], methods=ALL + ["DisCo-T30"],
+                  seeds=[0, 1, 2]),
+    "newbase": dict(scenarios=["rot", "swap", "rot_qs", "mixed_qs", "label", "minority",
+                               "mnist_rot", "mnist_swap", "cifar_rot"],
+                    methods=NEW_BASELINES, seeds=[0, 1, 2]),
+    "strength": dict(scenarios=["angle15", "angle30", "angle45"], methods=SWEEP, seeds=[0, 1, 2]),
+    "groups": dict(scenarios=["perm2", "perm8"], methods=SWEEP, seeds=[0, 1, 2]),
+    "participation": dict(scenarios=["rot_part30", "swap_part30"],
+                          methods=["FedAvg", "IFCA", "MTCFL", "FL+HC", "PACFL", "FeSEM", "DisCo", "Oracle"],
+                          seeds=[0, 1, 2]),
+    "scale": dict(scenarios=["rot_n200"], methods=["FedAvg", "FL+HC", "PACFL", "FeSEM", "DisCo", "Oracle"],
+                  seeds=[0, 1, 2]),
     # ablations of the DisCo components
     "ablation": dict(scenarios=["rot", "swap", "rot_qs", "mixed_qs", "label"],
                      methods=["DisCo-noDisatt", "DisCo-noClass", "DisCo-mean", "DisCo-linkorder",
@@ -62,6 +93,7 @@ VARIANTS = {
     "DisCo-mean": dict(linkage="mean"),
     "DisCo-linkorder": dict(order="link"),
     "DisCo-noClip": dict(clip=0.0),
+    "DisCo-T30": dict(warmup=30),
 }
 
 
@@ -75,7 +107,7 @@ def conflict_matrix(fed, min_count=4):
     for c in fed.clients:
         g = fed.groups[c.group]
         perm = np.arange(C) if g.perm is None else np.array(g.perm)
-        inv.append((g.rotation % 4, np.argsort(perm)))
+        inv.append((g.key(), np.argsort(perm)))
     M = np.zeros((n, n), bool)
     for i in range(n):
         for j in range(i + 1, n):
@@ -138,11 +170,14 @@ def run_one(job):
     if os.path.exists(path):
         return path
     fcfg = dict(BASE, **SCENARIOS[scen])
+    train_extra = fcfg.pop("_train", {})
     fed = make_federation(seed=seed, **fcfg)
     K_true = len(fed.groups)
     tr = Trainer(fed, lr=TRAIN["lr"], batch_size=TRAIN["batch_size"],
                  local_epochs=TRAIN["local_epochs"], seed=seed)
     cfg = dict(TRAIN, seed=seed, K=K_true)
+    cfg.update(train_extra)
+    tr.participation = cfg.get("participation", 1.0)
     base_method = method
     if method in VARIANTS:
         cfg.update(VARIANTS[method])
@@ -188,7 +223,7 @@ if __name__ == "__main__":
         keep = set(a.methods.split(","))
         jobs = [j for j in jobs if j[1] in keep]
     # longest jobs first
-    order = {"IFCA": 0, "MTCFL": 1, "Local": 2}
+    order = {"IFCA": 0, "FeSEM": 1, "MTCFL": 1, "Local": 2}
     jobs.sort(key=lambda j: order.get(j[1], 5))
     with Pool(a.workers) as p:
         for _ in p.imap_unordered(run_one, jobs):

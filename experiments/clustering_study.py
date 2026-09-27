@@ -184,7 +184,7 @@ def job_explain(args):
         A, B = fed.groups[ga], fed.groups[gb]
         pa = np.arange(C) if A.perm is None else np.array(A.perm)
         pb = np.arange(C) if B.perm is None else np.array(B.perm)
-        if A.rotation % 4 != B.rotation % 4:
+        if A.key() != B.key():
             truth, kind = set(range(C)), "global"
         else:
             truth, kind = set(np.where(np.argsort(pa) != np.argsort(pb))[0].tolist()), "class-specific"

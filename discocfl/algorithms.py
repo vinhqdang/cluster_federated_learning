@@ -12,7 +12,7 @@ import torch
 from sklearn.cluster import AgglomerativeClustering
 
 from .disco import CountSketch, SignatureConfig, client_signature, disco_cluster
-from .fl import Trainer, cluster_fedavg_round, weighted_average
+from .fl import Trainer, cluster_fedavg_round, participating, weighted_average
 
 
 def _fedavg_rounds(tr, fed, w, rounds):
@@ -128,8 +128,9 @@ def run_mtcfl(fed, tr, cfg):
     next_id = 1
     for r in range(cfg["rounds"]):
         new_models = dict(models)
+        part = {c.cid for c in participating(tr, fed)}
         for k in list(models):
-            members = [c for c in fed.clients if assign[c.cid] == k]
+            members = [c for c in fed.clients if assign[c.cid] == k and c.cid in part]
             if not members:
                 continue
             ws = [tr.local_train(models[k], c.x, c.y) for c in members]
@@ -179,12 +180,49 @@ def run_pacfl(fed, tr, cfg):
     return {"assign": assign, "models": models, "cluster_floats": n * p * Us[0].shape[0]}
 
 
+def run_fedavg_ft(fed, tr, cfg):
+    """FedAvg followed by local fine-tuning (a standard personalisation
+    baseline): the global model is trained for all rounds, then every client
+    fine-tunes it for `ft_epochs` local epochs."""
+    w = _fedavg_rounds(tr, fed, tr.get(), cfg["rounds"])
+    models = {c.cid: tr.local_train(w, c.x, c.y, epochs=cfg.get("ft_epochs", 1)) for c in fed.clients}
+    return {"assign": np.arange(len(fed.clients)), "models": models, "cluster_floats": 0}
+
+
+def run_fesem(fed, tr, cfg):
+    """FeSEM / multi-center FL (Long et al. 2023): K centres in parameter space;
+    each round every participating client trains from its centre, is re-assigned
+    to the nearest centre (L2) and the centres are re-estimated (K given)."""
+    K = cfg["K"]
+    rng = np.random.default_rng(cfg["seed"] + 5)
+    w0 = tr.get()
+    # initial centres: locally trained models of K random clients
+    init = rng.choice(len(fed.clients), K, replace=False)
+    centres = {k: tr.local_train(w0, fed.clients[i].x, fed.clients[i].y) for k, i in enumerate(init)}
+    assign = np.zeros(len(fed.clients), int)
+    for c in fed.clients:
+        assign[c.cid] = int(np.argmin([torch.norm(w0 - centres[k]).item() for k in range(K)]))
+    for _ in range(cfg["rounds"]):
+        local = {}
+        for c in participating(tr, fed):
+            wi = tr.local_train(centres[int(assign[c.cid])], c.x, c.y)
+            assign[c.cid] = int(np.argmin([torch.norm(wi - centres[k]).item() for k in range(K)]))
+            local[c.cid] = (wi, c.n)
+        for k in range(K):
+            mem = [local[i] for i in local if assign[i] == k]
+            if mem:
+                centres[k] = weighted_average([v for v, _ in mem], [n for _, n in mem])
+    return {"assign": assign.copy(), "models": centres, "cluster_floats": 0}
+
+
 ALGORITHMS = {
     "FedAvg": run_fedavg,
     "Local": run_local,
     "IFCA": run_ifca,
     "MTCFL": run_mtcfl,
     "FL+HC": run_flhc,
+    "FeSEM": run_fesem,
+    "FedAvg-FT": run_fedavg_ft,
     "PACFL": run_pacfl,
     "DisCo": run_disco,
     "Oracle": run_oracle,

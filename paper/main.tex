@@ -14,6 +14,9 @@
 \usepackage{enumitem}
 \usepackage{subcaption}
 \usepackage{multirow}
+\usepackage{placeins}
+\usepackage{microtype}
+\emergencystretch=1.5em
 \hypersetup{colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black}
 
 \newtheorem{theorem}{Theorem}
@@ -61,16 +64,13 @@ Federated learning (FL) trains a model across clients that keep their data local
 
 \paragraph{Contributions.}
 \begin{itemize}[leftmargin=*,itemsep=1pt]
-\item \textbf{Algorithm.} DisCo-CFL, a one-shot server-side CFL algorithm based on sketched class-conditional gradient signatures, split-half disattenuation, and threshold clustering with a class-wise \emph{bottleneck} linkage and evidence-ordered merging. $K$ is determined by one threshold on a calibrated scale (Section~\ref{sec:method}).
-\item \textbf{Theory} (Section~\ref{sec:theory}): exact invariance; a concentration bound; safety, maximality and exact recovery with a size-independent sample complexity; a minimax lower bound; differential privacy with an explicit utility cost; and explanation fidelity.
+\item \textbf{Algorithm.} DisCo-CFL is a one-shot, server-side CFL algorithm. It uses sketched class-conditional gradient signatures, split-half disattenuation, and threshold clustering with a class-wise \emph{bottleneck} linkage and evidence-ordered merging. $K$ is determined by one threshold on a calibrated scale (Section~\ref{sec:method}).
+\item \textbf{Theory} (Section~\ref{sec:theory}): exact invariance; a concentration bound; safety, maximality and exact recovery with a size-independent sample complexity; a minimax lower bound; differential privacy with an explicit utility cost; explanation fidelity; and Bayes optimality of prior-corrected cluster models. The deterministic core of every proof (25 theorems) is machine-checked in Lean~4 with Mathlib (Appendix~\ref{app:lean}).
 \item \textbf{Properties beyond accuracy} (Section~\ref{sec:fat}), which we organise along fairness, accountability, transparency and privacy: minority-group protection, per-client assignment certificates, an audit log, anomaly flags, class-level explanations and an automatic heterogeneity diagnosis.
 \item \textbf{Evaluation} (Section~\ref{sec:exp}) under concept shift on features and targets, label skew, quantity skew, imbalanced groups, newcomers and DP noise, with clustering-quality, fairness, explainability and certificate-calibration metrics in addition to accuracy.
 \end{itemize}
 
-\section{Related work}
-\paragraph{Clustered FL.} Server-side methods cluster model updates, e.g.\ CFL/MTCFL (recursive cosine bipartitioning,~\citealp{sattler2021cfl}), FL+HC (one-shot hierarchical clustering after warm-up,~\citealp{briggs2020flhc}) and FeSEM~\citep{long2023fesem}. Client-side methods let each client pick the model with the lowest loss, e.g.\ IFCA~\citep{ghosh2020ifca}, or weight several models, e.g.\ FedEM~\citep{marfoq2021fedem} and FedRC~\citep{guo2024fedrc}. Metadata-based methods share data statistics; PACFL~\citep{vahidian2023pacfl}, for instance, shares principal subspaces of the raw data. See~\citet{benali2026survey} for a complete taxonomy. Two recent works also compare clients class by class: FedDAG~\citep{pramanik2026feddag} combines gradient similarity with class-wise principal angles between data subspaces, and FedCCFA~\citep{chen2024fedccfa} clusters class-specific classifier vectors under concept drift. DisCo-CFL differs in three ways. (a) It uses neither data subspaces nor classifier weights: it uses sketched class-conditional expected gradients at a frozen reference model. (b) It corrects the noise-induced attenuation of similarities, which is what makes the scale calibrated across sample sizes and privacy levels. (c) It comes with recovery guarantees, a matching lower bound, and accountability and transparency outputs.
-
-\paragraph{Fairness, accountability and transparency in FL.} Fairness in FL usually concerns the distribution of accuracy across clients~\citep{li2020qffl,mohri2019afl}. In CFL a more basic unfairness arises before training: a small group can be absorbed into a larger one, or a small client can be isolated because its statistics are noisy. We address both at the level of the clustering decision, with a guarantee. Transparency and accountability of \emph{who is grouped with whom, and why}~\citep{doshivelez2017interpretable,barocas2023fairness} have, to our knowledge, not been treated in CFL.
+\input{related.tex}
 
 \section{Problem setting}\label{sec:setting}
 There are $N$ clients. Client $i$ holds $D_i=\{(x_{s},y_{s})\}_{s=1}^{n_i}$ with labels in $[C]$ drawn from $\cP_i(X,Y)=\cP_i(Y)\,\cP_i(X\mid Y)$. Let $S_i=\{c: n_i^c\ge m\}$ be the classes the client holds with at least $m$ samples.
@@ -135,7 +135,7 @@ where $f_k$ are the logits of the cluster model, $\hat p_i$ is the client's own 
 \end{itemize}
 
 \section{Theory}\label{sec:theory}
-Proofs are in Appendix~\ref{app:proofs}. Write $\mu_i^c=\E_{x\sim\cP_i(X\mid Y=c)}[g(x,c)]$ and $a_i^c=\|\mu_i^c\|^2$.
+Proofs are in Appendix~\ref{app:proofs}; their deterministic parts are formalised in Lean~4 (Appendix~\ref{app:lean}). Write $\mu_i^c=\E_{x\sim\cP_i(X\mid Y=c)}[g(x,c)]$ and $a_i^c=\|\mu_i^c\|^2$.
 
 \begin{proposition}[Invariance]\label{prop:inv}
 $\mu_i^c$ is a functional of $\cP_i(X\mid Y=c)$ only. Consequently, for compatible clients $\rho^c_{ij}=1$ on every shared class, whatever their label proportions $\cP_i(Y),\cP_j(Y)$ and sample sizes $n_i,n_j$.
@@ -154,13 +154,23 @@ Replacing each inner product and squared norm in~\eqref{eq:rel}--\eqref{eq:disat
 \end{lemma}
 
 \begin{theorem}[Concentration]\label{thm:conc}
-Under Assumption~\ref{ass:noise}, with $\kappa\le1$, there are constants $c_0,C_1$ depending only on $K_0$ such that for $\delta\in(0,1)$, if $\eta:=\big(\sqrt{\kappa/r_s}+\kappa/\sqrt{r_e}\big)\sqrt{\log(12/\delta)}\le c_0$, then with probability at least $1-\delta$
-\[ |\rhohat_{ij}^c-\rho_{ij}^c|\le C_1\,\eta,\qquad |R_i^c-R_i^{c,\star}|\le C_1\eta, \]
-where $R_i^{c,\star}=a_i^c/(a_i^c+\sigma^2/(2h_i^c))$. In contrast, the raw cosine $\cos(m_i^c,m_j^c)$ converges to $\rho^c_{ij}\sqrt{R_i^{c,\star}R_j^{c,\star}}$, which is biased towards $0$ by a factor that depends on the sample sizes.
+Under Assumption~\ref{ass:noise}, let $\kappa\le1$ and $\delta\in(0,1)$. There are constants $c_0,C_1$ depending only on $K_0$ such that, if
+\[
+\eta:=\Big(\sqrt{\kappa/r_s}+\kappa/\sqrt{r_e}\Big)\sqrt{\log(12/\delta)}\;\le\; c_0,
+\]
+then with probability at least $1-\delta$
+\[
+|\rhohat_{ij}^c-\rho_{ij}^c|\le C_1\,\eta,
+\qquad
+|R_i^c-R_i^{c,\star}|\le C_1\eta,
+\qquad
+R_i^{c,\star}:=\frac{a_i^c}{a_i^c+\sigma^2/(2h_i^c)}.
+\]
+In contrast, the raw cosine $\cos(m_i^c,m_j^c)$ converges to $\rho^c_{ij}\sqrt{R_i^{c,\star}R_j^{c,\star}}$. It is biased towards $0$ by a factor that depends on the sample sizes.
 \end{theorem}
 
 \begin{theorem}[Safety, maximality, recovery]\label{thm:rec}
-Let $\gamma=\min(1-\tau,\ \tau-1+\Delta)>0$. Suppose all estimates satisfy $|\rhohat^c_{ij}-\rho^c_{ij}|\le\gamma/2$ (event $\mathcal E$), and every conflicting pair on class $c$ has evidence $W^c_{ij}>w_0:=2\lambda(1-\tau)/\gamma$. Then the merging phase of Algorithm~\ref{alg:disco}, in any merge order, satisfies:
+Let $\gamma=\min(1-\tau,\ \tau-1+\Delta)>0$ and $w_0:=2\lambda(1-\tau)/\gamma$. Suppose that all estimates satisfy $|\rhohat^c_{ij}-\rho^c_{ij}|\le\gamma/2$ (event $\mathcal E$) and that every pair conflicting on a class $c$ has evidence $W^c_{ij}>w_0$. Then the merging phase of Algorithm~\ref{alg:disco}, in any merge order, satisfies:
 \begin{enumerate}[label=(\alph*),itemsep=0pt]
 \item \emph{Safety:} no cluster ever contains two conflicting clients.
 \item \emph{Maximality:} any two output clusters with shared evidence $\ge e_{\min}$ contain a conflicting pair, so no two output clusters can be merged without mixing concepts.
@@ -171,22 +181,47 @@ Let $\gamma=\min(1-\tau,\ \tau-1+\Delta)>0$. Suppose all estimates satisfy $|\rh
 \begin{corollary}[Sample complexity and minority fairness]\label{cor:sc}
 Under Assumptions~\ref{ass:noise}--\ref{ass:sep}, let $\gamma\le1/3$ and $\lambda<\gamma/(8(1-\tau))$. The conclusions of Theorem~\ref{thm:rec} hold with probability at least $1-\delta$ as soon as every reported half size satisfies
 \begin{equation}\label{eq:hstar}
-h\;\ge\;h^\star:=C_2\,\frac{\sigma^2}{a}\max\Big\{\frac{\log(12N^2C/\delta)}{r_s\,\gamma^2},\ \frac{\sqrt{\log(12N^2C/\delta)}}{\sqrt{r_e}\,\gamma},\ 1\Big\}.
+h\;\ge\;h^\star:=C_2\,\frac{\sigma^2}{a}\,
+\max\Big\{\frac{\mathsf L}{r_s\,\gamma^2},\ \frac{\sqrt{\mathsf L}}{\sqrt{r_e}\,\gamma},\ 1\Big\},
+\qquad \mathsf L:=\log\frac{12N^2C}{\delta}.
 \end{equation}
 $h^\star$ does not depend on the sizes of the groups $|G_k|$, on the number of clients per group, or on the other clients' dataset sizes (apart from $\log N$). A concept group made of a \emph{single} client is recovered under the same condition as a group of a hundred.
 \end{corollary}
 
 \begin{theorem}[Minimax lower bound]\label{thm:lb}
-Let $\xi\sim\mathcal N(0,\Sigma)$ and $\|\mu\|^2=a$. For any test that decides from $n$ per-sample signatures of client $j$, even when $\mu_i$ is known exactly, whether $\rho_{ij}=1$ or $\rho_{ij}=1-\Delta$, the worst-case error probability is at least $\tfrac14\exp(-n\,a\,\Delta\,r_s/\sigma^2)$. Error at most $\delta$ therefore requires $n\ge \frac{\sigma^2}{a\,r_s\,\Delta}\log\frac1{4\delta}$.
+Let $\xi\sim\mathcal N(0,\Sigma)$ and $\|\mu\|^2=a$. For any test that decides from $n$ per-sample signatures of client $j$, even when $\mu_i$ is known exactly, whether $\rho_{ij}=1$ or $\rho_{ij}=1-\Delta$, the worst-case error probability is at least
+\[
+\tfrac14\exp\!\big(-n\,a\,\Delta\,r_s/\sigma^2\big).
+\]
+Error at most $\delta$ therefore requires
+\[
+n\;\ge\;\frac{\sigma^2}{a\,r_s\,\Delta}\,\log\frac1{4\delta}.
+\]
 \end{theorem}
-With $\tau$ in the middle of the admissible interval ($\gamma=\Delta/2$), the leading term of~\eqref{eq:hstar} is $O\big(\sigma^2\log(N^2C/\delta)/(a\,r_s\,\Delta^2)\big)$. The upper and lower bounds therefore agree in their dependence on noise $\sigma^2$, signal $a$ and effective rank $r_s$, and differ by a factor $1/\Delta$ and a $\log N$ term.
+With $\tau$ in the middle of the admissible interval ($\gamma=\Delta/2$), the leading term of~\eqref{eq:hstar} is
+\[
+O\!\left(\frac{\sigma^2\log(N^2C/\delta)}{a\,r_s\,\Delta^2}\right).
+\]
+The upper and lower bounds therefore agree in their dependence on noise $\sigma^2$, signal $a$ and effective rank $r_s$, and differ by a factor $1/\Delta$ and a $\log N$ term.
 
 \begin{proposition}[Differential privacy and its cost]\label{prop:dp}
-Suppose each released half-mean is $\frac1h\sum_{s}\operatorname{clip}_{C_{\rm clip}}(g_s)+\mathcal N\big(0,(2\sigma_{\rm dp}C_{\rm clip}/h)^2I_p\big)$.
+Suppose each released half-mean is
+\[
+\frac1h\sum_{s}\operatorname{clip}_{C_{\rm clip}}(g_s)+\xi_{\rm dp},
+\qquad
+\xi_{\rm dp}\sim\mathcal N\!\big(0,(2\sigma_{\rm dp}C_{\rm clip}/h)^2I_p\big).
+\]
 (i) Every sample enters exactly one released vector, whose replace-one sensitivity is $2C_{\rm clip}/h$. The signature is therefore $(\varepsilon,\delta)$-DP with respect to replacing one record by another of the same label, with $(\varepsilon,\delta)$ given by the analytic Gaussian mechanism~\citep{balle2018analytic} at noise multiplier $\sigma_{\rm dp}$ (parallel composition). The class support $S_i$ is released in the clear.
 (ii) The DP noise is independent of sampling noise. Lemma~\ref{lem:pop} therefore still holds, and Theorem~\ref{thm:conc} applies with the half-mean covariance $\Sigma/h+(2\sigma_{\rm dp}C_{\rm clip}/h)^2I_p$. The recovery guarantee then requires, in addition to~\eqref{eq:hstar},
-$h\gtrsim\sigma_{\rm dp}C_{\rm clip}\big(\sqrt{\log(N^2C/\delta)}/(\sqrt a\,\gamma)+p^{1/4}\log^{1/4}(N^2C/\delta)/\sqrt{a\gamma}\big)$, i.e.\ the per-class sample size grows linearly in $\sigma_{\rm dp}\propto1/\varepsilon$.
-(iii) Without disattenuation, the raw cosine tends to $\rho\,\sqrt{R_iR_j}$ with $R\approx a/(a+2p\sigma^2_{\rm dp}C_{\rm clip}^2/h^2)$. Unless $h\gg\sqrt p\,\sigma_{\rm dp}C_{\rm clip}/\sqrt a$, same-concept clients look unrelated.
+\[
+h\;\gtrsim\;\sigma_{\rm dp}C_{\rm clip}\left(\frac{\sqrt{\mathsf L}}{\sqrt a\,\gamma}+\frac{p^{1/4}\,\mathsf L^{1/4}}{\sqrt{a\gamma}}\right),
+\]
+so the per-class sample size grows linearly in $\sigma_{\rm dp}\propto1/\varepsilon$.
+(iii) Without disattenuation, the raw cosine tends to $\rho\,\sqrt{R_iR_j}$ with
+\[
+R\approx\frac{a}{a+2p\,\sigma^2_{\rm dp}C_{\rm clip}^2/h^2}.
+\]
+Unless $h\gg\sqrt p\,\sigma_{\rm dp}C_{\rm clip}/\sqrt a$, same-concept clients look unrelated.
 \end{proposition}
 
 \begin{proposition}[Explanation fidelity]\label{prop:expl}
@@ -222,6 +257,9 @@ DisCo-CFL replaces ad hoc similarity heuristics in clustered FL with a \emph{cal
 \appendix
 \section{Proofs}\label{app:proofs}
 \input{proofs.tex}
+
+\section{Lean 4 verification}\label{app:lean}
+\input{lean_appendix.tex}
 
 \section{Additional results}\label{app:figs}
 \input{appendix_figs.tex}

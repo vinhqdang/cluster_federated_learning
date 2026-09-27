@@ -25,6 +25,7 @@ _MEAN_STD = {
     "mnist": ((0.1307,), (0.3081,)),
     "fmnist": ((0.2860,), (0.3530,)),
     "cifar10": ((0.4914, 0.4822, 0.4465), (0.2470, 0.2435, 0.2616)),
+    "svhn": ((0.4377, 0.4438, 0.4728), (0.1980, 0.2010, 0.1970)),
 }
 
 
@@ -80,6 +81,20 @@ def _load_cifar10(root):
     return xtr, ytr, xte, yte
 
 
+def _load_svhn(root):
+    from scipy.io import loadmat
+
+    def part(name):
+        d = loadmat(os.path.join(root, f"svhn_{name}_32x32.mat"))
+        x = np.transpose(d["X"], (3, 2, 0, 1))
+        y = d["y"].reshape(-1).astype(np.int64) % 10   # label 10 encodes digit 0
+        return x, y
+
+    xtr, ytr = part("train")
+    xte, yte = part("test")
+    return xtr, ytr, xte, yte
+
+
 _CACHE: dict = {}
 
 
@@ -93,6 +108,8 @@ def load_dataset(name: str):
         xtr, ytr, xte, yte = _load_idx_dataset(os.path.join(DATA_ROOT, "FashionMNIST"))
     elif name == "cifar10":
         xtr, ytr, xte, yte = _load_cifar10(DATA_ROOT)
+    elif name == "svhn":
+        xtr, ytr, xte, yte = _load_svhn(DATA_ROOT)
     else:
         raise ValueError(name)
     mean, std = _MEAN_STD[name]
@@ -112,13 +129,21 @@ def load_dataset(name: str):
 class Group:
     rotation: int = 0                 # multiples of 90 degrees
     perm: list | None = None          # label permutation (None = identity)
+    angle: float = 0.0                # additional rotation in degrees (any value)
 
     def apply(self, x, y):
         if self.rotation % 4:
             x = torch.rot90(x, k=self.rotation % 4, dims=(2, 3))
+        if self.angle:
+            from torchvision.transforms.functional import rotate
+            x = rotate(x, self.angle)
         if self.perm is not None:
             y = torch.as_tensor(self.perm, dtype=torch.long)[y]
         return x, y
+
+    def key(self):
+        """Feature transformation identifier (used to define conflicts)."""
+        return (self.rotation % 4, round(float(self.angle), 6))
 
 
 @dataclass
@@ -170,6 +195,22 @@ def make_groups(kind: str, num_classes: int = 10):
         return [Group(0), Group(0, p), Group(2), Group(2, p)]
     if kind == "single":
         return [Group()]
+    if kind.startswith("angle"):          # angleXX: 4 groups rotated by 0, X, 2X, 3X degrees
+        a = float(kind[5:])
+        return [Group(angle=k * a) for k in range(4)]
+    if kind.startswith("perm"):           # permK: K groups, each swapping two random class pairs
+        K = int(kind[4:])
+        rng = np.random.default_rng(1234)
+        gs, seen = [Group()], set()
+        while len(gs) < K:
+            c = rng.permutation(num_classes)[:4]
+            pairs = [tuple(sorted(c[:2])), tuple(sorted(c[2:]))]
+            key = tuple(sorted(pairs))
+            if key in seen:
+                continue
+            seen.add(key)
+            gs.append(Group(perm=swap_perm(num_classes, [tuple(int(v) for v in pr) for pr in pairs])))
+        return gs
     raise ValueError(kind)
 
 

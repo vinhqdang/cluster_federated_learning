@@ -92,13 +92,24 @@ def weighted_average(vecs, weights):
     return (torch.stack(vecs) * w[:, None]).sum(0)
 
 
+def participating(trainer, fed):
+    """Clients taking part in this round (a random fraction when
+    trainer.participation < 1, the same sampling for every method)."""
+    frac = getattr(trainer, "participation", 1.0)
+    if frac >= 1.0:
+        return fed.clients
+    m = max(1, int(round(frac * len(fed.clients))))
+    idx = np.sort(trainer.rng.choice(len(fed.clients), m, replace=False))
+    return [fed.clients[i] for i in idx]
+
+
 def cluster_fedavg_round(trainer, fed, models, assign):
     """One synchronous round of FedAvg run independently inside each cluster.
 
     models: dict cluster_id -> parameter vector; assign: array client -> cluster.
     """
     updates = {}
-    for c in fed.clients:
+    for c in participating(trainer, fed):
         k = int(assign[c.cid])
         updates.setdefault(k, []).append((trainer.local_train(models[k], c.x, c.y), c.n))
     new = dict(models)
