@@ -1,0 +1,5092 @@
+[
+ {
+  "type": "explain",
+  "scenario": "swap",
+  "seed": 0,
+  "pair": "0-1",
+  "groups": [
+   0,
+   1
+  ],
+  "kind": "class-specific",
+  "truth": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "explain",
+  "scenario": "swap",
+  "seed": 0,
+  "pair": "0-2",
+  "groups": [
+   0,
+   2
+  ],
+  "kind": "class-specific",
+  "truth": [
+   4,
+   5,
+   6,
+   7
+  ],
+  "pred": [
+   4,
+   5,
+   6,
+   7
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "explain",
+  "scenario": "swap",
+  "seed": 0,
+  "pair": "0-3",
+  "groups": [
+   0,
+   3
+  ],
+  "kind": "class-specific",
+  "truth": [
+   1,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   1,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "explain",
+  "scenario": "swap",
+  "seed": 0,
+  "pair": "1-2",
+  "groups": [
+   1,
+   2
+  ],
+  "kind": "class-specific",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "explain",
+  "scenario": "swap",
+  "seed": 0,
+  "pair": "1-3",
+  "groups": [
+   1,
+   3
+  ],
+  "kind": "class-specific",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   3,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "explain",
+  "scenario": "swap",
+  "seed": 0,
+  "pair": "2-3",
+  "groups": [
+   2,
+   3
+  ],
+  "kind": "class-specific",
+  "truth": [
+   1,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   1,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 0,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.768081098745407
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 1,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7530104497961451
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 2,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7570453162614224
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 3,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7702278330970622
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 4,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7674443196366595
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 5,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7775302532649713
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 6,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7552785858735426
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 7,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7765263276033386
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 8,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7976262784896766
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 9,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7441486172614027
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 10,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.9949877201767323
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 11,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 1.020120063090082
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 12,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 1.0289804907782405
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 13,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 1.0179687794458994
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 14,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.9714214648702226
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 15,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 1.0500262507900031
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 16,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 1.0362119259574871
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 17,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 1.0548994245787409
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 18,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 1.0569256816690014
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 19,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 1.0673011729731814
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 20,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.9026693044364962
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 21,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8884896900603884
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 22,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8557415261711497
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 23,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.9031244502501079
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 24,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8990931423952904
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 25,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8154226021147155
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 26,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8996936015664333
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 27,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8451472116563594
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 28,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8339753239004329
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 29,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8432082076557413
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 30,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5883446344927432
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 31,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7178438343965842
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 32,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6889525861912238
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 33,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7364228247078732
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 34,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7389302424212596
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 35,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7304820054948452
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 36,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7820877232106342
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 37,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7632669207258731
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 38,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7840511694113793
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 0,
+  "client": 39,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7720359560147767
+ },
+ {
+  "type": "explain",
+  "scenario": "swap",
+  "seed": 1,
+  "pair": "0-1",
+  "groups": [
+   0,
+   1
+  ],
+  "kind": "class-specific",
+  "truth": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "explain",
+  "scenario": "swap",
+  "seed": 1,
+  "pair": "0-2",
+  "groups": [
+   0,
+   2
+  ],
+  "kind": "class-specific",
+  "truth": [
+   4,
+   5,
+   6,
+   7
+  ],
+  "pred": [
+   4,
+   5,
+   6,
+   7
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "explain",
+  "scenario": "swap",
+  "seed": 1,
+  "pair": "0-3",
+  "groups": [
+   0,
+   3
+  ],
+  "kind": "class-specific",
+  "truth": [
+   1,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   1,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "explain",
+  "scenario": "swap",
+  "seed": 1,
+  "pair": "1-2",
+  "groups": [
+   1,
+   2
+  ],
+  "kind": "class-specific",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "explain",
+  "scenario": "swap",
+  "seed": 1,
+  "pair": "1-3",
+  "groups": [
+   1,
+   3
+  ],
+  "kind": "class-specific",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   3,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "explain",
+  "scenario": "swap",
+  "seed": 1,
+  "pair": "2-3",
+  "groups": [
+   2,
+   3
+  ],
+  "kind": "class-specific",
+  "truth": [
+   1,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   1,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 0,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7648373803066724
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 1,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8260260389899349
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 2,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7749917927774943
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 3,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7236462937091637
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 4,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6028864740208055
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 5,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6757204094436462
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 6,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7762119693650881
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 7,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7962168632764131
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 8,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6666168958847264
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 9,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.79967819523365
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 10,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8056740849809559
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 11,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8546399394903138
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 12,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8390708120533885
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 13,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8701060742602081
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 14,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8986778158533101
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 15,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8547936801207772
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 16,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7747547008394297
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 17,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.9063788833140813
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 18,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8790681684568581
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 19,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.816677016345336
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 20,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8775490244678317
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 21,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8970956730304575
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 22,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8891578806768339
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 23,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8856369716242972
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 24,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.9000325036796906
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 25,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8744695135751419
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 26,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8556996972675136
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 27,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.9072469709938316
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 28,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.9093530640667303
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 29,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8982427552111638
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 30,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6479335936643823
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 31,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8219289070950185
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 32,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8458158964388387
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 33,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.805399539726088
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 34,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7615611919706677
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 35,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7525500754784358
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 36,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7746275582488802
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 37,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.806475778101553
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 38,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7697388746383279
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 1,
+  "client": 39,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7744546433510694
+ },
+ {
+  "type": "explain",
+  "scenario": "swap",
+  "seed": 2,
+  "pair": "0-1",
+  "groups": [
+   0,
+   1
+  ],
+  "kind": "class-specific",
+  "truth": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "explain",
+  "scenario": "swap",
+  "seed": 2,
+  "pair": "0-2",
+  "groups": [
+   0,
+   2
+  ],
+  "kind": "class-specific",
+  "truth": [
+   4,
+   5,
+   6,
+   7
+  ],
+  "pred": [
+   4,
+   5,
+   6,
+   7
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "explain",
+  "scenario": "swap",
+  "seed": 2,
+  "pair": "0-3",
+  "groups": [
+   0,
+   3
+  ],
+  "kind": "class-specific",
+  "truth": [
+   1,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   1,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "explain",
+  "scenario": "swap",
+  "seed": 2,
+  "pair": "1-2",
+  "groups": [
+   1,
+   2
+  ],
+  "kind": "class-specific",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "explain",
+  "scenario": "swap",
+  "seed": 2,
+  "pair": "1-3",
+  "groups": [
+   1,
+   3
+  ],
+  "kind": "class-specific",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   3,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "explain",
+  "scenario": "swap",
+  "seed": 2,
+  "pair": "2-3",
+  "groups": [
+   2,
+   3
+  ],
+  "kind": "class-specific",
+  "truth": [
+   1,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   1,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 0,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8420441936488374
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 1,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7584558377166222
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 2,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8169877240586372
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 3,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7349674860075045
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 4,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8101538535072939
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 5,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7485265567818694
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 6,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7930439351746424
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 7,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7802280733242881
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 8,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8112817002211046
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 9,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8565345339995829
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 10,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.9288115699965052
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 11,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8884445572117604
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 12,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.9055481200113111
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 13,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.9072180981360936
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 14,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8751710380909853
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 15,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.9479838670540842
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 16,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.924765109894379
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 17,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8409483430265086
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 18,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.9033713329022895
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 19,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.9167404577566842
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 20,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8449347252655701
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 21,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8751949833409742
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 22,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.9080421787516939
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 23,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.9018704900924953
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 24,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8823319128825242
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 25,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8583907092359085
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 26,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8962239765979961
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 27,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8841159860947241
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 28,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.9166843752412202
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 29,
+  "verdict": "uncertain",
+  "correct": true,
+  "margin": -0.01228004063347099
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 30,
+  "verdict": "uncertain",
+  "correct": true,
+  "margin": 0.6792552098363628
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 31,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7923493973199371
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 32,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7082595935183689
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 33,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7944475723666184
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 34,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7858228080001814
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 35,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8071504586935873
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 36,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7970562338844427
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 37,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.75624497122053
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 38,
+  "verdict": "uncertain",
+  "correct": true,
+  "margin": -0.0235082235905264
+ },
+ {
+  "type": "cert",
+  "scenario": "swap",
+  "seed": 2,
+  "client": 39,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7377243984984971
+ },
+ {
+  "type": "explain",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "pair": "0-1",
+  "groups": [
+   0,
+   1
+  ],
+  "kind": "class-specific",
+  "truth": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "explain",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "pair": "0-2",
+  "groups": [
+   0,
+   2
+  ],
+  "kind": "global",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   4,
+   5,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 0.8,
+  "exact": false,
+  "diagnosis_ok": false
+ },
+ {
+  "type": "explain",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "pair": "0-3",
+  "groups": [
+   0,
+   3
+  ],
+  "kind": "global",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 0.9,
+  "exact": false,
+  "diagnosis_ok": false
+ },
+ {
+  "type": "explain",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "pair": "1-2",
+  "groups": [
+   1,
+   2
+  ],
+  "kind": "global",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 0.9,
+  "exact": false,
+  "diagnosis_ok": false
+ },
+ {
+  "type": "explain",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "pair": "1-3",
+  "groups": [
+   1,
+   3
+  ],
+  "kind": "global",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   0,
+   1,
+   3,
+   4,
+   5,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 0.8,
+  "exact": false,
+  "diagnosis_ok": false
+ },
+ {
+  "type": "explain",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "pair": "2-3",
+  "groups": [
+   2,
+   3
+  ],
+  "kind": "class-specific",
+  "truth": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 0,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.464962044259405
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 1,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.45344473434671784
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 2,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6053605533963596
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 3,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5543514681093551
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 4,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6357357806158414
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 5,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.25263138991842116
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 6,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5380201908992246
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 7,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.4900880637263745
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 8,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5960032719680421
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 9,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5563406610813999
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 10,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5140186892737215
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 11,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.562244919698782
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 12,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.23477570007532333
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 13,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.2599846367573414
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 14,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5741677850515418
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 15,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5656672508176113
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 16,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.4428490379698178
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 17,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.3068552076745932
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 18,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.62383426534774
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 19,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5505939478834185
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 20,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.25431742750219144
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 21,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.601016228652721
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 22,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.584900904587845
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 23,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6053756765481353
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 24,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6116389839545526
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 25,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.3536902020963414
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 26,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.4241882145390078
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 27,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5547511988745422
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 28,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6154153429059919
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 29,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5363418864023478
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 30,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.2535539613768465
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 31,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5366611644888131
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 32,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5488739670002296
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 33,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.601385388057095
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 34,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.553609941451965
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 35,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.49356395432252126
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 36,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6202564503067796
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 37,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5411746392820815
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 38,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.21850196487195084
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 0,
+  "client": 39,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.571256899981463
+ },
+ {
+  "type": "explain",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "pair": "0-1",
+  "groups": [
+   3,
+   0
+  ],
+  "kind": "global",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 0.9,
+  "exact": false,
+  "diagnosis_ok": false
+ },
+ {
+  "type": "explain",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "pair": "0-2",
+  "groups": [
+   3,
+   1
+  ],
+  "kind": "global",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   0,
+   1,
+   3,
+   4,
+   5,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 0.8,
+  "exact": false,
+  "diagnosis_ok": false
+ },
+ {
+  "type": "explain",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "pair": "0-3",
+  "groups": [
+   3,
+   2
+  ],
+  "kind": "class-specific",
+  "truth": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "explain",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "pair": "1-2",
+  "groups": [
+   0,
+   1
+  ],
+  "kind": "class-specific",
+  "truth": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "explain",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "pair": "1-3",
+  "groups": [
+   0,
+   2
+  ],
+  "kind": "global",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   4,
+   5,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 0.8,
+  "exact": false,
+  "diagnosis_ok": false
+ },
+ {
+  "type": "explain",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "pair": "2-3",
+  "groups": [
+   1,
+   2
+  ],
+  "kind": "global",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 0.9,
+  "exact": false,
+  "diagnosis_ok": false
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 0,
+  "verdict": "confident",
+  "correct": false,
+  "margin": 0.6268388402428584
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 1,
+  "verdict": "confident",
+  "correct": false,
+  "margin": 0.602462579432828
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 2,
+  "verdict": "confident",
+  "correct": false,
+  "margin": 0.3234001265192322
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 3,
+  "verdict": "uncertain",
+  "correct": false,
+  "margin": 0.03300643179143781
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 4,
+  "verdict": "confident",
+  "correct": false,
+  "margin": 0.6517608943044559
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 5,
+  "verdict": "confident",
+  "correct": false,
+  "margin": 0.4217942677949711
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 6,
+  "verdict": "confident",
+  "correct": false,
+  "margin": 0.6310109543307825
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 7,
+  "verdict": "confident",
+  "correct": false,
+  "margin": 0.3810022145164098
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 8,
+  "verdict": "confident",
+  "correct": false,
+  "margin": 0.3636735769398566
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 9,
+  "verdict": "confident",
+  "correct": false,
+  "margin": 0.3313853305362724
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 10,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.39686829766584886
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 11,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6487991753372297
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 12,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.36758526622179777
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 13,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.24038135156886142
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 14,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6855651609678124
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 15,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.31874879200065465
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 16,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.40657351699953437
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 17,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.3861133387697562
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 18,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6993979307498955
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 19,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6719528991190742
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 20,
+  "verdict": "uncertain",
+  "correct": false,
+  "margin": -0.05804002357280169
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 21,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6428684729863621
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 22,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5106936671830387
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 23,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.418313579961369
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 24,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.3674812068393225
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 25,
+  "verdict": "uncertain",
+  "correct": true,
+  "margin": -0.011167453401849659
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 26,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.351300339522592
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 27,
+  "verdict": "uncertain",
+  "correct": true,
+  "margin": 0.0002444474355984827
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 28,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6531374560150196
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 29,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6344426832768463
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 30,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6680153737645268
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 31,
+  "verdict": "uncertain",
+  "correct": true,
+  "margin": 0.02570688074087546
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 32,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6221411775872945
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 33,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6675103137299547
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 34,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6794762874269732
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 35,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6759111657613955
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 36,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.3743722420446076
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 37,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.3503406881183687
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 38,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.34289808626112894
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 1,
+  "client": 39,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6149459627273872
+ },
+ {
+  "type": "explain",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "pair": "0-1",
+  "groups": [
+   0,
+   1
+  ],
+  "kind": "class-specific",
+  "truth": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "explain",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "pair": "0-2",
+  "groups": [
+   0,
+   2
+  ],
+  "kind": "global",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 0.9,
+  "exact": false,
+  "diagnosis_ok": false
+ },
+ {
+  "type": "explain",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "pair": "0-3",
+  "groups": [
+   0,
+   3
+  ],
+  "kind": "global",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "explain",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "pair": "1-2",
+  "groups": [
+   1,
+   2
+  ],
+  "kind": "global",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 0.9,
+  "exact": false,
+  "diagnosis_ok": false
+ },
+ {
+  "type": "explain",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "pair": "1-3",
+  "groups": [
+   1,
+   3
+  ],
+  "kind": "global",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   0,
+   1,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 0.9,
+  "exact": false,
+  "diagnosis_ok": false
+ },
+ {
+  "type": "explain",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "pair": "2-3",
+  "groups": [
+   2,
+   3
+  ],
+  "kind": "class-specific",
+  "truth": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 0,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.49348760576210293
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 1,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6027310687310824
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 2,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.4752366114540033
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 3,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.49277915326868704
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 4,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5878279744599576
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 5,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5980039944117126
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 6,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5964411546539754
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 7,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.61662211075787
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 8,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.38144589434749976
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 9,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.4437716690518896
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 10,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5598734016491772
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 11,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.3005865016645598
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 12,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5190476282838492
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 13,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6046756360979406
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 14,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.2325273763749478
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 15,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.257862829028475
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 16,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5749959111947354
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 17,
+  "verdict": "uncertain",
+  "correct": true,
+  "margin": 0.5181824187297296
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 18,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.32280390693311145
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 19,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.3284578772047566
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 20,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5558961034172092
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 21,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.4843186886422068
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 22,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5708222233413434
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 23,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5133679468399998
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 24,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.286619185169227
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 25,
+  "verdict": "uncertain",
+  "correct": true,
+  "margin": 0.45696646420698805
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 26,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5637676846764561
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 27,
+  "verdict": "uncertain",
+  "correct": true,
+  "margin": 0.393515321448057
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 28,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.3448826927403703
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 29,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.523036725562108
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 30,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5685952899956216
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 31,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5760228033298951
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 32,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5525090843058226
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 33,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.3775647627148603
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 34,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5159342916052635
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 35,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5726672795366048
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 36,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5837493659168568
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 37,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5463489283138065
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 38,
+  "verdict": "uncertain",
+  "correct": true,
+  "margin": -0.02998229421611931
+ },
+ {
+  "type": "cert",
+  "scenario": "mixed_qs",
+  "seed": 2,
+  "client": 39,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5791387604348814
+ },
+ {
+  "type": "explain",
+  "scenario": "rot",
+  "seed": 0,
+  "pair": "0-1",
+  "groups": [
+   0,
+   1
+  ],
+  "kind": "global",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "explain",
+  "scenario": "rot",
+  "seed": 0,
+  "pair": "0-2",
+  "groups": [
+   0,
+   2
+  ],
+  "kind": "global",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 0.9,
+  "exact": false,
+  "diagnosis_ok": false
+ },
+ {
+  "type": "explain",
+  "scenario": "rot",
+  "seed": 0,
+  "pair": "0-3",
+  "groups": [
+   0,
+   3
+  ],
+  "kind": "global",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "explain",
+  "scenario": "rot",
+  "seed": 0,
+  "pair": "1-2",
+  "groups": [
+   1,
+   2
+  ],
+  "kind": "global",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "explain",
+  "scenario": "rot",
+  "seed": 0,
+  "pair": "1-3",
+  "groups": [
+   1,
+   3
+  ],
+  "kind": "global",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   0,
+   2,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 0.8,
+  "exact": false,
+  "diagnosis_ok": false
+ },
+ {
+  "type": "explain",
+  "scenario": "rot",
+  "seed": 0,
+  "pair": "2-3",
+  "groups": [
+   2,
+   3
+  ],
+  "kind": "global",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 0,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.464884823050555
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 1,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6323089157888808
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 2,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6598602482850682
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 3,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6713770611270715
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 4,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6515212524848706
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 5,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.47546078689953575
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 6,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7045660630900503
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 7,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5579780762764484
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 8,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.556266616567723
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 9,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.22753430763610094
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 10,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6637011266407807
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 11,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5328792721727573
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 12,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.589001376185343
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 13,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5750288139806734
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 14,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.49747707703933963
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 15,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6418113093701292
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 16,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6051634842106268
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 17,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5828881245287484
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 18,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6713426458472149
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 19,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6877095781805151
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 20,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.642860674862994
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 21,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6832619373568609
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 22,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6450484802685298
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 23,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.685072645703434
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 24,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.43320897706405165
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 25,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.684863010904595
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 26,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.47381363356347145
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 27,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.42300755333371454
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 28,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6318510360256423
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 29,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.46974137361748425
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 30,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6404702599996839
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 31,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.609313143269265
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 32,
+  "verdict": "uncertain",
+  "correct": true,
+  "margin": 0.46956236394651174
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 33,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6983679207515174
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 34,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6427685070022744
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 35,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5492809606454065
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 36,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7057061980082204
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 37,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5774454611375115
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 38,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6497507557639319
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 0,
+  "client": 39,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6116923604653557
+ },
+ {
+  "type": "explain",
+  "scenario": "rot",
+  "seed": 1,
+  "pair": "0-1",
+  "groups": [
+   0,
+   2
+  ],
+  "kind": "global",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   0,
+   1,
+   4,
+   5,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 0.7,
+  "exact": false,
+  "diagnosis_ok": false
+ },
+ {
+  "type": "explain",
+  "scenario": "rot",
+  "seed": 1,
+  "pair": "0-2",
+  "groups": [
+   0,
+   3
+  ],
+  "kind": "global",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "explain",
+  "scenario": "rot",
+  "seed": 1,
+  "pair": "0-3",
+  "groups": [
+   0,
+   1
+  ],
+  "kind": "global",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "explain",
+  "scenario": "rot",
+  "seed": 1,
+  "pair": "1-2",
+  "groups": [
+   2,
+   3
+  ],
+  "kind": "global",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "explain",
+  "scenario": "rot",
+  "seed": 1,
+  "pair": "1-3",
+  "groups": [
+   2,
+   1
+  ],
+  "kind": "global",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "explain",
+  "scenario": "rot",
+  "seed": 1,
+  "pair": "2-3",
+  "groups": [
+   3,
+   1
+  ],
+  "kind": "global",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   0,
+   1,
+   4,
+   5,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 0.7,
+  "exact": false,
+  "diagnosis_ok": false
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 0,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6575103308720616
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 1,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7291648335951635
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 2,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6104557583310788
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 3,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5723852652761016
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 4,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6636470460726709
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 5,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.647813609900324
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 6,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.2970712375450981
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 7,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6230942001808817
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 8,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.4087539469777507
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 9,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7419781016009577
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 10,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5938149147195659
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 11,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.4225060732771832
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 12,
+  "verdict": "uncertain",
+  "correct": true,
+  "margin": 0.5446408269146272
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 13,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7266050574632509
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 14,
+  "verdict": "uncertain",
+  "correct": true,
+  "margin": 0.5895551023230348
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 15,
+  "verdict": "uncertain",
+  "correct": true,
+  "margin": 0.3801369424364488
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 16,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7086913641934661
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 17,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.36292092927993536
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 18,
+  "verdict": "uncertain",
+  "correct": true,
+  "margin": 0.6518617618227154
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 19,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7157790552755828
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 20,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6096096998212341
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 21,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7072496142965925
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 22,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6693879706617427
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 23,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5746616900335635
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 24,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6953246889342986
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 25,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6359778273532215
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 26,
+  "verdict": "uncertain",
+  "correct": true,
+  "margin": 0.566916537578235
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 27,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7032670005591453
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 28,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6997718297451352
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 29,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6599246620153085
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 30,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7320104606420463
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 31,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7303748388017279
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 32,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.731657513952082
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 33,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.4874283833528525
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 34,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7790353935515485
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 35,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7043708916925093
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 36,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7291223429696289
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 37,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7771821553599999
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 38,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.3990155733324775
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 1,
+  "client": 39,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7257720947644959
+ },
+ {
+  "type": "explain",
+  "scenario": "rot",
+  "seed": 2,
+  "pair": "0-1",
+  "groups": [
+   0,
+   1
+  ],
+  "kind": "global",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "explain",
+  "scenario": "rot",
+  "seed": 2,
+  "pair": "0-2",
+  "groups": [
+   0,
+   2
+  ],
+  "kind": "global",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 0.9,
+  "exact": false,
+  "diagnosis_ok": false
+ },
+ {
+  "type": "explain",
+  "scenario": "rot",
+  "seed": 2,
+  "pair": "0-3",
+  "groups": [
+   0,
+   3
+  ],
+  "kind": "global",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "explain",
+  "scenario": "rot",
+  "seed": 2,
+  "pair": "1-2",
+  "groups": [
+   1,
+   2
+  ],
+  "kind": "global",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "explain",
+  "scenario": "rot",
+  "seed": 2,
+  "pair": "1-3",
+  "groups": [
+   1,
+   3
+  ],
+  "kind": "global",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   0,
+   1,
+   4,
+   5,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 0.7,
+  "exact": false,
+  "diagnosis_ok": false
+ },
+ {
+  "type": "explain",
+  "scenario": "rot",
+  "seed": 2,
+  "pair": "2-3",
+  "groups": [
+   2,
+   3
+  ],
+  "kind": "global",
+  "truth": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "pred": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "precision": 1.0,
+  "recall": 1.0,
+  "exact": true,
+  "diagnosis_ok": true
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 0,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6879177942022956
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 1,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.3207466797001115
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 2,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6784648204970214
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 3,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.3430653543999934
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 4,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.3489726180738889
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 5,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.3728338760501655
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 6,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.3155469222930919
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 7,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.35828451003606765
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 8,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.3039338671921935
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 9,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.482215043320253
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 10,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5654705938678553
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 11,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7715547778478018
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 12,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7549653225056823
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 13,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6504009213884925
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 14,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7858469970233797
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 15,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5044950564488514
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 16,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.78767023609091
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 17,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5367663465797899
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 18,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7646070078472097
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 19,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6238378713125678
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 20,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.603520500973053
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 21,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.6146421052025567
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 22,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5876504233558384
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 23,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.40343909333621164
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 24,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.5543892537958348
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 25,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.3347071385394439
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 26,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.3161114865367909
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 27,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.33900360941491037
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 28,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.30442509505675575
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 29,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.31257357267016106
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 30,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8113980333701017
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 31,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8778934161934859
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 32,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.821903907846069
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 33,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7588871374208416
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 34,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.885931848929616
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 35,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7182597296888539
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 36,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.7508373784945612
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 37,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.8591615211820046
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 38,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.285950376933237
+ },
+ {
+  "type": "cert",
+  "scenario": "rot",
+  "seed": 2,
+  "client": 39,
+  "verdict": "confident",
+  "correct": true,
+  "margin": 0.4221178667312415
+ }
+]

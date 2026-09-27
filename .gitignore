@@ -220,3 +220,11 @@ __marimo__/
 # experiment caches
 results/cache/
 *.pt
+
+# LaTeX build files
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.blg
+paper/*.bbl
+paper/*.toc

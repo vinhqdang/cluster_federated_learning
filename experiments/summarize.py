@@ -63,9 +63,11 @@ def main_tables(rows, scenarios, name):
         for key, _, _ in cols:
             vals = {m: agg(by[(s, m)], key)[0] for m in methods if (s, m) in by and m not in ("Oracle",)}
             if vals and key not in ("k_found", "acc_mean"):
-                b = (min if key == "conflict_merge_rate" else max)(vals.values())
-                # ties (at display precision) are all highlighted
-                best[key] = {m for m, v in vals.items() if abs(v - b) < 5e-4}
+                # compare at display precision; ties are all highlighted
+                rv = {m: round(100 * v, 1) if key not in ("pc_jain", "ari") else round(v, 2)
+                      for m, v in vals.items()}
+                b = (min if key == "conflict_merge_rate" else max)(rv.values())
+                best[key] = {m for m, v in rv.items() if v == b}
         tex.append(r"\multicolumn{%d}{l}{\textit{%s}}\\" % (len(cols) + 1, SCEN_NAMES.get(s, s)))
         for m in methods:
             if (s, m) not in by:
@@ -90,6 +92,10 @@ def main_tables(rows, scenarios, name):
     os.makedirs(TAB, exist_ok=True)
     open(os.path.join(TAB, f"{name}.md"), "w").write("\n".join(md) + "\n")
     open(os.path.join(TAB, f"{name}.tex"), "w").write("\n".join(tex[:-1]) + "\n")
+    head = ("\\scriptsize\n\\setlength{\\tabcolsep}{3.2pt}\n\\begin{tabular}{l" + "c" * len(cols) + "}\n\\toprule\n"
+            "Method & " + " & ".join(c[1].replace("%", "\\%") for c in cols) + " \\\\\n\\midrule\n")
+    paper = os.path.join(ROOT, "paper", f"table_{name}.tex")
+    open(paper, "w").write(head + "\n".join(tex[:-1]) + "\n\\bottomrule\n\\end{tabular}\n")
     return "\n".join(md)
 
 

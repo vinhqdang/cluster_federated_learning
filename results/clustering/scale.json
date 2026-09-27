@@ -1,0 +1,50 @@
+[
+ {
+  "n_clients": 40,
+  "seed": 0,
+  "sig_time_per_client_s": 0.15748589038848876,
+  "server_time_s": 0.05028867721557617,
+  "upload_floats_per_client": 12236.8,
+  "model_dim": 46730,
+  "ari": 1.0,
+  "k": 4,
+  "conflict_merge_rate": 0.0,
+  "compatible_split_rate": 0.0
+ },
+ {
+  "n_clients": 80,
+  "seed": 0,
+  "sig_time_per_client_s": 0.14272090494632722,
+  "server_time_s": 0.07260441780090332,
+  "upload_floats_per_client": 12236.8,
+  "model_dim": 46730,
+  "ari": 1.0,
+  "k": 4,
+  "conflict_merge_rate": 0.0,
+  "compatible_split_rate": 0.0
+ },
+ {
+  "n_clients": 160,
+  "seed": 0,
+  "sig_time_per_client_s": 0.13533557653427125,
+  "server_time_s": 0.28635239601135254,
+  "upload_floats_per_client": 12134.4,
+  "model_dim": 46730,
+  "ari": 0.9832965647652064,
+  "k": 6,
+  "conflict_merge_rate": 0.0,
+  "compatible_split_rate": 0.025
+ },
+ {
+  "n_clients": 320,
+  "seed": 0,
+  "sig_time_per_client_s": 0.13807737827301025,
+  "server_time_s": 2.2795209884643555,
+  "upload_floats_per_client": 11820.8,
+  "model_dim": 46730,
+  "ari": 0.9834587785741922,
+  "k": 6,
+  "conflict_merge_rate": 0.0,
+  "compatible_split_rate": 0.024683544303797468
+ }
+]
