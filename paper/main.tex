@@ -118,6 +118,13 @@ The \emph{minimum} over classes encodes the definition of concept equivalence: t
 \end{algorithmic}
 \end{algorithm}
 
+\subsection{Inference: prior-corrected cluster models}\label{sec:pc}
+Clusters are built so that their members share class-conditionals but may have very different label proportions. By Bayes' rule, the posterior of client $i$ is obtained from that of its cluster $k$ by re-weighting the prior (Proposition~\ref{prop:pc}). Client $i$ therefore predicts with
+\begin{equation}\label{eq:pc}
+\hat y(x)=\argmax_y\ \big[f_k(x)_y+\log\hat p_i(y)-\log\hat p_k(y)\big],
+\end{equation}
+where $f_k$ are the logits of the cluster model, $\hat p_i$ is the client's own (smoothed) label distribution, and $\hat p_k$ is the label distribution of the cluster's training data. The latter is a sum of label counts that the server can obtain by secure aggregation, so no individual histogram is revealed. This correction~\citep{lipton2018labelshift,menon2021logit} costs nothing at training time. It is exactly what concept-level clustering calls for: label skew is handled by the prior, not by more clusters. In the experiments we apply the same correction to \emph{every} method, for a fair comparison.
+
 \subsection{Transparency and accountability outputs}\label{sec:outputs}
 \begin{itemize}[leftmargin=*,itemsep=1pt]
 \item \textbf{Class-level explanations.} For every pair of clusters the server reports the pooled per-class similarity and the set of \emph{divergent classes} $\hat D_{AB}=\{c:\rho^c_{AB}<\tau\}$.
@@ -184,6 +191,10 @@ $h\gtrsim\sigma_{\rm dp}C_{\rm clip}\big(\sqrt{\log(N^2C/\delta)}/(\sqrt a\,\gam
 
 \begin{proposition}[Explanation fidelity]\label{prop:expl}
 On $\mathcal E$, if two output clusters $A,B$ have pooled evidence $\mathrm{den}^c_{AB}>w_0$ on a class $c$, then $c\in\hat D_{AB}$ if and only if $\cP_A(X\mid Y=c)\neq\cP_B(X\mid Y=c)$. The reported divergent classes are exactly the classes on which the two concepts differ.
+\end{proposition}
+
+\begin{proposition}[Prior correction is Bayes-optimal within a concept cluster]\label{prop:pc}
+Let cluster $k$ consist of concept-equivalent clients with pooled distribution $\cP_k(X,Y)=\cP_k(Y)\cP(X\mid Y)$, and let $q_k(y\mid x)$ be its Bayes posterior. For every member $i$, $\cP_i(y\mid x)\propto q_k(y\mid x)\,\cP_i(y)/\cP_k(y)$. Hence~\eqref{eq:pc} with the true priors and $f_k=\log q_k$ is the Bayes-optimal classifier of client $i$. No clustering finer than concept equivalence can reduce the Bayes risk of any member.
 \end{proposition}
 
 \begin{remark}[Scope of the guarantees]

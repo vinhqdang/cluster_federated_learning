@@ -119,8 +119,10 @@ def run_mtcfl(fed, tr, cfg):
     """CFL / MTCFL (Sattler et al. 2020): recursive cosine bipartitioning once a
     cluster is near a stationary point of its joint objective but individual
     updates are still large. Norm thresholds are expressed relative to the mean
-    client-update norm so they do not depend on the model scale."""
-    eps1, eps2 = cfg.get("eps1", 0.4), cfg.get("eps2", 0.6)
+    client-update norm so they do not depend on the model scale. The defaults
+    were selected on the same pilot run as DisCo-CFL (best ARI and accuracy
+    among eps1 in {0.4,0.8,0.9,0.95}, eps2 in {0,0.6,1.2,1.4}, gamma in {0,0.2,0.5,1})."""
+    eps1, eps2 = cfg.get("eps1", 0.9), cfg.get("eps2", 0.0)
     assign = np.zeros(len(fed.clients), int)
     models = {0: tr.get()}
     next_id = 1
@@ -143,7 +145,7 @@ def run_mtcfl(fed, tr, cfg):
                 sim = (U @ U.T).numpy()
                 lab = _bipartition(sim)
                 cross = sim[np.ix_(lab == 0, lab == 1)].max()
-                if cross < cfg.get("gamma", 0.2):
+                if cross < cfg.get("gamma", 1.0):
                     for c, l in zip(members, lab):
                         if l == 1:
                             assign[c.cid] = next_id

@@ -48,9 +48,10 @@ def main_tables(rows, scenarios, name):
         by[(r["scenario"], r["method"])].append(r)
     methods = [m for m in METHOD_ORDER if any((s, m) in by for s in scenarios)] + \
         sorted({r["method"] for r in rows if r["method"] not in METHOD_ORDER and r["scenario"] in scenarios})
-    cols = [("acc_mean", "Acc", True), ("acc_p10", "Acc@10%", True), ("worst_group_acc", "Worst-grp", True),
-            ("acc_concept_mean", "Concept acc", True), ("jain", "Jain", False), ("ari", "ARI", False),
-            ("k_found", "K", False), ("conflict_merge_rate", "Conflict", True)]
+    cols = [("acc_mean", "Acc (raw)", True), ("pc_acc_mean", "Acc", True), ("pc_acc_p10", "Acc@10%", True),
+            ("pc_worst_group_acc", "Worst-grp", True), ("pc_acc_concept_mean", "Concept", True),
+            ("pc_jain", "Jain", False), ("ari", "ARI", False), ("k_found", "K", False),
+            ("conflict_merge_rate", "Conflict%", True)]
     md, tex = [], []
     for s in scenarios:
         if not any((s, m) in by for m in methods):
@@ -61,8 +62,10 @@ def main_tables(rows, scenarios, name):
         best = {}
         for key, _, _ in cols:
             vals = {m: agg(by[(s, m)], key)[0] for m in methods if (s, m) in by and m not in ("Oracle",)}
-            if vals and key not in ("k_found",):
-                best[key] = (min if key == "conflict_merge_rate" else max)(vals, key=vals.get)
+            if vals and key not in ("k_found", "acc_mean"):
+                b = (min if key == "conflict_merge_rate" else max)(vals.values())
+                # ties (at display precision) are all highlighted
+                best[key] = {m for m, v in vals.items() if abs(v - b) < 5e-4}
         tex.append(r"\multicolumn{%d}{l}{\textit{%s}}\\" % (len(cols) + 1, SCEN_NAMES.get(s, s)))
         for m in methods:
             if (s, m) not in by:
@@ -72,12 +75,12 @@ def main_tables(rows, scenarios, name):
                 mu, sd = agg(by[(s, m)], key)
                 if key == "k_found":
                     c = f"{mu:.1f}"
-                elif key in ("jain", "ari"):
+                elif key in ("pc_jain", "ari"):
                     c = f"{mu:.2f}"
                 else:
-                    c = fmt(mu, sd, pct) if key in ("acc_mean",) else f"{100 * mu:.1f}"
+                    c = fmt(mu, sd, pct) if key in ("pc_acc_mean",) else f"{100 * mu:.1f}"
                 t = c.replace("±", r"$\pm$")
-                if best.get(key) == m:
+                if m in best.get(key, ()):
                     c, t = f"**{c}**", r"\textbf{%s}" % t
                 cells.append(c)
                 tcells.append(t)

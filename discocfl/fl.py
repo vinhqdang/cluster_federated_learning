@@ -71,6 +71,12 @@ class Trainer:
         acc = (out.argmax(1) == y).float().mean().item()
         return acc, loss
 
+    @torch.no_grad()
+    def logits(self, vec, x):
+        self.set(vec)
+        self.model.eval()
+        return self.model(x)
+
     def mean_grad(self, vec, x, y):
         """Gradient of the mean loss on (x, y) at parameters vec."""
         self.set(vec)
@@ -101,16 +107,41 @@ def cluster_fedavg_round(trainer, fed, models, assign):
     return new
 
 
-def evaluate_assignment(trainer, fed, models, assign):
-    """Per-client accuracy on local test data and on the concept-balanced test set."""
+def evaluate_assignment(trainer, fed, models, assign, prior_correction=False):
+    """Per-client accuracy on local test data and on the concept-balanced test set.
+
+    prior_correction: Bayes prior (logit) correction of the cluster model. For
+    clients with the same class-conditionals the Bayes classifiers differ only by
+    the label prior, so client i adds log p_i(y) - log p_k(y) to the logits of its
+    cluster model k, where p_i is its own training label distribution and p_k the
+    label distribution of the cluster's training data (a sum of label counts that
+    can be obtained by secure aggregation). On the class-balanced concept test set
+    the target prior is uniform, i.e. -log p_k(y) is added.
+    """
+    C = fed.num_classes
+    counts = {c.cid: np.bincount(c.y.numpy(), minlength=C) + 1.0 for c in fed.clients}
+    assign = np.asarray(assign)
+    cl_counts = {}
+    for c in fed.clients:
+        k = int(assign[c.cid])
+        cl_counts[k] = cl_counts.get(k, 0) + counts[c.cid] - 1.0
+    log_pk = {k: torch.log(torch.tensor((v + 1.0) / (v + 1.0).sum(), dtype=torch.float32))
+              for k, v in cl_counts.items()}
     local, balanced = [], []
     cache = {}
     for c in fed.clients:
         k = int(assign[c.cid])
-        local.append(trainer.evaluate(models[k], c.x_test, c.y_test)[0])
+        out = trainer.logits(models[k], c.x_test)
+        if prior_correction:
+            log_pi = torch.log(torch.tensor(counts[c.cid] / counts[c.cid].sum(), dtype=torch.float32))
+            out = out + log_pi - log_pk[k]
+        local.append((out.argmax(1) == c.y_test).float().mean().item())
         key = (k, c.group)
         if key not in cache:
             gx, gy = fed.group_test[c.group]
-            cache[key] = trainer.evaluate(models[k], gx, gy)[0]
+            og = trainer.logits(models[k], gx)
+            if prior_correction:
+                og = og - log_pk[k]
+            cache[key] = (og.argmax(1) == gy).float().mean().item()
         balanced.append(cache[key])
     return np.array(local), np.array(balanced)

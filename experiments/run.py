@@ -93,6 +93,7 @@ def metrics(fed, tr, out):
     from discocfl.fl import evaluate_assignment
 
     local, bal = evaluate_assignment(tr, fed, out["models"], out["assign"])
+    local_pc, bal_pc = evaluate_assignment(tr, fed, out["models"], out["assign"], prior_correction=True)
     g = fed.true_labels
     A = np.asarray(out["assign"])
     group_acc = [float(local[g == k].mean()) for k in np.unique(g)]
@@ -114,6 +115,13 @@ def metrics(fed, tr, out):
         "compatible_split_rate": float((~same & compatible & np.equal.outer(g, g)).sum()
                                        / max((compatible & np.equal.outer(g, g)).sum(), 1)),
         "per_client_acc": local.tolist(),
+        # with Bayes prior (logit) correction, applied identically to every method
+        "pc_acc_mean": float(local_pc.mean()),
+        "pc_acc_p10": float(np.percentile(local_pc, 10)),
+        "pc_worst_group_acc": float(min(local_pc[g == k].mean() for k in np.unique(g))),
+        "pc_jain": float(local_pc.sum() ** 2 / (len(local_pc) * (local_pc ** 2).sum())),
+        "pc_acc_concept_mean": float(bal_pc.mean()),
+        "pc_per_client_acc": local_pc.tolist(),
     }
 
 
