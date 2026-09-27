@@ -98,4 +98,52 @@ cd paper && pdflatex main && bibtex main && pdflatex main && pdflatex main
 
 ## Results
 
-RESULTS_PLACEHOLDER
+All numbers: mean over 3 seeds, 40 clients, 50 rounds, same CNN and budget for every method.
+"Acc" is mean local test accuracy with the Bayes prior correction applied **identically to every
+method**. IFCA, FL+HC and PACFL are **given the true K**; DisCo-CFL finds K on its own.
+Full tables: [`results/tables/main.md`](results/tables/main.md),
+[`results/tables/studies.md`](results/tables/studies.md); manuscript: [`paper/main.pdf`](paper/main.pdf).
+
+### Fashion-MNIST (main benchmark)
+
+| Scenario | DisCo Acc | best baseline Acc | DisCo worst-group | best baseline worst-group | DisCo concept acc | best baseline concept acc | DisCo ARI / K | conflicting pairs merged (DisCo / baselines with K) |
+|---|---|---|---|---|---|---|---|---|
+| Rotation | **90.5** | 90.2 (CFL, 35 clusters) | **89.5** | 89.1 | **83.9** | 79.4 | 1.00 / 4 | 0% / 21–85% |
+| Label swap | **90.8** | 90.4 (CFL) | **89.2** | 87.8 | **84.9** | 76.1 | 1.00 / 4 | 0% / 17–86% |
+| Rotation + quantity skew | **90.1** | 88.8 (CFL) | **88.7** | 86.7 | **82.1** | 77.0 | 1.00 / 4 | 0% / 21–85% |
+| Mixed + quantity skew | **90.6** | 89.0 (IFCA) | **88.8** | 87.5 | **82.5** | 75.4 | 0.94 / 4 | 0.6% / 22–85% |
+| Label skew only (true K = 1) | **95.6** | 95.5 | **95.6** | 95.5 | 85.6 | 85.9 | K = 1.3 | 0% |
+| Minority groups (25/9/4/2) | **90.8** | 89.8 (PACFL) | **86.5** | 85.2 (Local) | **84.1** | 78.8 | 0.98 / 4.3 | 0% / 18–75% |
+
+DisCo-CFL matches the Oracle (clustering on the ground-truth groups) exactly in three scenarios
+and is within 0.1 points in the others. On minority groups, its worst-group accuracy is 86.5%
+against 35.7% for FedAvg, 51.9% for CFL, 67.3% for IFCA and 74.5% for FL+HC.
+
+### Beyond accuracy
+
+* **Transparency.** For label-swap groups, the divergent classes the server reports are
+  *exactly* the swapped classes in 100% of cluster pairs, and the diagnosis ("class-specific
+  concept shift") is always correct. For rotations, precision is 1.00 and recall 0.93; all
+  misses are 0° vs. 180° pairs on items that are nearly invariant under 180° rotation.
+* **Accountability.** 93–97% of clients receive a *confident* assignment certificate; these
+  are 100% conflict-free on rotation and swap, and 91.9% (vs. 77.8% for *uncertain*
+  certificates) in the hardest mixed scenario. Newcomers are assigned correctly in 96–100% of
+  cases, and 100% of newcomers with an unseen concept are flagged as *novel*.
+* **Fairness.** Minority groups of 1, 2, 3 and 5 clients are recovered with recall and purity
+  1.00 and no conflicting merges. FL+HC merges 81% of the conflicting pairs, and PACFL misses
+  the minority entirely.
+* **Privacy.** With (ε, δ = 1e-5)-DP signatures, the raw cosine collapses to ARI ≈ 0 at every
+  noise level, while DisCo-CFL degrades gracefully: with 1,500 samples per client, ARI is
+  0.92 (rotation) and 0.77 (swap) at ε = 4.4, and 0.68 / 0.60 at ε = 2.
+* **Calibration.** The same-group similarity is 0.98–0.99 for every client size from 50 to
+  800 samples, and τ ∈ [0.75, 0.85] works in all concept-shift scenarios. λ has almost no
+  effect between 0.02 and 1.
+* **Cost.** One upload of about 1.2·10⁴ floats per client, independent of the model size;
+  0.15 s per client to compute; 2.3 s of server time for 320 clients.
+
+![theory](results/figures/theory_recovery.png)
+![dp](results/figures/dp.png)
+![tau](results/figures/tau_sensitivity.png)
+
+MORE_RESULTS_PLACEHOLDER
+

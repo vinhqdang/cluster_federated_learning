@@ -1,1 +1,21 @@
-
+\subsection{Ablation}
+Table~\ref{tab:abl} removes one component at a time. Every component contributes. Without class conditioning (one signature per client over all its data), clients are grouped by their label mix, exactly the failure mode reported in the survey~\citep{benali2026survey}: 13--23 clusters and a concept accuracy 10--12 points lower. Without disattenuation, noise-attenuated similarities fall below the threshold and the federation is over-split, including the label-only case. The mean linkage averages class-specific shifts away and merges conflicting clients (up to 6.9\% in \emph{Mixed + QS}). Linkage-ordered merging creates bridges through ambiguous clients and over-splits. Without clipping, heavy-tailed per-sample gradients inflate the number of clusters.
+\begin{table}[t]
+\centering
+\caption{Ablation (Fashion-MNIST, 3 seeds): ARI / number of clusters $K$ per scenario, mean conflict-merge rate and mean concept accuracy over the five scenarios.}\label{tab:abl}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lccccccc}
+\toprule
+Variant & Rotation & Label swap & Rot.\,+\,QS & Mixed\,+\,QS & Label only & Conflict\% & Concept \\
+\midrule
+DisCo-CFL (full) & 1.00 / 4.0 & 1.00 / 4.0 & 1.00 / 4.0 & 0.94 / 4.0 & 0.67 / 1.3 & 0.1 & 83.8 \\
+-- no disattenuation (raw cosine) & 0.87 / 6.7 & 0.87 / 6.0 & 0.83 / 7.0 & 0.85 / 5.7 & 0.00 / 4.0 & 0.0 & 82.4 \\
+-- no class conditioning & 0.15 / 23.3 & 0.15 / 17.7 & 0.16 / 22.3 & 0.09 / 22.3 & 0.00 / 13.0 & 0.9 & 72.7 \\
+-- mean instead of bottleneck linkage & 1.00 / 4.0 & 0.80 / 4.0 & 0.92 / 4.0 & 0.69 / 4.0 & 1.00 / 1.0 & 2.6 & 82.1 \\
+-- linkage-ordered merging & 0.95 / 5.0 & 0.86 / 5.7 & 1.00 / 4.0 & 0.81 / 5.7 & 0.33 / 1.7 & 0.0 & 82.5 \\
+-- no per-sample clipping & 0.94 / 5.0 & 1.00 / 4.0 & 0.91 / 5.7 & 0.88 / 5.3 & 0.00 / 3.0 & 0.3 & 83.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\input{exp_datasets.tex}
