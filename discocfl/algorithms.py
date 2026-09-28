@@ -192,27 +192,36 @@ def run_fedavg_ft(fed, tr, cfg):
 def run_fesem(fed, tr, cfg):
     """FeSEM / multi-center FL (Long et al. 2023): K centres in parameter space;
     each round every participating client trains from its centre, is re-assigned
-    to the nearest centre (L2) and the centres are re-estimated (K given)."""
+    to the nearest centre (L2) and the centres are re-estimated (K given).
+    For a fair comparison it gets the same FedAvg warm-up as FL+HC and DisCo-CFL,
+    and its centres are initialised by k-means++ on the clients' local models
+    (initialising from one shared model makes all clients pick the same centre)."""
     K = cfg["K"]
     rng = np.random.default_rng(cfg["seed"] + 5)
-    w0 = tr.get()
-    # initial centres: locally trained models of K random clients
-    init = rng.choice(len(fed.clients), K, replace=False)
-    centres = {k: tr.local_train(w0, fed.clients[i].x, fed.clients[i].y) for k, i in enumerate(init)}
-    assign = np.zeros(len(fed.clients), int)
-    for c in fed.clients:
-        assign[c.cid] = int(np.argmin([torch.norm(w0 - centres[k]).item() for k in range(K)]))
-    for _ in range(cfg["rounds"]):
-        local = {}
+    w0 = _fedavg_rounds(tr, fed, tr.get(), cfg["warmup"])
+    local = torch.stack([tr.local_train(w0, c.x, c.y) for c in fed.clients])
+    idx = [int(rng.integers(len(fed.clients)))]
+    for _ in range(1, K):                      # k-means++ seeding
+        d2 = torch.cdist(local, local[idx]).min(1).values ** 2
+        p = (d2 / d2.sum()).numpy().astype(np.float64)
+        idx.append(int(rng.choice(len(fed.clients), p=p / p.sum())))
+    centres = {k: local[i].clone() for k, i in enumerate(idx)}
+    assign = torch.cdist(local, torch.stack([centres[k] for k in range(K)])).argmin(1).numpy()
+    for k in range(K):
+        mem = np.where(assign == k)[0]
+        if len(mem):
+            centres[k] = weighted_average([local[i] for i in mem], [fed.clients[i].n for i in mem])
+    for _ in range(cfg["rounds"] - cfg["warmup"]):
+        upd = {}
         for c in participating(tr, fed):
             wi = tr.local_train(centres[int(assign[c.cid])], c.x, c.y)
             assign[c.cid] = int(np.argmin([torch.norm(wi - centres[k]).item() for k in range(K)]))
-            local[c.cid] = (wi, c.n)
+            upd[c.cid] = (wi, c.n)
         for k in range(K):
-            mem = [local[i] for i in local if assign[i] == k]
+            mem = [upd[i] for i in upd if assign[i] == k]
             if mem:
                 centres[k] = weighted_average([v for v, _ in mem], [n for _, n in mem])
-    return {"assign": assign.copy(), "models": centres, "cluster_floats": 0}
+    return {"assign": np.asarray(assign).copy(), "models": centres, "cluster_floats": 0}
 
 
 ALGORITHMS = {
