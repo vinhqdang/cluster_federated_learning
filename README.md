@@ -90,7 +90,7 @@ experiments/
   theory_sim.py       # synthetic validation of the theorems
   summarize.py        # tables (results/tables) and figures (results/figures)
 paper/            # LaTeX manuscript with full proofs (long version)
-paper_tnnls/      # IEEE TNNLS version: main.pdf (8 pages) + supplement.pdf (full proofs, Lean, full tables)
+paper_tnnls/      # IEEE TNNLS version (submitted 28 Sep 2026, see SUBMISSION.md): main.pdf (8 pages) + supplement.pdf
                   #   submission/: anonymised single-file main.tex, figures, anonymised PDFs, cover_letter.pdf (set \anonfalse in main.tex/supplement.tex for the final version)
 lean/             # Lean 4 formalization of the proofs
 tests/            # unit tests
