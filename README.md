@@ -91,6 +91,7 @@ experiments/
   summarize.py        # tables (results/tables) and figures (results/figures)
 paper/            # LaTeX manuscript with full proofs (long version)
 paper_tnnls/      # IEEE TNNLS version: main.pdf (8 pages) + supplement.pdf (full proofs, Lean, full tables)
+                  #   submission/: single-file main.tex, figures, cover_letter.pdf
 lean/             # Lean 4 formalization of the proofs
 tests/            # unit tests
 results/          # raw results, tables, figures

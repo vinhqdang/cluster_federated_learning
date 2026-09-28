@@ -1,0 +1,45 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.85in,top=0.7in,bottom=0.7in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue!50!black}
+\usepackage{enumitem}
+\setlist[itemize]{itemsep=2pt,topsep=3pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+\pagestyle{empty}
+\begin{document}
+\begin{flushright}
+Quang-Vinh Dang\\ British University Vietnam\\ Hung Yen, Vietnam\\ \href{mailto:vinh.dq4@buv.edu.vn}{vinh.dq4@buv.edu.vn}\\ ORCID: 0000-0002-3877-8024\\[0.8em]
+September 28, 2026
+\end{flushright}
+
+Editor-in-Chief\\
+IEEE Transactions on Neural Networks and Learning Systems
+
+Dear Editor-in-Chief,
+
+
+I am pleased to submit the manuscript entitled \emph{``DisCo-CFL: Calibrated, Fair and Explainable Clustered Federated Learning via Disattenuated Class-Conditional Gradient Signatures''} for consideration as a regular paper in the IEEE Transactions on Neural Networks and Learning Systems.
+
+Clustered federated learning (CFL) trains one model per group of clients that share a data distribution. A recent survey of the field identifies several open problems: the clustering signal is high-dimensional and changes from round to round, methods tend to group clients by label distribution rather than by concept, the number of clusters is set through hyperparameters without a stable meaning, performance degrades under quantity skew, and grouping decisions are neither private nor explained. The manuscript addresses these problems with a single algorithm and its analysis.
+
+The main contributions are:
+\begin{itemize}
+\item \textbf{A new CFL algorithm.} Each client uploads, once, sketched class-conditional gradient signatures computed on two random halves of its data. Spearman's correction for attenuation, estimated from the two halves, yields a calibrated similarity that is invariant to label and quantity skew and equals one for clients that share a concept. A class-wise bottleneck linkage then determines the number of clusters from one threshold on this calibrated scale.
+\item \textbf{Guarantees beyond accuracy.} We prove safety (conflicting clients are never merged), maximality and exact recovery with a sample complexity that does not depend on cluster sizes, which gives fairness towards minority groups, and a minimax lower bound that matches it up to a factor $1/\Delta$. We also prove differential privacy with an explicit cost, the fidelity of the class-level explanations, and the Bayes optimality of prior-corrected cluster models. The deterministic core of all proofs (25 theorems) is machine-checked in Lean~4.
+\item \textbf{Transparency and accountability.} The server returns assignment certificates with uncertainty, an audit log, anomaly flags, class-level explanations of why clusters differ, and a test for newcomers with a novel concept.
+\item \textbf{Extensive evaluation.} 618 training runs on Fashion-MNIST, MNIST, SVHN and CIFAR-10 against nine baselines, with robustness sweeps, ablations and significance tests. DisCo-CFL recovers the concept groups without knowing their number and merges on average 0.1\% of conflicting client pairs, against 8--84\% for baselines that are given the true number of clusters. The limitations, including the weaker results on CIFAR-10 with a short warm-up, are reported explicitly.
+\end{itemize}
+
+We believe the manuscript fits the scope of the Transactions, as it combines a new learning algorithm for distributed neural network training with theoretical guarantees and a thorough empirical study. The main paper is 8 pages long. Full proofs, the Lean~4 formalisation and complete result tables are provided in a separate supplementary file. Code, raw results and the Lean project are publicly available at \url{https://github.com/vinhqdang/cluster_federated_learning}.
+
+This manuscript is original, has not been published previously, and is not under consideration for publication elsewhere. The author declares no conflict of interest. Thank you for considering this submission. I look forward to hearing from you.
+
+Sincerely,\\[0.8em]
+Quang-Vinh Dang\\
+British University Vietnam
+\end{document}
