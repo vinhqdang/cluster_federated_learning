@@ -1,0 +1,19 @@
+\begin{tabular}{lcccccccccccc}
+\toprule
+ & \multicolumn{2}{c}{Rotation} & \multicolumn{2}{c}{Label swap} & \multicolumn{2}{c}{Rot.+QS} & \multicolumn{2}{c}{Mixed+QS} & \multicolumn{2}{c}{Label only} & \multicolumn{2}{c}{Minority} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-9}\cmidrule(lr){10-11}\cmidrule(lr){12-13}
+Method & Acc & Con. & Acc & Con. & Acc & Con. & Acc & Con. & Acc & Con. & Acc & Con. \\
+\midrule
+FedAvg & 86.0 & 75.7 & 70.1 & 55.7 & 85.8 & 74.7 & 80.8 & 66.6 & 95.5 & 85.8 & 85.5 & 76.7 \\
+Local & 87.8 & 60.7 & 88.7 & 64.0 & 87.9 & 61.9 & 88.9 & 64.1 & 94.6 & 51.0 & 88.5 & 62.7 \\
+FedAvg-FT & 88.8 & 77.9 & 90.6 & 80.9 & 87.6 & 75.4 & 88.6 & 76.5 & 94.2 & 80.7 & 89.4 & 78.5 \\
+IFCA & 89.2 & 77.0 & 85.6 & 71.1 & 88.5 & 77.0 & 89.0 & 75.4 & 95.4 & 85.7 & 89.4 & 78.1 \\
+FeSEM & 89.1 & 80.6 & 87.5 & 79.8 & 88.3 & 78.4 & 88.1 & 77.9 & 95.5 & 85.7 & 89.8 & 81.8 \\
+CFL & 90.2 & 73.9 & 90.4 & 76.1 & 88.8 & 73.5 & 84.8 & 70.2 & 95.3 & 77.1 & 87.3 & 76.7 \\
+FL+HC & 86.4 & 74.9 & 71.5 & 59.1 & 85.3 & 73.5 & 81.8 & 67.1 & 95.5 & \textbf{85.9} & 87.7 & 78.0 \\
+PACFL & 89.5 & 79.4 & 74.8 & 53.6 & 88.0 & 76.5 & 83.3 & 66.4 & 95.5 & 85.8 & 89.8 & 78.8 \\
+\textbf{DisCo-CFL} & \textbf{90.5} & \textbf{83.9} & \textbf{90.8} & \textbf{84.9} & \textbf{90.1} & \textbf{82.1} & \textbf{90.6} & \textbf{82.5} & \textbf{95.6} & 85.6 & \textbf{90.8} & \textbf{84.1} \\
+\midrule
+Oracle & 90.5 & 83.9 & 90.8 & 84.9 & 90.1 & 82.1 & 90.6 & 83.4 & 95.5 & 85.8 & 90.9 & 84.2 \\
+\bottomrule
+\end{tabular}

@@ -89,7 +89,8 @@ experiments/
   clustering_study.py # tau / DP / sample size / minority / explanations / certificates / newcomers / scalability
   theory_sim.py       # synthetic validation of the theorems
   summarize.py        # tables (results/tables) and figures (results/figures)
-paper/            # LaTeX manuscript with full proofs
+paper/            # LaTeX manuscript with full proofs (long version)
+paper_tnnls/      # IEEE TNNLS version: main.pdf (8 pages) + supplement.pdf (full proofs, Lean, full tables)
 lean/             # Lean 4 formalization of the proofs
 tests/            # unit tests
 results/          # raw results, tables, figures
@@ -118,7 +119,7 @@ All numbers: mean over 3 seeds (618 training runs in total), 40 clients unless s
 "Acc" is mean local test accuracy with the Bayes prior correction applied **identically to every
 method**. IFCA, FeSEM, FL+HC and PACFL are **given the true K**; DisCo-CFL finds K on its own.
 Full tables: [`results/tables/main.md`](results/tables/main.md),
-[`results/tables/studies.md`](results/tables/studies.md); manuscript: [`paper/main.pdf`](paper/main.pdf).
+[`results/tables/studies.md`](results/tables/studies.md); manuscript: [`paper/main.pdf`](paper/main.pdf); IEEE TNNLS version: [`paper_tnnls/main.pdf`](paper_tnnls/main.pdf) and [`paper_tnnls/supplement.pdf`](paper_tnnls/supplement.pdf).
 
 ### Fashion-MNIST (main benchmark)
 

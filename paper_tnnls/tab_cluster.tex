@@ -1,0 +1,15 @@
+\begin{tabular}{lcccccccc}
+\toprule
+ & \multicolumn{2}{c}{FMNIST} & \multicolumn{2}{c}{MNIST} & \multicolumn{2}{c}{SVHN} & \multicolumn{2}{c}{CIFAR-10} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-9}
+Method & ARI & Conf. & ARI & Conf. & ARI & Conf. & ARI & Conf. \\
+\midrule
+IFCA & 0.44 & 22.3 & 0.51 & 17.5 & 0.32 & 23.5 & 0.03 & 29.6 \\
+FeSEM & 0.70 & 8.3 & 0.88 & 3.0 & 0.67 & 11.1 & 0.67 & 11.7 \\
+CFL & 0.21 & 22.9 & 0.17 & 41.5 & 0.27 & 10.6 & 0.16 & 0.3 \\
+FL+HC & 0.05 & 83.2 & 0.01 & 85.3 & 0.01 & 84.9 & 0.01 & 85.0 \\
+PACFL & 0.31 & 23.3 & 0.22 & 23.0 & 0.19 & 22.9 & 0.19 & 33.3 \\
+\textbf{DisCo-CFL} & 0.98 & 0.1 & 0.98 & 0.0 & 0.98 & 0.0 & 0.63 & 13.8 \\
+DisCo-CFL (30 warm-up) & -- & -- & -- & -- & -- & -- & 0.83 & 2.2 \\
+\bottomrule
+\end{tabular}

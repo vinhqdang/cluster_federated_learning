@@ -228,3 +228,8 @@ paper/*.out
 paper/*.blg
 paper/*.bbl
 paper/*.toc
+paper_tnnls/*.aux
+paper_tnnls/*.log
+paper_tnnls/*.out
+paper_tnnls/*.blg
+paper_tnnls/*.bbl

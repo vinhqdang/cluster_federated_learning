@@ -1,0 +1,26 @@
+We formalised the deterministic core of every result of Section~\ref{sec:theory} in Lean~4~\citep{moura2021lean4} with Mathlib~\citep{mathlib2020}. The project is in the \texttt{lean/} directory of the repository and is checked with \texttt{lake build}. None of the 25 theorems uses \texttt{sorry}, and \texttt{\#print axioms} reports only Lean's standard axioms (\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}) for each of them. Table~\ref{tab:lean} maps the results to Lean theorems.
+
+The probabilistic ingredients enter the formal statements as hypotheses: sub-Gaussian and Hanson--Wright concentration, the Bretagnolle--Huber inequality and the $(\varepsilon,\delta)$ accounting of the Gaussian mechanism. For example, \texttt{claim1\_conflict\_not\_linked} assumes the event $\mathcal E$ in the form $\mathrm{num}\le(1-\Delta+\gamma/2)\,\mathrm{den}$. These ingredients are standard, cited results that Mathlib does not yet provide in the required form, so they are not re-proved. The combinatorial part of Theorem~\ref{thm:rec} is modelled abstractly. A state is a list of clusters and a merge step replaces two linked clusters by their union. Safety is proved for every state reachable by \emph{any} sequence of allowed merges (\texttt{Relation.ReflTransGen}), so it does not depend on the merge order.
+
+\begin{table}[h]
+\centering
+\caption{Results of Section~\ref{sec:theory} and the Lean theorems that verify their deterministic core.}\label{tab:lean}
+\small
+\begin{tabular}{p{0.3\linewidth}p{0.62\linewidth}}
+\toprule
+Result & Lean theorems (namespace \texttt{DiscoProofs}) \\
+\midrule
+Lemma~\ref{lem:pop} & \texttt{spearman\_brown}, \texttt{population\_calibration}, \texttt{raw\_cosine\_attenuated}, \texttt{attenuation\_le\_one} \\
+Theorem~\ref{thm:conc} (clipping step) & \texttt{clip\_reduces\_error} \\
+Theorem~\ref{thm:rec}, Claims 1--2 & \texttt{claim1\_conflict\_not\_linked}, \texttt{claim2\_compatible\_linked}, \texttt{claim2\_lower\_bound} \\
+Theorem~\ref{thm:rec}(a) safety & \texttt{singleton\_conflict\_free}, \texttt{merge\_preserves\_conflict\_free}, \texttt{safety\_all\_merges} \\
+Theorem~\ref{thm:rec}(b) maximality & \texttt{maximality} \\
+Theorem~\ref{thm:rec}(c) exact recovery & \texttt{exact\_recovery} \\
+Corollary~\ref{cor:sc} & \texttt{sample\_size\_sufficient}, \texttt{evidence\_condition} \\
+Theorem~\ref{thm:lb} & \texttt{lower\_bound\_construction}, \texttt{lower\_bound\_cosine}, \texttt{kl\_value}, \texttt{lower\_bound\_sample\_size} \\
+Proposition~\ref{prop:dp}(i) & \texttt{norm\_clip\_le}, \texttt{clipped\_mean\_sensitivity}, \texttt{clipped\_signature\_sensitivity} \\
+Proposition~\ref{prop:expl} & \texttt{explanation\_fidelity} \\
+Proposition~\ref{prop:pc} & \texttt{prior\_correction\_proportional}, \texttt{prior\_correction\_argmax} \\
+\bottomrule
+\end{tabular}
+\end{table}

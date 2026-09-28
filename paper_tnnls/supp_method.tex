@@ -1,0 +1,59 @@
+\begin{definition}[Concept equivalence and conflicts]\label{def:concept}
+Clients $i$ and $j$ \emph{conflict on class} $c\in S_i\cap S_j$ if $\cP_i(X\mid Y=c)\neq\cP_j(X\mid Y=c)$. They are \emph{compatible} if they conflict on no shared class. Clients belong to $K$ latent concept groups $G_1,\dots,G_K$: $\cP_i(X\mid Y=c)=\cP^{(k)}(X\mid Y=c)$ for $i\in G_k$.
+\end{definition}
+
+\subsection{Method definitions}\label{sec:method}
+\subsubsection{Class-conditional gradient signatures (client side)}
+After $T_0$ warm-up rounds of FedAvg the server broadcasts a reference model $w$ and the seed of a count-sketch $\Phi:\R^d\to\R^p$~\citep{charikar2002countsketch,weinberger2009hashing} ($p=1024$). For a sample $(x,c)$ let $g(x,c)=\Phi\nabla_w\ell(w;x,c)\in\R^p$. For every class $c\in S_i$ the client randomly splits its class-$c$ samples into halves $A_i^c,B_i^c$ of size $h_i^c$ and sends
+\[ a_i^c=\frac1{h_i^c}\sum_{s\in A_i^c}g(x_s,c),\qquad b_i^c=\frac1{h_i^c}\sum_{s\in B_i^c}g(x_s,c). \]
+Per-sample sketched gradients are clipped to a shared norm $C_{\rm clip}$ ($0.5$ in all experiments) before averaging. Per-sample gradients at a trained reference model are extremely heavy-tailed: in our Fashion-MNIST runs the median norm is $0.08$ and the 99th percentile about $23$, so a handful of hard examples would otherwise dominate a class signature. The expected clipped gradient is still a functional of $\cP_i(X\mid Y=c)$, so invariance is preserved, and clipping makes per-sample signatures bounded, hence sub-Gaussian as required by Assumption~\ref{ass:noise}. The upload happens \emph{once} and costs $2p|S_i|\le 2pC$ floats, independent of the model size $d$. For our small CNN ($d\approx4.7\times10^4$) this is comparable to one model upload; for realistic models with $d\gg 2pC$ it is negligible. For differential privacy (Proposition~\ref{prop:dp}), Gaussian noise is added to each clipped half-mean.
+
+\subsubsection{Disattenuated similarity (server side)}
+Let $m_i^c=(a_i^c+b_i^c)/2$. The split-half reliability and its Spearman--Brown extension to the full mean are
+\begin{equation}\label{eq:rel}
+r_i^c=\cos(a_i^c,b_i^c),\qquad R_i^c=\frac{2r_i^c}{1+r_i^c}\quad(R_i^c:=0 \text{ if } r_i^c\le 0).
+\end{equation}
+The calibrated similarity of $i$ and $j$ on class $c$ is
+\begin{equation}\label{eq:disatt}
+\rhohat_{ij}^c=\operatorname{clip}_{[-1,1]}\!\left(\frac{\cos(m_i^c,m_j^c)}{\sqrt{R_i^cR_j^c}}\right),\qquad W_{ij}^c=R_i^cR_j^c,
+\end{equation}
+where $W_{ij}^c$ is the evidence weight. In the population version of~\eqref{eq:disatt} the attenuation factors cancel exactly (Lemma~\ref{lem:pop}), so $\rhohat$ targets $\rho_{ij}^c=\cos(\mu_i^c,\mu_j^c)$, the cosine between expected class-conditional gradients, whatever the sample sizes and noise levels.
+
+\subsubsection{Threshold clustering with bottleneck linkage}
+For two sets of clients $A,B$ and a class $c$, let $\mathrm{num}^c_{AB}=\sum_{i\in A,j\in B}W_{ij}^c\rhohat_{ij}^c$ and $\mathrm{den}^c_{AB}=\sum W_{ij}^c$. The linkage is
+\begin{equation}\label{eq:link}
+L(A,B)=\min_{c}\;\frac{\mathrm{num}^c_{AB}+\lambda}{\mathrm{den}^c_{AB}+\lambda}\qquad\text{if }\textstyle\sum_c\mathrm{den}^c_{AB}\ge e_{\min},\ \text{else }-\infty.
+\end{equation}
+The \emph{minimum} over classes encodes the definition of concept equivalence: two groups share a concept only if every class-conditional gradient agrees, so a label swap affecting two of ten classes is not averaged away. The shrinkage $\lambda$ pulls classes with little evidence towards $1$ (``no evidence of a difference''). Starting from singletons, the server repeatedly merges, among the pairs with $L\ge\tau$, the pair with the \emph{largest shared evidence}. Well-supported groups therefore form first, and clients that carry little information on the discriminative classes join them afterwards instead of bridging different groups. Merging stops when no pair reaches $\tau$. Because the scale is calibrated, $\tau$ has a fixed meaning: we use $\tau=0.8$ in \emph{all} experiments, with $\lambda=0.5$. Clients with total reliability $\sum_c R_i^c<0.3$ are \emph{low-evidence}: they are excluded from shaping clusters and attached to their most similar cluster afterwards. A singleton cluster is attached to its closest cluster unless the evidence \emph{significantly} separates them (upper confidence bound below $\tau$), in which case it is kept and flagged as \emph{anomalous}. Each cluster then runs FedAvg from $w$. Algorithm~\ref{alg:disco} summarises the procedure.
+
+\begin{algorithm}[t]
+\caption{DisCo-CFL}\label{alg:disco}
+\begin{algorithmic}[1]
+\State Warm-up: $T_0$ rounds of FedAvg on all clients $\to$ reference model $w$; broadcast $w$ and sketch seed
+\For{each client $i$ \textbf{in parallel}} \Comment{once}
+ \For{$c\in S_i$} split class-$c$ samples into halves, send $(a_i^c,b_i^c)$ (per-sample clipped; noised if DP) \EndFor
+\EndFor
+\State Server: $R_i^c$ by~\eqref{eq:rel}; $\rhohat^c_{ij},W^c_{ij}$ by~\eqref{eq:disatt}
+\State Clusters $\gets$ singletons of clients with enough evidence
+\While{$\exists A,B$ with $L(A,B)\ge\tau$} merge the eligible pair with the largest $\sum_c\mathrm{den}^c_{AB}$; log it \EndWhile
+\State Attach low-evidence clients and non-significant singletons; flag anomalies
+\State Output clusters, certificates, explanations, audit log; run FedAvg within each cluster from $w$
+\end{algorithmic}
+\end{algorithm}
+
+\subsubsection{Inference: prior-corrected cluster models}\label{sec:pc}
+Clusters are built so that their members share class-conditionals but may have very different label proportions. By Bayes' rule, the posterior of client $i$ is obtained from that of its cluster $k$ by re-weighting the prior (Proposition~\ref{prop:pc}). Client $i$ therefore predicts with
+\begin{equation}\label{eq:pc}
+\hat y(x)=\argmax_y\ \big[f_k(x)_y+\log\hat p_i(y)-\log\hat p_k(y)\big],
+\end{equation}
+where $f_k$ are the logits of the cluster model, $\hat p_i$ is the client's own (smoothed) label distribution, and $\hat p_k$ is the label distribution of the cluster's training data. The latter is a sum of label counts that the server can obtain by secure aggregation, so no individual histogram is revealed. This correction~\citep{lipton2018labelshift,menon2021logit} costs nothing at training time. It is exactly what concept-level clustering calls for: label skew is handled by the prior, not by more clusters. In the experiments we apply the same correction to \emph{every} method, for a fair comparison.
+
+\subsubsection{Transparency and accountability outputs}\label{sec:outputs}
+\begin{itemize}[leftmargin=*,itemsep=1pt]
+\item \textbf{Class-level explanations.} For every pair of clusters the server reports the pooled per-class similarity and the set of \emph{divergent classes} $\hat D_{AB}=\{c:\rho^c_{AB}<\tau\}$.
+\item \textbf{Heterogeneity diagnosis.} If $\hat D_{AB}$ contains every shared class, the server reports a global (feature-level) concept shift; if it is a strict subset, a class-specific shift on the listed classes; if $\hat K=1$, it reports that the heterogeneity is explained by target and quantity skew only.
+\item \textbf{Assignment certificates.} Each client receives its bottleneck similarity to its own cluster and to the closest other cluster, the bottleneck classes, and standard errors from the spread over member pairs. A certificate is \emph{confident} if $s_{\rm own}-z\,\mathrm{se}\ge\tau$ and $s_{\rm other}+z\,\mathrm{se}<\tau$ ($z=2$); otherwise it is \emph{uncertain} or \emph{low-evidence}.
+\item \textbf{Audit log} of every merge (members, linkage, bottleneck class, evidence) and of every attachment or anomaly decision, so that each grouping can be traced and contested.
+\item \textbf{Newcomers} compute their signature at the same frozen $w$ and join the cluster with the highest bottleneck similarity if it reaches $\tau$. Otherwise they are reported as a \emph{novel concept}.
+\end{itemize}
+

@@ -1,0 +1,157 @@
+Throughout, $C,C_1,C_2,\dots$ and $c_0$ denote constants that depend only on the sub-Gaussian constant $K_0$ and may change from line to line. We fix a class $c$ and drop it from the notation when no confusion arises. Statements whose deterministic core is machine-checked in Lean~4 are marked with the name of the corresponding Lean theorem (Section~\ref{app:lean}).
+
+\subsection{Proof of Proposition~\ref{prop:inv}}
+The reference model $w$, the sketch $\Phi$ and the label $c$ are the same for all clients, so
+\[
+\mu_i^c=\int \Phi\,\nabla_w\ell(w;x,c)\;d\cP_i(x\mid Y=c)
+\]
+is determined by $\cP_i(X\mid Y=c)$ alone. Neither the proportion $\cP_i(Y=c)$ nor the number of samples enters. If $i$ and $j$ are compatible, then $\cP_i(X\mid Y=c)=\cP_j(X\mid Y=c)$ on each shared class, hence $\mu_i^c=\mu_j^c$ and $\rho^c_{ij}=1$. Per-sample clipping is applied identically by all clients, so the same holds for the expected clipped signature. \qed
+
+\subsection{Proof of Lemma~\ref{lem:pop}}
+Write the half-means as $a_i=\mu_i+\zeta_{i1}$ and $b_i=\mu_i+\zeta_{i2}$, where $\zeta_{i1},\zeta_{i2}$ are independent, zero-mean and have covariance $\Sigma_i/h_i$ (any covariance works, and it may differ across clients). Let $t_i=\tr\Sigma_i/h_i$. Then
+\[
+\E\langle a_i,b_i\rangle=a_i,
+\qquad
+\E\|a_i\|^2=\E\|b_i\|^2=a_i+t_i,
+\]
+so the population split-half reliability is $r_i^\star=a_i/(a_i+t_i)$ and
+\[
+R_i^\star=\frac{2r_i^\star}{1+r_i^\star}=\frac{a_i}{a_i+t_i/2}.
+\]
+For the full means, $\E\|m_i\|^2=a_i+t_i/2=a_i/R_i^\star$, and by independence across clients $\E\langle m_i,m_j\rangle=\langle\mu_i,\mu_j\rangle$. The population cosine is therefore
+\[
+\frac{\langle\mu_i,\mu_j\rangle}{\sqrt{(a_i/R_i^\star)(a_j/R_j^\star)}}
+=\frac{\langle\mu_i,\mu_j\rangle}{\sqrt{a_ia_j}}\sqrt{R^\star_iR^\star_j}
+=\rho_{ij}\sqrt{R^\star_iR^\star_j},
+\]
+and dividing by $\sqrt{R_i^\star R_j^\star}$ gives $\rho_{ij}$ exactly. (Lean: \texttt{spearman\_brown}, \texttt{population\_calibration}.) \qed
+
+\subsection{Proof of Theorem~\ref{thm:conc}}
+\emph{Noise representation.} A half-mean noise vector is $\zeta=(\Sigma/h)^{1/2}\bar z$ with $\bar z=h^{-1/2}\sum_{s}z_s$. Its coordinates are independent, zero-mean, unit-variance and $CK_0$-sub-Gaussian.
+
+\emph{Statistics.} $\rhohat_{ij}$ and $R_i$ are functions of nine statistics:
+\[
+X_1=\langle a_i,b_i\rangle,\quad X_2=\|a_i\|^2,\quad X_3=\|b_i\|^2,\quad X_4=\|m_i\|^2,
+\]
+the same four statistics $X_5,\dots,X_8$ for client $j$, and $X_9=\langle m_i,m_j\rangle$. We normalise them as $x_k=X_k/a_i$ for the statistics of $i$, $x_k=X_k/a_j$ for those of $j$, and $x_9=X_9/\sqrt{a_ia_j}$. With $\kappa_i=\tr\Sigma/(a_ih_i)\le\kappa$, their expectations are
+\[
+x^\star=\big(1,\;1+\kappa_i,\;1+\kappa_i,\;1+\kappa_i/2,\;\dots,\;\rho_{ij}\big).
+\]
+Each statistic is a constant, plus linear terms $\langle\mu,\zeta\rangle$, plus quadratic or bilinear forms in the $\zeta$'s.
+
+\emph{Linear terms.} $\langle\mu_i,\zeta\rangle$ is sub-Gaussian with variance proxy
+\[
+CK_0^2\,\frac{\mu_i^\top\Sigma\mu_i}{h}\;\le\;CK_0^2\,\frac{a_i\|\Sigma\|_\op}{h}.
+\]
+After normalisation by $a_i$ (or by $\sqrt{a_ia_j}$ for cross terms), it is, with probability $1-\delta'$, at most
+\[
+C\sqrt{\frac{\|\Sigma\|_\op}{ah}}\sqrt{\log(2/\delta')}
+\;=\;C\sqrt{\kappa/r_s}\,\sqrt{\log(2/\delta')},
+\]
+because $\|\Sigma\|_\op=\sigma^2/r_s$.
+
+\emph{Quadratic and bilinear terms.} $\|\zeta\|^2-\tr(\Sigma/h)$ and $\langle\zeta,\zeta'\rangle$ for independent $\zeta,\zeta'$ are centred quadratic forms $\bar Z^\top M\bar Z$ of the concatenated vector $\bar Z$, with $\|M\|_F\le\|\Sigma\|_F/h$ and $\|M\|_\op\le\|\Sigma\|_\op/h$. The Hanson--Wright inequality~\citep{rudelson2013hansonwright} bounds the deviation, with probability $1-\delta'$, by
+\[
+C K_0^2\Big(\|M\|_F\sqrt{\log(2/\delta')}+\|M\|_\op\log(2/\delta')\Big).
+\]
+Since $\|\Sigma\|_F=\sigma^2/\sqrt{r_e}$, after normalisation by $a$ this is at most
+\[
+C\frac{\kappa}{\sqrt{r_e}}\sqrt{\log(2/\delta')}+C\frac{\kappa}{r_s}\log(2/\delta'),
+\]
+and the second term is at most $C\eta^2\le Cc_0\eta$.
+
+\emph{Union bound.} Taking $\delta'=\delta/6$ over the at most six independent noise terms that appear in each group of statistics, we obtain $\|x-x^\star\|_\infty\le C\eta$ with probability $1-\delta$.
+
+\emph{Smoothness.} Write $\rhohat=F(x)$, where, before clipping,
+\[
+r_i=\frac{x_1}{\sqrt{x_2x_3}},\qquad R_i=\frac{2r_i}{1+r_i}\ \ \text{(similarly for $j$)},\qquad
+\rhohat=\frac{x_9}{\sqrt{x_4x_8R_iR_j}}.
+\]
+By Lemma~\ref{lem:pop}, $F(x^\star)=\rho_{ij}$. For $\kappa\le1$ and $\|x-x^\star\|_\infty\le Cc_0$ with $c_0$ small enough, the argument stays in a compact set on which $x_2,x_3,x_4\in[1/2,3]$, $r_i\ge1/5$ and $R_i\ge1/3$. On that set $F$ is continuously differentiable with gradient bounded by an absolute constant. Hence $|F(x)-F(x^\star)|\le C_1\eta$, and the same argument gives the bound for $R_i$. Clipping to $[-1,1]$ can only reduce the error, because $\rho_{ij}\in[-1,1]$ (Lean: \texttt{clip\_reduces\_error}). For the raw cosine,
+\[
+\frac{x_9}{\sqrt{x_4x_8}}\;\longrightarrow\;\frac{\rho_{ij}}{\sqrt{(1/R^\star_i)(1/R^\star_j)}}=\rho_{ij}\sqrt{R_i^\star R_j^\star}.
+\qquad\qed
+\]
+
+\subsection{Proof of Theorem~\ref{thm:rec}}
+We use two facts, both on $\mathcal E$.
+
+\emph{Claim 1 (conflicting clusters cannot be linked).} Let $A,B$ be conflict-free and suppose some $i\in A$ and $j\in B$ conflict on class $c$. Since $A$ is conflict-free, all members of $A$ holding $c$ share one class-conditional $\cP_A^c$; likewise for $B$, and $\cP_A^c\neq\cP_B^c$. Hence \emph{every} pair in $A\times B$ holding $c$ conflicts on $c$. By Assumption~\ref{ass:sep} and $\mathcal E$, each such pair has $\rhohat\le1-\Delta+\gamma/2$, so
+\[
+\mathrm{num}^c_{AB}\le(1-\Delta+\gamma/2)\,\mathrm{den}^c_{AB}.
+\]
+Moreover
+\[
+\frac{\mathrm{num}^c_{AB}+\lambda}{\mathrm{den}^c_{AB}+\lambda}<\tau
+\iff
+\mathrm{den}^c_{AB}\,\big(\tau-1+\Delta-\gamma/2\big)>\lambda(1-\tau).
+\]
+Since $\tau-1+\Delta\ge\gamma$, the left side is at least
+\[
+\mathrm{den}^c_{AB}\,\frac{\gamma}{2}\;\ge\;W_{ij}^c\,\frac{\gamma}{2}\;>\;w_0\,\frac{\gamma}{2}\;=\;\lambda(1-\tau).
+\]
+The minimum over classes in~\eqref{eq:link} is therefore below $\tau$. (Lean: \texttt{claim1\_conflict\_not\_linked}.)
+
+\emph{Claim 2 (compatible clusters are always linkable).} If $A\cup B$ is conflict-free, then every pair in $A\times B$ that holds a class $c$ has $\rho^c=1$ (Proposition~\ref{prop:inv}), so $\rhohat^c\ge1-\gamma/2$. Every class term of~\eqref{eq:link} is then at least
+\[
+1-\frac{\gamma}{2}\;\ge\;1-\frac{1-\tau}{2}\;=\;\frac{1+\tau}{2}\;>\;\tau,
+\]
+and classes without evidence contribute $1$. So $L(A,B)>\tau$ whenever the shared evidence is at least $e_{\min}$. (Lean: \texttt{claim2\_compatible\_linked}.)
+
+\emph{Conclusion.} (a) Singletons are conflict-free. By Claim~1, a merge is only performed between clusters whose union is conflict-free, so the invariant is preserved by every merge, in any order. (b) At termination, every pair of clusters with shared evidence $\ge e_{\min}$ has $L<\tau$; by Claim~2 their union is not conflict-free. (c) Under full support, two clients of different groups $k\ne l$ both hold a class on which $\cP^{(k)}$ and $\cP^{(l)}$ differ, so they conflict. By (a), each output cluster is contained in a single group. Two output clusters inside the same group have a conflict-free union and share evidence $\ge e_{\min}$, which contradicts (b). Each group thus forms exactly one cluster. (Lean: \texttt{merge\_preserves\_conflict\_free}, \texttt{safety\_all\_merges}, \texttt{exact\_recovery}.) \qed
+
+\subsection{Proof of Corollary~\ref{cor:sc}}
+There are at most $N^2C/2$ pairwise class estimates and $NC$ reliabilities; we apply Theorem~\ref{thm:conc} to each with $\delta/(N^2C)$. With $\mathsf L=\log(12N^2C/\delta)$, the requirement $C_1\eta\le\gamma/2$ holds if
+\[
+\sqrt{\kappa/r_s}\,\sqrt{\mathsf L}\le\frac{\gamma}{4C_1}
+\qquad\text{and}\qquad
+\frac{\kappa}{\sqrt{r_e}}\sqrt{\mathsf L}\le\frac{\gamma}{4C_1}.
+\]
+With $\kappa=\sigma^2/(ah)$ these are the first two terms of~\eqref{eq:hstar} (Lean: \texttt{sample\_size\_sufficient}). The side conditions $\kappa\le1$ and $\eta\le c_0$ are absorbed into $C_2$ and the third term. For the evidence condition: on the event, $R\ge R^\star-\gamma/2\ge2/3-\gamma/2$ because $\kappa\le1$. For $\gamma\le1/3$ this gives $W\ge1/4$, so $W>w_0$ holds whenever $\lambda<\gamma/(8(1-\tau))$ (Lean: \texttt{evidence\_condition}). None of these conditions involves $|G_k|$. \qed
+
+\subsection{Proof of Theorem~\ref{thm:lb}}
+Let $e_1$ be a top eigenvector of $\Sigma$ ($\Sigma e_1=\|\Sigma\|_\op e_1$) and let $e_2\perp e_1$ be a unit vector. With $s^2=\Delta/2$ put
+\[
+u=\sqrt a\,\big(\sqrt{1-s^2}\,e_2+s\,e_1\big),
+\qquad
+v=\sqrt a\,\big(\sqrt{1-s^2}\,e_2-s\,e_1\big).
+\]
+Then
+\[
+\|u\|^2=\|v\|^2=a,\qquad \cos(u,v)=1-2s^2=1-\Delta,\qquad u-v=2\sqrt a\,s\,e_1
+\]
+(Lean: \texttt{lower\_bound\_construction}). Under $H_0$ the $n$ samples of client $j$ are i.i.d.\ $\mathcal N(u,\Sigma)$; under $H_1$ they are $\mathcal N(v,\Sigma)$; $\mu_i=u$ is known. Then
+\[
+\mathrm{KL}\big(\mathcal N(u,\Sigma)^{\otimes n}\,\big\|\,\mathcal N(v,\Sigma)^{\otimes n}\big)
+=\frac n2(u-v)^\top\Sigma^{-1}(u-v)
+=\frac n2\cdot\frac{4as^2}{\|\Sigma\|_\op}
+=\frac{n\,a\,\Delta\,r_s}{\sigma^2}.
+\]
+By the Bretagnolle--Huber inequality (\citealp[Thm.~2.2]{tsybakov2009}), every test $\psi$ satisfies
+\[
+\max_{H\in\{0,1\}}\Pr_H(\psi\neq H)\;\ge\;\tfrac14\exp(-\mathrm{KL}).
+\]
+A procedure that sees only half-means (as DisCo-CFL does), or that does not know $\mu_i$, has access to less information, so the bound applies to it as well. \qed
+
+\subsection{Proof of Proposition~\ref{prop:pc}}
+For $i$ in cluster $k$, since the class-conditionals are shared,
+\[
+\cP_i(y\mid x)=\frac{\cP_i(y)\,\cP(x\mid y)}{\sum_{y'}\cP_i(y')\,\cP(x\mid y')},
+\qquad
+q_k(y\mid x)=\frac{\cP_k(y)\,\cP(x\mid y)}{\sum_{y'}\cP_k(y')\,\cP(x\mid y')}.
+\]
+Dividing, $\cP_i(y\mid x)\propto q_k(y\mid x)\,\cP_i(y)/\cP_k(y)$, with a normalising constant that does not depend on $y$. Taking logarithms and the $\argmax$ gives~\eqref{eq:pc} (Lean: \texttt{prior\_correction\_proportional}, \texttt{prior\_correction\_argmax}). The Bayes classifier of $i$ is thus a function of $q_k$ and $\cP_i(Y)$ only. Splitting the cluster changes neither quantity, so it cannot reduce the Bayes risk; it only reduces the data available to estimate $q_k$. \qed
+
+\subsection{Proof of Proposition~\ref{prop:dp}}
+(i) Replacing one record by another of the same label changes one clipped summand. The half-mean therefore changes by at most $2C_{\rm clip}/h$ in $\ell_2$ (Lean: \texttt{clipped\_mean\_sensitivity}). The added noise has standard deviation $\sigma_{\rm dp}$ times this sensitivity, so the analytic Gaussian mechanism~\citep{balle2018analytic} gives $(\varepsilon,\delta)$-DP for that vector. Every record enters exactly one released vector, so by parallel composition the whole signature is $(\varepsilon,\delta)$-DP. The server's computations are post-processing~\citep{dwork2014dp}. The class supports and half sizes are released and are not protected.
+
+(ii) The DP noise is zero-mean and independent of everything else. The proof of Lemma~\ref{lem:pop} used only these two properties, so it still holds with
+\[
+t_i=\frac{\tr\Sigma_{\rm clip}}{h}+p\Big(\frac{2\sigma_{\rm dp}C_{\rm clip}}{h}\Big)^2.
+\]
+In the proof of Theorem~\ref{thm:conc}, the Gaussian DP component adds a linear term with normalised standard deviation $2\sigma_{\rm dp}C_{\rm clip}/(h\sqrt a)$ and a quadratic term with normalised Frobenius scale $4\sqrt p\,\sigma^2_{\rm dp}C^2_{\rm clip}/(h^2a)$. Requiring each to be at most $\gamma/(4C_1\sqrt{\mathsf L})$ gives the two stated conditions.
+
+(iii) This follows from the last statement of Theorem~\ref{thm:conc} with the inflated $t_i$. \qed
+
+\subsection{Proof of Proposition~\ref{prop:expl}}
+Output clusters are conflict-free (Theorem~\ref{thm:rec}(a)), so the members of $A$ holding $c$ share $\cP_A^c$, and likewise for $B$. If $\cP_A^c\neq\cP_B^c$, the computation of Claim~1 with $\mathrm{den}^c_{AB}>w_0$ gives a pooled value below $\tau$, so $c\in\hat D_{AB}$. Otherwise all pairs have $\rho^c=1$ and the pooled value is at least $(1+\tau)/2>\tau$ (Claim~2), so $c\notin\hat D_{AB}$. (Lean: \texttt{explanation\_fidelity}.) \qed

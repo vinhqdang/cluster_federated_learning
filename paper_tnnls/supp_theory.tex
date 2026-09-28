@@ -1,0 +1,102 @@
+\subsection{Full statements}\label{sec:theory}
+Proofs are in Section~\ref{app:proofs}; their deterministic parts are formalised in Lean~4 (Section~\ref{app:lean}). Write $\mu_i^c=\E_{x\sim\cP_i(X\mid Y=c)}[g(x,c)]$ and $a_i^c=\|\mu_i^c\|^2$.
+
+\begin{proposition}[Invariance]\label{prop:inv}
+$\mu_i^c$ is a functional of $\cP_i(X\mid Y=c)$ only. Consequently, for compatible clients $\rho^c_{ij}=1$ on every shared class, whatever their label proportions $\cP_i(Y),\cP_j(Y)$ and sample sizes $n_i,n_j$.
+\end{proposition}
+
+\begin{assumption}[Noise]\label{ass:noise}
+Per-sample signatures are $g=\mu_i^c+\Sigma^{1/2}z$ with independent $z$ having independent, zero-mean, unit-variance, $K_0$-sub-Gaussian coordinates. Let $\sigma^2=\tr\Sigma$, and define the effective ranks $r_s=\tr\Sigma/\|\Sigma\|_{\op}$ and $r_e=(\tr\Sigma)^2/\|\Sigma\|_F^2$.
+\end{assumption}
+\begin{assumption}[Identifiability]\label{ass:sep}
+If $i,j$ conflict on $c$, then $\rho^c_{ij}\le1-\Delta$ for some $\Delta\in(0,1]$.
+\end{assumption}
+For a pair and a class let $h=\min(h_i^c,h_j^c)$, $a=\min(a_i^c,a_j^c)$, and let $\kappa=\sigma^2/(ah)$ be the inverse signal-to-noise ratio of a half-mean.
+
+\begin{lemma}[Exact calibration at the population level]\label{lem:pop}
+Replacing each inner product and squared norm in~\eqref{eq:rel}--\eqref{eq:disatt} by its expectation gives exactly $\rho_{ij}^c$.
+\end{lemma}
+
+\begin{theorem}[Concentration]\label{thm:conc}
+Under Assumption~\ref{ass:noise}, let $\kappa\le1$ and $\delta\in(0,1)$. There are constants $c_0,C_1$ depending only on $K_0$ such that, if
+\[
+\eta:=\Big(\sqrt{\kappa/r_s}+\kappa/\sqrt{r_e}\Big)\sqrt{\log(12/\delta)}\;\le\; c_0,
+\]
+then with probability at least $1-\delta$
+\[
+|\rhohat_{ij}^c-\rho_{ij}^c|\le C_1\,\eta,
+\qquad
+|R_i^c-R_i^{c,\star}|\le C_1\eta,
+\qquad
+R_i^{c,\star}:=\frac{a_i^c}{a_i^c+\sigma^2/(2h_i^c)}.
+\]
+In contrast, the raw cosine $\cos(m_i^c,m_j^c)$ converges to $\rho^c_{ij}\sqrt{R_i^{c,\star}R_j^{c,\star}}$. It is biased towards $0$ by a factor that depends on the sample sizes.
+\end{theorem}
+
+\begin{theorem}[Safety, maximality, recovery]\label{thm:rec}
+Let $\gamma=\min(1-\tau,\ \tau-1+\Delta)>0$ and $w_0:=2\lambda(1-\tau)/\gamma$. Suppose that all estimates satisfy $|\rhohat^c_{ij}-\rho^c_{ij}|\le\gamma/2$ (event $\mathcal E$) and that every pair conflicting on a class $c$ has evidence $W^c_{ij}>w_0$. Then the merging phase of Algorithm~\ref{alg:disco}, in any merge order, satisfies:
+\begin{enumerate}[label=(\alph*),itemsep=0pt]
+\item \emph{Safety:} no cluster ever contains two conflicting clients.
+\item \emph{Maximality:} any two output clusters with shared evidence $\ge e_{\min}$ contain a conflicting pair, so no two output clusters can be merged without mixing concepts.
+\item \emph{Exact recovery:} if every client holds every class on which some groups differ, and every pair of clients shares evidence $\ge e_{\min}$, the output partition equals $\{G_1,\ldots,G_K\}$; in particular $\hat K=K$.
+\end{enumerate}
+\end{theorem}
+
+\begin{corollary}[Sample complexity and minority fairness]\label{cor:sc}
+Under Assumptions~\ref{ass:noise}--\ref{ass:sep}, let $\gamma\le1/3$ and $\lambda<\gamma/(8(1-\tau))$. The conclusions of Theorem~\ref{thm:rec} hold with probability at least $1-\delta$ as soon as every reported half size satisfies
+\begin{equation}\label{eq:hstar}
+h\;\ge\;h^\star:=C_2\,\frac{\sigma^2}{a}\,
+\max\Big\{\frac{\mathsf L}{r_s\,\gamma^2},\ \frac{\sqrt{\mathsf L}}{\sqrt{r_e}\,\gamma},\ 1\Big\},
+\qquad \mathsf L:=\log\frac{12N^2C}{\delta}.
+\end{equation}
+$h^\star$ does not depend on the sizes of the groups $|G_k|$, on the number of clients per group, or on the other clients' dataset sizes (apart from $\log N$). A concept group made of a \emph{single} client is recovered under the same condition as a group of a hundred.
+\end{corollary}
+
+\begin{theorem}[Minimax lower bound]\label{thm:lb}
+Let $\xi\sim\mathcal N(0,\Sigma)$ and $\|\mu\|^2=a$. For any test that decides from $n$ per-sample signatures of client $j$, even when $\mu_i$ is known exactly, whether $\rho_{ij}=1$ or $\rho_{ij}=1-\Delta$, the worst-case error probability is at least
+\[
+\tfrac14\exp\!\big(-n\,a\,\Delta\,r_s/\sigma^2\big).
+\]
+Error at most $\delta$ therefore requires
+\[
+n\;\ge\;\frac{\sigma^2}{a\,r_s\,\Delta}\,\log\frac1{4\delta}.
+\]
+\end{theorem}
+With $\tau$ in the middle of the admissible interval ($\gamma=\Delta/2$), the leading term of~\eqref{eq:hstar} is
+\[
+O\!\left(\frac{\sigma^2\log(N^2C/\delta)}{a\,r_s\,\Delta^2}\right).
+\]
+The upper and lower bounds therefore agree in their dependence on noise $\sigma^2$, signal $a$ and effective rank $r_s$, and differ by a factor $1/\Delta$ and a $\log N$ term.
+
+\begin{proposition}[Differential privacy and its cost]\label{prop:dp}
+Suppose each released half-mean is
+\[
+\frac1h\sum_{s}\operatorname{clip}_{C_{\rm clip}}(g_s)+\xi_{\rm dp},
+\qquad
+\xi_{\rm dp}\sim\mathcal N\!\big(0,(2\sigma_{\rm dp}C_{\rm clip}/h)^2I_p\big).
+\]
+(i) Every sample enters exactly one released vector, whose replace-one sensitivity is $2C_{\rm clip}/h$. The signature is therefore $(\varepsilon,\delta)$-DP with respect to replacing one record by another of the same label, with $(\varepsilon,\delta)$ given by the analytic Gaussian mechanism~\citep{balle2018analytic} at noise multiplier $\sigma_{\rm dp}$ (parallel composition). The class support $S_i$ is released in the clear.
+(ii) The DP noise is independent of sampling noise. Lemma~\ref{lem:pop} therefore still holds, and Theorem~\ref{thm:conc} applies with the half-mean covariance $\Sigma/h+(2\sigma_{\rm dp}C_{\rm clip}/h)^2I_p$. The recovery guarantee then requires, in addition to~\eqref{eq:hstar},
+\[
+h\;\gtrsim\;\sigma_{\rm dp}C_{\rm clip}\left(\frac{\sqrt{\mathsf L}}{\sqrt a\,\gamma}+\frac{p^{1/4}\,\mathsf L^{1/4}}{\sqrt{a\gamma}}\right),
+\]
+so the per-class sample size grows linearly in $\sigma_{\rm dp}\propto1/\varepsilon$.
+(iii) Without disattenuation, the raw cosine tends to $\rho\,\sqrt{R_iR_j}$ with
+\[
+R\approx\frac{a}{a+2p\,\sigma^2_{\rm dp}C_{\rm clip}^2/h^2}.
+\]
+Unless $h\gg\sqrt p\,\sigma_{\rm dp}C_{\rm clip}/\sqrt a$, same-concept clients look unrelated.
+\end{proposition}
+
+\begin{proposition}[Explanation fidelity]\label{prop:expl}
+On $\mathcal E$, if two output clusters $A,B$ have pooled evidence $\mathrm{den}^c_{AB}>w_0$ on a class $c$, then $c\in\hat D_{AB}$ if and only if $\cP_A(X\mid Y=c)\neq\cP_B(X\mid Y=c)$. The reported divergent classes are exactly the classes on which the two concepts differ.
+\end{proposition}
+
+\begin{proposition}[Prior correction is Bayes-optimal within a concept cluster]\label{prop:pc}
+Let cluster $k$ consist of concept-equivalent clients with pooled distribution $\cP_k(X,Y)=\cP_k(Y)\cP(X\mid Y)$, and let $q_k(y\mid x)$ be its Bayes posterior. For every member $i$, $\cP_i(y\mid x)\propto q_k(y\mid x)\,\cP_i(y)/\cP_k(y)$. Hence~\eqref{eq:pc} with the true priors and $f_k=\log q_k$ is the Bayes-optimal classifier of client $i$. No clustering finer than concept equivalence can reduce the Bayes risk of any member.
+\end{proposition}
+
+\begin{remark}[Scope of the guarantees]
+Theorem~\ref{thm:rec} covers the merging phase. The attachment of low-evidence clients and of non-significant singletons is a fairness heuristic: it avoids training a client alone because of noise, may violate safety when evidence is weak, and is logged in the audit trail. Corollary~\ref{cor:sc} asks for a small $\lambda$ so that a single pair of clients carries enough evidence. Our default $\lambda=0.5$ is larger. It makes the method more conservative about splitting on thin evidence, and merges quickly happen between clusters whose pooled evidence far exceeds $w_0$. Table~\ref{tab:lambda} reports the sensitivity to $\lambda$, including values that satisfy the corollary.
+\end{remark}
+
