@@ -1,4 +1,7 @@
 \documentclass[11pt]{article}
+\newif\ifanon
+\anontrue % double-anonymous review; set \anonfalse for the final version
+
 \usepackage[margin=1in]{geometry}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
@@ -50,13 +53,13 @@
 \DeclareMathOperator*{\argmax}{arg\,max}
 
 \title{Supplementary Material for\\ ``DisCo-CFL: Calibrated, Fair and Explainable Clustered Federated Learning via Disattenuated Class-Conditional Gradient Signatures''}
-\author{Quang-Vinh Dang\\ British University Vietnam, Hung Yen, Vietnam\\ \texttt{vinh.dq4@buv.edu.vn}}
+\ifanon\author{Anonymous Authors}\else\author{Quang-Vinh Dang\\ British University Vietnam, Hung Yen, Vietnam\\ \texttt{vinh.dq4@buv.edu.vn}}\fi
 \date{}
 
 \begin{document}
 \maketitle
 
-\noindent This supplement contains the full definitions and statements (Section~\ref{app:defs}), all proofs (Section~\ref{app:proofs}), the Lean~4 formalisation (Section~\ref{app:lean}), and additional experimental details and results (Section~\ref{app:results}). Code, raw results and the Lean project are available at \url{https://github.com/vinhqdang/cluster_federated_learning}. Results carry the prefix ``S''. They correspond to the main paper as follows: Proposition~\ref{prop:inv} is Proposition~1; Lemma~\ref{lem:pop} and Theorem~\ref{thm:conc} together form Theorem~1; Theorems~\ref{thm:rec} and~\ref{thm:lb} are Theorems~2 and~3; Corollary~\ref{cor:sc} is Corollary~1; Proposition~\ref{prop:dp} is Proposition~2; Propositions~\ref{prop:expl} and~\ref{prop:pc} together form Proposition~3.
+\noindent This supplement contains the full definitions and statements (Section~\ref{app:defs}), all proofs (Section~\ref{app:proofs}), the Lean~4 formalisation (Section~\ref{app:lean}), and additional experimental details and results (Section~\ref{app:results}). Code, raw results and the Lean project \ifanon will be made public upon acceptance\else are available at \url{https://github.com/vinhqdang/cluster_federated_learning}\fi. Results carry the prefix ``S''. They correspond to the main paper as follows: Proposition~\ref{prop:inv} is Proposition~1; Lemma~\ref{lem:pop} and Theorem~\ref{thm:conc} together form Theorem~1; Theorems~\ref{thm:rec} and~\ref{thm:lb} are Theorems~2 and~3; Corollary~\ref{cor:sc} is Corollary~1; Proposition~\ref{prop:dp} is Proposition~2; Propositions~\ref{prop:expl} and~\ref{prop:pc} together form Proposition~3.
 
 \section{Definitions and full statements}\label{app:defs}
 \input{supp_method.tex}

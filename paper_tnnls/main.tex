@@ -27,12 +27,20 @@
 \newcommand{\rhohat}{\hat\rho}
 \DeclareMathOperator*{\argmax}{arg\,max}
 
+\newif\ifanon
+\anontrue % double-anonymous review; set \anonfalse for the final version
+
 \begin{document}
 \title{DisCo-CFL: Calibrated, Fair and Explainable Clustered Federated Learning via Disattenuated Class-Conditional Gradient Signatures}
+\ifanon
+\author{Anonymous Authors}
+\markboth{IEEE Transactions on Neural Networks and Learning Systems}{Anonymous: DisCo-CFL}
+\else
 \author{Quang-Vinh~Dang%
 \thanks{Q.-V. Dang is with British University Vietnam, Hung Yen, Vietnam (e-mail: vinh.dq4@buv.edu.vn; ORCID: 0000-0002-3877-8024).}}
 
 \markboth{IEEE Transactions on Neural Networks and Learning Systems}{Dang: DisCo-CFL}
+\fi
 \maketitle
 
 \begin{abstract}
@@ -62,7 +70,7 @@ Our contributions are as follows.
 \item \emph{Properties beyond accuracy.} The method provides minority protection, per-client assignment certificates, an audit log, anomaly flags, class-level explanations and an automatic heterogeneity diagnosis (Section~\ref{sec:fat}).
 \item \emph{Evaluation.} We test on four datasets against nine baselines that cover all CFL families, with clustering, fairness, explanation and certificate metrics, robustness sweeps and significance tests (Section~\ref{sec:exp}).
 \end{itemize}
-Code, raw results and the Lean project are available at \url{https://github.com/vinhqdang/cluster_federated_learning}. Full statements, proofs, the Lean summary and additional results are in the supplementary material (Sections~S1--S4).
+Code, raw results and the Lean project \ifanon will be made public upon acceptance\else are available at \url{https://github.com/vinhqdang/cluster_federated_learning}\fi. Full statements, proofs, the Lean summary and additional results are in the supplementary material (Sections~S1--S4).
 
 \section{Related Work and Positioning}\label{sec:related}
 We follow the taxonomy of~\cite{benali2026survey}, which separates \emph{core} CFL (several models for statistical heterogeneity) from operational uses of clustering.
