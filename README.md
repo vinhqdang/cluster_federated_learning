@@ -44,7 +44,7 @@ halves** of its class-`c` samples: `(a_c, b_c)`, each of dimension `p = 1024`.
 | **Transparency** | class-level explanation of why clusters differ, automatic heterogeneity diagnosis (feature shift vs. class-specific target shift vs. label/quantity skew only) | explanation fidelity (Prop. 3); precision/recall of the divergent classes |
 | **Accountability** | per-client assignment certificate (similarity to own/closest cluster, standard errors, verdict), audit log of every merge, low-evidence and anomaly flags, newcomer and novel-concept detection | certificate calibration |
 | **Privacy** | optional (ε, δ)-DP signatures (per-sample clipping + Gaussian noise); one-shot, low-dimensional upload | DP by the analytic Gaussian mechanism; the disattenuation stays consistent under DP noise (Prop. 2) |
-| **Theory** | invariance, concentration, safety / maximality / exact recovery, minimax lower bound | Prop. 1, Thm. 1–3, Cor. 1 (proofs in `paper/`) |
+| **Theory** | invariance, concentration, safety / maximality / exact recovery, minimax lower bound | Prop. 1–4, Thm. 1–3, Cor. 1 (proofs in `paper/`; deterministic core machine-checked in Lean 4, see `lean/`) |
 
 ## Theoretical results (summary)
 
@@ -62,13 +62,26 @@ halves** of its class-`c` samples: `(a_c, b_c)`, each of dimension `p = 1024`.
 * **DP.** Signatures are (ε, δ)-DP. The required per-class sample size grows linearly in
   1/ε, while the raw cosine collapses under DP noise.
 
+## Lean 4 verification
+
+`lean/` is a Lean 4 + Mathlib project with 25 machine-checked theorems. It covers the deterministic
+core of every result: population calibration, the linkage claims, safety for every merge order,
+maximality, exact recovery, the corollary arithmetic, the lower-bound construction, DP
+sensitivity, explanation fidelity and the Bayes optimality of prior correction. No theorem uses
+`sorry`, and all depend only on Lean's standard axioms. See [`lean/README.md`](lean/README.md).
+
+```bash
+cd lean && lake exe cache get && lake build && lake env lean AxiomsCheck.lean
+```
+
 ## Repository layout
 
 ```
 discocfl/
   disco.py        # signatures, disattenuated similarity, clustering, certificates, explanations, DP, newcomers
-  algorithms.py   # DisCo-CFL and baselines: FedAvg, Local, IFCA, CFL/MTCFL, FL+HC, PACFL, Oracle
-  data.py         # federated non-IID generation: rotation / label swap / label skew / quantity skew / minority groups
+  algorithms.py   # DisCo-CFL and baselines: FedAvg, Local, FedAvg-FT, IFCA, FeSEM, CFL/MTCFL, FL+HC, PACFL, Oracle
+  data.py         # federated non-IID generation (MNIST, Fashion-MNIST, SVHN, CIFAR-10): rotations, label swaps,
+                  # label skew, quantity skew, minority groups, K groups, partial participation
   fl.py           # model (small CNN) and FedAvg primitives
   synthetic.py    # synthetic signatures with known ground truth (tests, theory validation)
 experiments/
@@ -77,6 +90,7 @@ experiments/
   theory_sim.py       # synthetic validation of the theorems
   summarize.py        # tables (results/tables) and figures (results/figures)
 paper/            # LaTeX manuscript with full proofs
+lean/             # Lean 4 formalization of the proofs
 tests/            # unit tests
 results/          # raw results, tables, figures
 ```
@@ -91,6 +105,8 @@ python experiments/theory_sim.py
 python experiments/run.py --suite main --workers 4
 python experiments/run.py --suite ablation --workers 4
 python experiments/run.py --suite mnist --workers 4
+python experiments/run.py --suite cifar --workers 4
+for s in color newbase strength groups participation scale; do python experiments/run.py --suite $s --workers 4; done
 python experiments/clustering_study.py --study all --workers 4
 python experiments/summarize.py
 cd paper && pdflatex main && bibtex main && pdflatex main && pdflatex main
@@ -98,26 +114,26 @@ cd paper && pdflatex main && bibtex main && pdflatex main && pdflatex main
 
 ## Results
 
-All numbers: mean over 3 seeds, 40 clients, 50 rounds, same CNN and budget for every method.
+All numbers: mean over 3 seeds (618 training runs in total), 40 clients unless stated, 50 rounds, same CNN and budget for every method.
 "Acc" is mean local test accuracy with the Bayes prior correction applied **identically to every
-method**. IFCA, FL+HC and PACFL are **given the true K**; DisCo-CFL finds K on its own.
+method**. IFCA, FeSEM, FL+HC and PACFL are **given the true K**; DisCo-CFL finds K on its own.
 Full tables: [`results/tables/main.md`](results/tables/main.md),
 [`results/tables/studies.md`](results/tables/studies.md); manuscript: [`paper/main.pdf`](paper/main.pdf).
 
 ### Fashion-MNIST (main benchmark)
 
-| Scenario | DisCo Acc | best baseline Acc | DisCo worst-group | best baseline worst-group | DisCo concept acc | best baseline concept acc | DisCo ARI / K | conflicting pairs merged (DisCo / baselines with K) |
+| Scenario | DisCo Acc | best baseline Acc | DisCo worst-group | best baseline worst-group | DisCo concept acc | best baseline concept acc | DisCo ARI / K | conflicting pairs merged (DisCo / baselines given K) |
 |---|---|---|---|---|---|---|---|---|
-| Rotation | **90.5** | 90.2 (CFL, 35 clusters) | **89.5** | 89.1 | **83.9** | 79.4 | 1.00 / 4 | 0% / 21–85% |
-| Label swap | **90.8** | 90.4 (CFL) | **89.2** | 87.8 | **84.9** | 76.1 | 1.00 / 4 | 0% / 17–86% |
-| Rotation + quantity skew | **90.1** | 88.8 (CFL) | **88.7** | 86.7 | **82.1** | 77.0 | 1.00 / 4 | 0% / 21–85% |
-| Mixed + quantity skew | **90.6** | 89.0 (IFCA) | **88.8** | 87.5 | **82.5** | 75.4 | 0.94 / 4 | 0.6% / 22–85% |
-| Label skew only (true K = 1) | **95.6** | 95.5 | **95.6** | 95.5 | 85.6 | 85.9 | K = 1.3 | 0% |
-| Minority groups (25/9/4/2) | **90.8** | 89.8 (PACFL) | **86.5** | 85.2 (Local) | **84.1** | 78.8 | 0.98 / 4.3 | 0% / 18–75% |
+| Rotation | **90.5** | 90.2 (CFL, 35 clusters) | **89.5** | 89.1 (CFL) | **83.9** | 80.6 (FeSEM) | 1.00 / 4 | 0% / 10–85% |
+| Label swap | **90.8** | 90.6 (FedAvg-FT) | 89.2 | **89.7** (FedAvg-FT) | **84.9** | 80.9 (FedAvg-FT) | 1.00 / 4 | 0% / 6–86% |
+| Rotation + quantity skew | **90.1** | 88.8 (CFL) | **88.7** | 86.7 (CFL) | **82.1** | 78.4 (FeSEM) | 1.00 / 4 | 0% / 12–85% |
+| Mixed + quantity skew | **90.6** | 89.0 (IFCA) | **88.8** | 87.5 (IFCA) | **82.5** | 77.9 (FeSEM) | 0.94 / 4 | 0.6% / 8–85% |
+| Label skew only (true K = 1) | **95.6** | 95.5 | **95.6** | 95.5 | 85.6 | **85.9** (FL+HC) | K = 1.3 | 0% |
+| Minority groups (25/9/4/2) | **90.8** | 89.8 (FeSEM, PACFL) | **86.5** | 85.2 (Local) | **84.1** | 81.8 (FeSEM) | 0.98 / 4.3 | 0% / 6–75% |
 
 DisCo-CFL matches the Oracle (clustering on the ground-truth groups) exactly in three scenarios
 and is within 0.1 points in the others. On minority groups, its worst-group accuracy is 86.5%
-against 35.7% for FedAvg, 51.9% for CFL, 67.3% for IFCA and 74.5% for FL+HC.
+against 35.7% for FedAvg, 51.9% for CFL, 67.3% for IFCA, 74.5% for FL+HC and 79.4% for FeSEM.
 
 ### Beyond accuracy
 
@@ -149,10 +165,36 @@ against 35.7% for FedAvg, 51.9% for CFL, 67.3% for IFCA and 74.5% for FL+HC.
 
 | Dataset / scenario | DisCo Acc | best baseline Acc | DisCo concept acc | best baseline concept acc | DisCo ARI | Oracle Acc |
 |---|---|---|---|---|---|---|
-| MNIST rotation | **98.5** | 96.9 (IFCA) | **97.1** | 91.6 | 0.97 | 98.5 |
-| MNIST label swap | **98.7** | 97.1 (Local) | **97.8** | 87.9 | 1.00 | 98.7 |
-| CIFAR-10 rotation (warm-up 10) | 60.5 | **67.0** (CFL, 35 clusters) | 41.0 | 38.2 | 0.38 | 64.2 |
-| CIFAR-10 rotation (warm-up 30) | 62.0 | **67.0** (CFL, 35 clusters) | **44.8** | 38.2 | 0.74 | 64.2 |
+| MNIST rotation | **98.5** | 98.2 (FeSEM) | **97.1** | 95.9 (FeSEM) | 0.97 | 98.5 |
+| MNIST label swap | **98.7** | 98.4 (FeSEM) | **97.8** | 97.1 (FeSEM) | 1.00 | 98.7 |
+| SVHN rotation | **85.4** | 84.1 (FeSEM) | **79.7** | 75.6 (FeSEM) | 0.99 | 85.5 |
+| SVHN label swap | **87.2** | 84.9 (FedAvg-FT) | **82.5** | 72.7 (FedAvg-FT) | 0.97 | 87.1 |
+| CIFAR-10 rotation (warm-up 10 / 30) | 60.5 / 62.0 | **67.0** (CFL, 35 clusters) | 41.0 / **44.8** | 44.8 (FeSEM) | 0.38 / 0.74 | 64.2 |
+| CIFAR-10 label swap (warm-up 10 / 30) | 64.1 / 64.6 | **68.8** (CFL, 33 clusters) | 48.6 / **49.8** | 43.7 (FeSEM) | 0.87 / 0.92 | 64.7 |
+
+### Robustness sweeps (Fashion-MNIST)
+
+| Factor | Setting | DisCo ARI / K | DisCo Acc | best baseline Acc | DisCo concept | best baseline concept | Oracle Acc |
+|---|---|---|---|---|---|---|---|
+| Shift strength | θ = 15° | 0.42 / 3.0 | 90.0 | **90.2** (FeSEM) | 82.8 | **83.0** (FeSEM) | 90.5 |
+| Shift strength | θ = 30° | 0.93 / 4.3 | **90.3** | 90.0 (PACFL) | **83.1** | 81.2 (PACFL) | 90.4 |
+| Shift strength | θ = 45° | 1.00 / 4.0 | **90.4** | 89.9 (FeSEM) | **83.8** | 81.8 (FeSEM) | 90.4 |
+| Groups | K = 2 | 0.94 / 3.3 | **91.4** | 88.5 (IFCA) | **86.5** | 80.2 (IFCA) | 91.5 |
+| Groups | K = 8 | 0.92 / 8.0 | **90.4** | 88.0 (FeSEM) | **81.7** | 75.4 (FeSEM) | 90.5 |
+| Participation 30% | rotation | 1.00 / 4.0 | **89.1** | 87.5 (PACFL) | **78.4** | 75.1 (FeSEM) | 89.1 |
+| Participation 30% | label swap | 0.98 / 4.0 | **89.3** | 86.5 (FeSEM) | **78.3** | 73.0 (FeSEM) | 89.3 |
+| Scale | N = 200 | 0.98 / 6.3 | **91.1** | 89.8 (PACFL) | **86.6** | 83.9 (FeSEM) | 91.1 |
+
+When the shift is too small to be told apart (15°), DisCo-CFL merges neighbouring concepts, as the
+separation assumption predicts; this costs 0.5 points against the Oracle.
+
+### Statistical significance
+
+Paired one-sided Wilcoxon signed-rank tests over all (scenario, seed) pairs with concept shift show
+that DisCo-CFL is significantly better than every baseline on mean, concept and worst-group
+accuracy (all p < 0.01). Against the strongest baseline, FeSEM (given K), the win/tie/loss count is
+45/4/8 on accuracy and 48/2/7 on concept accuracy
+([`results/tables/signif_all.md`](results/tables/signif_all.md)).
 
 ### Ablation (Fashion-MNIST, ARI / K)
 

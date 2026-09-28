@@ -24,7 +24,7 @@ Two recent works also compare clients class by class. FedDAG~\citep{pramanik2026
 \subsection{Positioning}
 Table~\ref{tab:position} compares representative methods on the properties this paper targets. The entries for other methods summarise what their papers and the survey~\citep[Tables~3 and~5]{benali2026survey} report; ``--'' means that we could not find the property claimed. SA-compat.: compatible with secure aggregation. DisCo-CFL is, to our knowledge, the first CFL method that combines (i) a similarity that is invariant to label and quantity skew by construction and calibrated across sample sizes and privacy noise, (ii) an automatic $K$ from a threshold with a fixed meaning, (iii) recovery guarantees independent of group size together with a matching lower bound, machine-checked in Lean~4, and (iv) explanations, certificates and an audit trail of the grouping decision.
 
-\begin{table}[t]
+\begin{table}[!htbp]
 \centering
 \caption{Positioning of DisCo-CFL. S/C/M: server-side, client-side, metadata-based. Shared: what the server clusters on. $K$: fixed (given), threshold (implicit in another hyperparameter) or calibrated (fixed-meaning threshold). LS-inv.: invariant to label skew by design. QS: explicit treatment of quantity skew. Priv.: formal privacy mechanism for the clustering signal. Expl./Cert.: explanations or certificates of the grouping. Theory: main guarantee.}\label{tab:position}
 \scriptsize

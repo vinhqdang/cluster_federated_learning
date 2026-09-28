@@ -25,7 +25,11 @@ ABLATION_ORDER = ["DisCo", "DisCo-noDisatt", "DisCo-noClass", "DisCo-mean", "Dis
 SCEN_NAMES = {"rot": "Rotation", "swap": "Label swap", "rot_qs": "Rotation + QS",
               "mixed_qs": "Mixed + QS", "label": "Label skew only", "minority": "Minority groups",
               "mnist_rot": "MNIST rotation", "mnist_swap": "MNIST label swap",
-              "cifar_rot": "CIFAR-10 rotation"}
+              "cifar_rot": "CIFAR-10 rotation", "cifar_swap": "CIFAR-10 label swap",
+              "svhn_rot": "SVHN rotation", "svhn_swap": "SVHN label swap",
+              "angle15": "Rotation 15 deg", "angle30": "Rotation 30 deg", "angle45": "Rotation 45 deg",
+              "perm2": "2 groups", "perm8": "8 groups", "rot_part30": "Rotation, participation 0.3",
+              "swap_part30": "Label swap, participation 0.3", "rot_n200": "Rotation, 200 clients"}
 
 
 def load_raw():
@@ -347,16 +351,104 @@ def study_tables():
     return text
 
 
+def sweep_table(rows):
+    """Compact table of the robustness sweeps: DisCo-CFL vs. the best baseline."""
+    by = defaultdict(list)
+    for r in rows:
+        by[(r["scenario"], r["method"])].append(r)
+    settings = [("Strength", r"$\theta=15^\circ$", "angle15"), ("Strength", r"$\theta=30^\circ$", "angle30"),
+                ("Strength", r"$\theta=45^\circ$", "angle45"), ("Strength", r"$\theta=90^\circ$", "rot"),
+                ("Groups", "$K=2$", "perm2"), ("Groups", "$K=4$", "swap"), ("Groups", "$K=8$", "perm8"),
+                ("Participation 30\\%", "rotation", "rot_part30"), ("Participation 30\\%", "label swap", "swap_part30"),
+                ("Scale", "$N=200$", "rot_n200")]
+    base = ["FedAvg", "Local", "FedAvg-FT", "IFCA", "FeSEM", "MTCFL", "FL+HC", "PACFL"]
+    mean = lambda sc, m, k: float(np.mean([r[k] for r in by[(sc, m)]]))
+    tex = []
+    for grp, lab, sc in settings:
+        if not by[(sc, "DisCo")]:
+            continue
+        avail = [m for m in base if by[(sc, m)]]
+        ba = max(avail, key=lambda m: mean(sc, m, "pc_acc_mean"))
+        bc = max(avail, key=lambda m: mean(sc, m, "pc_acc_concept_mean"))
+        cells = [f"{mean(sc, 'DisCo', 'ari'):.2f}", f"{mean(sc, 'DisCo', 'k_found'):.1f}",
+                 f"{100 * mean(sc, 'DisCo', 'conflict_merge_rate'):.1f}",
+                 f"{100 * mean(sc, 'DisCo', 'pc_acc_mean'):.1f}",
+                 f"{100 * mean(sc, 'DisCo', 'pc_acc_concept_mean'):.1f}",
+                 f"{100 * mean(sc, ba, 'pc_acc_mean'):.1f} ({ba})",
+                 f"{100 * mean(sc, bc, 'pc_acc_concept_mean'):.1f} ({bc})",
+                 f"{100 * mean(sc, 'Oracle', 'pc_acc_mean'):.1f}"]
+        tex.append(f"{grp} & {lab} & " + " & ".join(cells) + r" \\")
+    head = ("\\scriptsize\n\\setlength{\\tabcolsep}{3pt}\n\\resizebox{\\textwidth}{!}{%\n"
+            "\\begin{tabular}{llcccccccc}\n\\toprule\n"
+            "& & \\multicolumn{5}{c}{DisCo-CFL} & & & \\\\\n\\cmidrule(lr){3-7}\n"
+            "Factor & Setting & ARI & $K$ & Conflict\\% & Acc & Concept & Best baseline Acc & "
+            "Best baseline Concept & Oracle Acc \\\\\n\\midrule\n")
+    open(os.path.join(ROOT, "paper", "table_sweeps.tex"), "w").write(
+        head + "\n".join(tex) + "\n\\bottomrule\n\\end{tabular}}\n")
+    return "\n".join(tex)
+
+
+def significance(rows, scenarios, name, reference="DisCo",
+                 metrics=(("pc_acc_mean", "Acc"), ("pc_acc_concept_mean", "Concept"),
+                          ("pc_worst_group_acc", "Worst-grp"))):
+    """Paired one-sided Wilcoxon signed-rank tests: DisCo-CFL vs. each baseline over all
+    (scenario, seed) pairs, plus the win/tie/loss count."""
+    from scipy.stats import wilcoxon
+    by = {(r["scenario"], r["method"], r["seed"]): r for r in rows}
+    baselines = [m for m in METHOD_ORDER if m not in (reference, "DisCo-T30", "Oracle")]
+    lines = [f"\n### Paired Wilcoxon signed-rank tests, {reference} vs. baseline ({name})\n",
+             "| Baseline | pairs | " + " | ".join(f"{t} W/T/L | {t} p" for _, t in metrics) + " |",
+             "|---|---|" + "---|---|" * len(metrics)]
+    tex = []
+    for b in baselines:
+        keys = [(sc, sd) for (sc, m, sd) in by if m == reference and sc in scenarios
+                and (sc, b, sd) in by]
+        if len(keys) < 3:
+            continue
+        cells, tcells = [], []
+        for key, _ in metrics:
+            d = np.array([by[(sc, reference, sd)][key] - by[(sc, b, sd)][key] for sc, sd in keys])
+            w, t, l = int((d > 5e-4).sum()), int((np.abs(d) <= 5e-4).sum()), int((d < -5e-4).sum())
+            try:
+                p = wilcoxon(d, alternative="greater", zero_method="zsplit").pvalue
+            except ValueError:
+                p = float("nan")
+            ps = f"{p:.1e}" if p < 1e-3 else f"{p:.3f}"
+            cells += [f"{w}/{t}/{l}", ps]
+            tcells += [f"{w}/{t}/{l}", ps.replace("e-0", "e-")]
+        lines.append(f"| {b} | {len(keys)} | " + " | ".join(cells) + " |")
+        tex.append(f"{b} & {len(keys)} & " + " & ".join(tcells) + r" \\")
+    os.makedirs(TAB, exist_ok=True)
+    open(os.path.join(TAB, f"signif_{name}.md"), "w").write("\n".join(lines) + "\n")
+    head = ("\\small\n\\begin{tabular}{lccccccc}\n\\toprule\n"
+            "& & \\multicolumn{2}{c}{Accuracy} & \\multicolumn{2}{c}{Concept accuracy} & "
+            "\\multicolumn{2}{c}{Worst-group accuracy} \\\\\n"
+            "\\cmidrule(lr){3-4}\\cmidrule(lr){5-6}\\cmidrule(lr){7-8}\n"
+            "Baseline & pairs & W/T/L & $p$ & W/T/L & $p$ & W/T/L & $p$ \\\\\n\\midrule\n")
+    open(os.path.join(ROOT, "paper", f"table_signif_{name}.tex"), "w").write(
+        head + "\n".join(tex) + "\n\\bottomrule\n\\end{tabular}\n")
+    return "\n".join(lines)
+
+
 if __name__ == "__main__":
     rows = load_raw()
     base = [m for m in METHOD_ORDER if m != "DisCo-T30"]
     print(main_tables(rows, ["rot", "swap", "rot_qs", "mixed_qs", "label", "minority"], "main", base))
+    main_tables(rows, ["rot", "swap", "rot_qs"], "main_a", base)
+    main_tables(rows, ["mixed_qs", "label", "minority"], "main_b", base)
     print(main_tables(rows, ["mnist_rot", "mnist_swap", "svhn_rot", "svhn_swap", "cifar_rot", "cifar_swap"],
                       "other_datasets", METHOD_ORDER))
+    main_tables(rows, ["mnist_rot", "mnist_swap", "svhn_rot"], "other_a", METHOD_ORDER)
+    main_tables(rows, ["svhn_swap", "cifar_rot", "cifar_swap"], "other_b", METHOD_ORDER)
     print(main_tables(rows, ["angle15", "angle30", "angle45", "rot"], "strength", METHOD_ORDER))
     print(main_tables(rows, ["perm2", "swap", "perm8"], "groups", METHOD_ORDER))
     print(main_tables(rows, ["rot_part30", "swap_part30", "rot_n200"], "participation", METHOD_ORDER))
     abl = [r for r in rows if r["method"].startswith("DisCo")]
     print(main_tables(abl, ["rot", "swap", "rot_qs", "mixed_qs", "label"], "ablation"))
     print(study_tables())
+    concept = ["rot", "swap", "rot_qs", "mixed_qs", "minority", "mnist_rot", "mnist_swap", "svhn_rot",
+               "svhn_swap", "cifar_rot", "cifar_swap", "angle15", "angle30", "angle45", "perm2", "perm8",
+               "rot_part30", "swap_part30", "rot_n200"]
+    print(significance(rows, concept, "all"))
+    print(sweep_table(rows))
     figures()
