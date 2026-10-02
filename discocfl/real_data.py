@@ -162,9 +162,12 @@ def _load_cifar100_raw(size=96):
     def part(n):
         with open(os.path.join(folder, n), "rb") as f:
             d = pickle.load(f, encoding="latin1")
-        x = torch.from_numpy(d["data"].reshape(-1, 3, 32, 32))
-        x = F.interpolate(x.float(), size=size, mode="bilinear", align_corners=False)
-        return x.round().clamp(0, 255).to(torch.uint8), torch.tensor(d["fine_labels"], dtype=torch.long)
+        raw = torch.from_numpy(d["data"].reshape(-1, 3, 32, 32))
+        out = torch.empty(len(raw), 3, size, size, dtype=torch.uint8)
+        for s0 in range(0, len(raw), 1000):       # chunked: the full float array needs > 5 GB
+            chunk = F.interpolate(raw[s0:s0 + 1000].float(), size=size, mode="bilinear", align_corners=False)
+            out[s0:s0 + 1000] = chunk.round().clamp(0, 255).to(torch.uint8)
+        return out, torch.tensor(d["fine_labels"], dtype=torch.long)
 
     xtr, ytr = part("train")
     xte, yte = part("test")
