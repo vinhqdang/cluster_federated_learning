@@ -94,6 +94,7 @@ VARIANTS = {
     "DisCo-linkorder": dict(order="link"),
     "DisCo-noClip": dict(clip=0.0),
     "DisCo-T30": dict(warmup=30),
+    "DisCo-full": dict(sig="full"),
 }
 
 

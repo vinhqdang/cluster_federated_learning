@@ -192,11 +192,11 @@ def make_femnist_federation(n_writers=100, min_samples=150, max_samples=400, see
     if not os.path.exists(cache):
         path = _download(HF.format(name="femnist", f=HF_FILES["femnist"][0]),
                          os.path.join(ROOT, "femnist", HF_FILES["femnist"][0]))
-        t = pq.read_table(path, columns=["writer_id", "character"]).to_pandas()
-        keep = t.groupby("writer_id").size()
-        keep = keep[keep >= min_samples].index.tolist()
+        from collections import Counter
+        cnt = Counter(pq.read_table(path, columns=["writer_id"]).column("writer_id").to_pylist())
+        keep = sorted(w for w, c in cnt.items() if c >= min_samples)
         rng = np.random.default_rng(0)
-        chosen = set(rng.permutation(keep)[:600].tolist())
+        chosen = set(keep[i] for i in rng.permutation(len(keep))[:600])
         xs, ys, ws = [], [], []
         for batch in pq.ParquetFile(path).iter_batches(batch_size=2048):
             cols = batch.to_pydict()

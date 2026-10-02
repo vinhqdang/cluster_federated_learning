@@ -42,7 +42,9 @@ SUITES = {
                  methods=METHODS, seeds=[0, 1, 2]),
     "femnist": dict(scenarios=["femnist"], methods=["FedAvg", "Local", "FedAvg-FT", "IFCA", "FeSEM",
                                                       "MTCFL", "FL+HC", "DisCo"], seeds=[0, 1, 2]),
-    "ablation_real": dict(scenarios=["pacs", "officehome", "c100_swap"],
+    "variants": dict(scenarios=["officehome", "c100_rot", "pacs"], methods=["DisCo-full", "DisCo-T30"],
+                     seeds=[0, 1, 2]),
+    "ablation_real": dict(scenarios=["pacs", "c100_swap"],
                           methods=["DisCo-noDisatt", "DisCo-noClass", "DisCo-mean", "DisCo-linkorder",
                                    "DisCo-noClip"], seeds=[0, 1, 2]),
 }
@@ -76,7 +78,7 @@ def run_one(scen, method, seed, device, pretrained=True, size=112, out_dir=RESUL
     tr.participation = 1.0
     cfg = dict(train, seed=seed, K=K_true)
     if scen == "femnist":
-        cfg["K"] = FEMNIST_K[seed % len(FEMNIST_K)]
+        cfg["K"] = 4          # natural writers have no true K; baselines get the same K as elsewhere
     base = method
     if method in VARIANTS:
         cfg.update(VARIANTS[method])
