@@ -1,0 +1,40 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.9in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue!50!black}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.5em}
+\setlist{itemsep=2pt,topsep=2pt}
+\pagestyle{empty}
+\begin{document}
+\begin{center}
+{\large\bfseries MLJ Contribution Information Sheet}\\[2pt]
+{\bfseries DisCo-CFL: Calibrated, Fair and Explainable Clustered Federated Learning via Disattenuated Class-Conditional Gradient Signatures}\\[2pt]
+Quang-Vinh Dang, British University Vietnam (\texttt{vinh.dq4@buv.edu.vn})
+\end{center}
+
+\textbf{1. What is the main claim of the paper? Why is it an important contribution to the machine learning literature?}
+
+Clustered federated learning (CFL) methods compute a similarity between clients whose scale depends on the number of samples, on label skew and on noise. The number of clusters therefore depends on a threshold or an integer $K$ that has no fixed meaning, and no recovery guarantee is known that holds irrespective of the size of a group. We claim that this can be fixed by a \emph{calibrated} similarity. Each client uploads, once, count-sketched mean gradients of each class at a frozen reference model, computed on two random halves of the class. Spearman's correction for attenuation, estimated from the two halves, turns the cosine between two clients into an estimate of the population cosine of their class-conditional gradients, which is $1$ for clients that share a concept whatever their sample sizes, label proportions or privacy noise. A class-wise bottleneck linkage with one threshold on this scale then gives the number of clusters. This is important because it makes a statistical statement possible for CFL: conflicting clients are never merged, the groups are recovered exactly with a sample complexity that does not depend on the size of the group (a formal guarantee for minority groups), and a minimax lower bound matches the upper bound up to a factor $1/\Delta$. The same statistic gives differentially private signatures with an explicit cost, explanations whose fidelity is proven, and per-client certificates and an audit log. The deterministic core of the proofs (25 theorems) is machine-checked in Lean~4.
+
+\textbf{2. What is the evidence you provide to support your claim?}
+\begin{itemize}
+\item \emph{Theory (Section~5 and the appendices).} Invariance to label and quantity skew; a finite-sample concentration bound for the calibrated similarity; safety, maximality and exact recovery for any merge order; a sample complexity $h^\ast$ independent of group size; a minimax lower bound (Bretagnolle--Huber); a differential-privacy guarantee; explanation fidelity; Bayes optimality of prior-corrected cluster models. The assumptions (sub-Gaussian signatures, a fixed reference model, a separation $\Delta$) are stated, and the attachment heuristics for low-evidence clients are not covered by the theorems.
+\item \emph{Small CNNs, 618 runs, Fashion-MNIST/MNIST/SVHN/CIFAR-10.} Without knowing $K$, DisCo-CFL recovers the groups (mean ARI $0.94$--$1.00$) in the rotation, label-swap, mixed and minority scenarios of the first three datasets and merges $0.1\%$ of the conflicting client pairs, against $7.7$--$84\%$ for baselines that are given the true $K$. Its accuracy is within 0.1 points of training on the true groups, and it is significantly better than eight baselines on mean, concept and worst-group accuracy (paired Wilcoxon tests, $p<0.01$). It also covers shift strength, 2--8 groups, partial participation, 200 clients, newcomers and privacy noise, with ablations of each component.
+\item \emph{Pretrained ResNet-18, 150 runs.} On CIFAR-100 with label-swap groups, DisCo-CFL matches the oracle (63.0\% accuracy, ARI $0.98$), against 59.7\% for FeSEM (given $K$) and 55.5\% for FedAvg. On PACS it has the highest concept accuracy of the non-oracle methods (87.3\%; FeSEM 85.9\%). Its accuracy is statistically indistinguishable from that of FeSEM over the 15 (scenario, seed) pairs ($p=0.26$), while it is better on concept accuracy ($p=0.004$) and worst-group accuracy ($p=0.015$).
+\item \emph{Failures, reported in the paper.} DisCo-CFL does not separate the groups on Office-Home or on rotated CIFAR-100 (ARI $\approx 0$), where the oracle improves on FedAvg by less than one point; a whole-block signature and a longer warm-up did not repair this. On FEMNIST (natural writers) it forms about 47 clusters for 100 writers.
+\end{itemize}
+
+\textbf{3. What papers by other authors make the most closely related contributions, and how is the paper related to them?}
+
+The closest are the CFL methods that we compare with experimentally: CFL/MTCFL (Sattler et al., 2021), which splits clients by the cosine of their updates; IFCA (Ghosh et al., 2020), which assigns clients by loss; FL+HC (Briggs et al., 2020), FeSEM (Long et al., 2023) and PACFL (Vahidian et al., 2023), which cluster updates, weights or data subspaces; and FedRC (Guo et al., 2024), which addresses grouping by label distribution. The recent survey of Ben Ali et al. (2026) organises these methods and lists the open problems that we address. Section~2 of the manuscript contains a table that positions 14 methods on the properties targeted here. Our work differs by clustering on class-conditional gradients, which are unaffected by label and quantity skew, and by correcting the attenuation of the similarity (Spearman, 1904), which gives it a known scale and allows recovery guarantees. None of the methods above offers a recovery guarantee or a lower bound for the clustering step.
+
+\textbf{4. Have you published parts of your paper before?}
+
+No. No part of this work has been published, and it is not under consideration elsewhere. The accompanying code, raw results and Lean~4 project are in a public repository and are cited in the manuscript.
+\end{document}

@@ -1,0 +1,36 @@
+\documentclass[10.5pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue!50!black}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.7em}
+\pagestyle{empty}
+\begin{document}
+\begin{flushright}
+Quang-Vinh Dang\\ British University Vietnam\\ Hung Yen, Vietnam\\ \href{mailto:vinh.dq4@buv.edu.vn}{vinh.dq4@buv.edu.vn}\\ ORCID: 0000-0002-3877-8024\\[0.6em]
+\today
+\end{flushright}
+
+Editor-in-Chief\\
+\emph{Machine Learning}, Springer
+
+Dear Editor-in-Chief,
+
+I submit the manuscript \emph{``DisCo-CFL: Calibrated, Fair and Explainable Clustered Federated Learning via Disattenuated Class-Conditional Gradient Signatures''} for consideration in \emph{Machine Learning}.
+
+Clustered federated learning trains one model per group of clients that share a data distribution. The manuscript asks how a server can decide which clients belong together, in a way that comes with guarantees. Each client uploads once a count-sketched mean gradient for every class it holds, computed on two random halves. The agreement between the halves is used to correct the attenuation of the similarity between clients (Spearman's correction), which gives a similarity with a known scale: it equals one for clients that share a concept, whatever their sample sizes, label proportions or privacy noise. A single threshold on this scale determines the number of clusters.
+
+The main results are: (i) safety (conflicting clients are never merged), maximality and exact recovery, with a sample complexity that does not depend on the size of a group, and a minimax lower bound that matches it up to a factor $1/\Delta$; (ii) differential privacy with an explicit cost, and proven fidelity of the explanations that the server returns; (iii) a machine-checked formalisation in Lean~4 of the deterministic core of the proofs; and (iv) an evaluation of 618 runs with small CNNs on Fashion-MNIST, MNIST, SVHN and CIFAR-10, of 150 runs with a pretrained ResNet-18 on CIFAR-100, PACS and Office-Home, and of 24 runs on FEMNIST. The method recovers the groups and reaches the accuracy of the oracle in several settings, but it does not separate the groups on Office-Home or on rotated CIFAR-100, and it over-splits natural writers in FEMNIST. The manuscript reports these failures, together with two repairs that we tried without success.
+
+The MLJ Contribution Information Sheet is attached. The manuscript is original, has not been published, and is not under consideration elsewhere. The code, raw results and Lean~4 project are available at \url{https://github.com/vinhqdang/cluster_federated_learning}. The author has no competing interests, and no funding was received for this work.
+
+Thank you for considering the manuscript.
+
+Sincerely,\\[1.2em]
+Quang-Vinh Dang\\
+British University Vietnam
+\end{document}
