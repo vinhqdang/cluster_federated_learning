@@ -1,0 +1,43 @@
+\subsection{Setup}\label{sec:setup}
+\paragraph{Datasets.} We use four image datasets of increasing difficulty: MNIST~\citep{lecun1998mnist}, Fashion-MNIST~\citep{xiao2017fmnist} (the main benchmark), SVHN~\citep{netzer2011svhn} (natural photographs of house numbers) and CIFAR-10~\citep{krizhevsky2009cifar} (natural object images). Federations are built from them following the non-IID taxonomy used in the survey~\citep{benali2026survey}, which lists image classification with rotations and label swaps as the standard CFL benchmark~\citep[Table~6]{benali2026survey}.
+
+\paragraph{Heterogeneity.} Each client belongs to a latent concept group. \emph{Concept shift on features} is a rotation of the inputs (by $0^\circ,90^\circ,180^\circ,270^\circ$, or by $0,\theta,2\theta,3\theta$ in the strength sweep). \emph{Concept shift on targets} is a label permutation that swaps two pairs of classes per group. On top of this, every client has \emph{target skew} (Dirichlet label proportions, $\alpha=0.3$, or $\alpha=0.1$ in the label-only scenario) and, where indicated, \emph{quantity skew} (log-normal dataset sizes with $\sigma=1$, clipped to $[30,3200]$, mean 400). Table~\ref{tab:scenarios} lists all scenarios. Each client has a local test set drawn with its own label proportions and transformation. We also evaluate every model on a class-balanced test set of its client's concept (\emph{concept accuracy}), which measures generalisation beyond the local label mix.
+
+\begin{table}[!htbp]
+\centering
+\caption{Scenarios. $N$: clients; groups: number of concept groups; QS: quantity skew; part.: fraction of clients per round.}\label{tab:scenarios}
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llllcl}
+\toprule
+Scenario & Dataset(s) & Concept groups & $N$ & QS & Other \\
+\midrule
+Rotation & FMNIST, MNIST, SVHN, CIFAR-10 & 4 rotations ($90^\circ$ steps) & 40 & -- & \\
+Label swap & FMNIST, MNIST, SVHN, CIFAR-10 & 4 labelings (2 swapped pairs) & 40 & -- & \\
+Rotation + QS & FMNIST & 4 rotations & 40 & \checkmark & \\
+Mixed + QS & FMNIST & 2 rotations $\times$ 2 labelings & 40 & \checkmark & \\
+Label skew only & FMNIST & 1 (true $K=1$) & 40 & \checkmark & $\alpha=0.1$ \\
+Minority groups & FMNIST & 4 rotations, 25/9/4/2 clients & 40 & -- & \\
+Strength $\theta$ & FMNIST & 4 rotations, $\theta\in\{15^\circ,30^\circ,45^\circ\}$ & 40 & -- & \\
+Groups $K$ & FMNIST & $K\in\{2,4,8\}$ labelings & 40 & -- & \\
+Partial participation & FMNIST & rotation / label swap & 40 & -- & part.\ $=0.3$ \\
+Scale & FMNIST & 4 rotations & 200 & -- & 200 samples/client \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\paragraph{Training.} All methods use the same CNN (two convolutional and two fully connected layers; $d=46{,}730$ parameters for $28\times28$ inputs and $65{,}962$ for $32\times32$ colour images), SGD with learning rate $0.05$, batch size 32, one local epoch per round and 50 communication rounds. Methods with a warm-up (DisCo-CFL, FL+HC, FeSEM, Oracle) spend 10 of the 50 rounds on FedAvg. \emph{Local} trains each client alone for 50 epochs. Every configuration is run with three seeds, which change the federation, the initialisation and the sketch: 618 training runs in total, plus the clustering-only studies.
+
+\paragraph{Baselines.} We compare with nine methods that cover all three families of the taxonomy and the main alternatives to clustering:
+\begin{itemize}[leftmargin=*,itemsep=1pt]
+\item \emph{Single model / personalisation:} FedAvg~\citep{mcmahan2017fedavg}; Local; FedAvg-FT (FedAvg followed by one epoch of local fine-tuning, a standard personalisation baseline).
+\item \emph{Client-side:} IFCA~\citep{ghosh2020ifca}.
+\item \emph{Server-side:} CFL/MTCFL~\citep{sattler2021cfl} (recursive cosine bipartitioning, triggered when the norm of the aggregated update falls below $\varepsilon_1=0.9$ times the mean client-update norm); FL+HC~\citep{briggs2020flhc} (Ward clustering of local updates after the warm-up); FeSEM~\citep{long2023fesem} (EM-like assignment to the nearest of $K$ centres in parameter space, with the same warm-up and a $k$-means++ initialisation on the clients' local models).
+\item \emph{Metadata-based:} PACFL~\citep{vahidian2023pacfl} (principal angles between client data subspaces, $p=3$).
+\item \emph{Oracle:} FedAvg inside the ground-truth groups (an upper reference).
+\end{itemize}
+IFCA, FL+HC, FeSEM and PACFL are \emph{given the true number of groups} $K$, which favours them. DisCo-CFL and MTCFL find $K$ on their own. The MTCFL thresholds and the FeSEM initialisation were selected on the same pilot run as DisCo-CFL. Without them, MTCFL never splits and FeSEM collapses to a single cluster.
+
+\paragraph{DisCo-CFL.} Sketch dimension $p=1024$, at most 200 samples per class for the signature, classes with fewer than 4 samples not reported, $\tau=0.8$, $\lambda=0.5$, $e_{\min}=0.05$, low-evidence threshold $0.3$, $z=2$, per-sample clipping $C_{\rm clip}=0.5$. These values, and the design choices of bottleneck linkage and evidence-ordered merging, were fixed during pilot runs on seed 0 of the Rotation, Label swap, Mixed + QS and label-only configurations (and seed 1 of Label swap with QS), using clustering quality only. They are kept identical for all scenarios, seeds and datasets. Seeds 1 and 2, the sweeps, and the MNIST, SVHN and CIFAR-10 results were not used for design. Per-sample clipping ($C_{\rm clip}$ chosen on seed 0 only, from $\{0.5,1,2\}$ in all scenarios and additionally $\{0.1,0.25\}$ in the label-only scenario) was added after a first sensitivity study showed over-splitting caused by heavy-tailed per-sample gradients. The run without clipping is reported as an ablation. On the colour datasets we also report DisCo-T30, which uses 30 warm-up rounds (Section~\ref{sec:datasets}). Section~\ref{sec:sens} reports the sensitivity to $\tau$ and $\lambda$.
+
+\paragraph{Metrics.} \emph{Performance:} mean local test accuracy (Acc), with the prior correction of Section~\ref{sec:pc} applied identically to every method, and concept accuracy. \emph{Fairness:} accuracy of the worst 10\% of clients (Acc@10\%), accuracy of the worst concept group (Worst-grp), Jain's index. \emph{Clustering:} ARI with respect to the groups, number of clusters $K$, and the \emph{conflict-merge rate}: the fraction of conflicting client pairs (Definition~\ref{def:concept}) that end up in the same cluster. ARI penalises the legitimate placement of compatible clients (e.g.\ a client of a label-swap group that holds none of the swapped classes), whereas the conflict-merge rate measures exactly the harmful errors. \emph{Statistics:} paired one-sided Wilcoxon signed-rank tests of DisCo-CFL against each baseline over all (scenario, seed) pairs.

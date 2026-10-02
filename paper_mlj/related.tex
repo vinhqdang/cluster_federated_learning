@@ -1,0 +1,55 @@
+\section{Related work and positioning}\label{sec:related}
+We follow the taxonomy of the recent survey by~\citet{benali2026survey}. It separates \emph{core} CFL (clustering to handle statistical heterogeneity by training several models) from operational uses of clustering, and within core CFL it distinguishes server-side, client-side and metadata-based methods. DisCo-CFL is core CFL. We review the three families, then the neighbouring lines of work from which DisCo-CFL borrows or with which it can be confused, and close with an explicit positioning (Table~\ref{tab:position}).
+
+\subsection{Server-side CFL}
+Server-side methods cluster what clients already send in FedAvg, namely model weights or updates. \citet{ghosh2019robust} apply trimmed $k$-means to locally trained models. CFL, often called MTCFL~\citep{sattler2021cfl}, recursively bipartitions a cluster by the cosine similarity of the clients' updates once its joint objective is near a stationary point; a theorem guarantees that a correct bipartition exists when several distributions are present. FL+HC~\citep{briggs2020flhc} applies one-shot hierarchical clustering after a FedAvg warm-up and was the first to build benchmarks from a non-IID taxonomy. FlexCFL~\citep{duan2021flexcfl} and ICFL~\citep{yan2023icfl} reduce the cost of comparing high-dimensional updates with truncated SVD. FLACC~\citep{mehta2023flacc} merges clusters greedily, FPFC~\citep{yu2024fpfc} penalises pairwise model distances, and CFL-GT~\citep{liu2024cflgt} uses gradient trajectories. StoCFL~\citep{zeng2025stocfl} compares gradients of a frozen model under dynamic participation. FeSEM~\citep{long2023fesem} runs an EM-like assignment of clients to the nearest of $K$ centres in parameter space. The common signal of these methods is a whole-model update, whose geometry changes across rounds, mixes the effect of label proportions with that of concepts, and depends on the client's sample size. The survey lists the instability of these metrics and the choice of $K$ as open problems~\citep[Sec.~4.3.1, 4.3.4]{benali2026survey}.
+
+\subsection{Client-side CFL}
+In client-side CFL the server broadcasts $K$ models and each client selects the one with the lowest training loss: HypCluster~\citep{mansour2020three} and IFCA~\citep{ghosh2020ifca}, the latter with a convergence analysis. FLSC~\citep{li2021flsc} lets clients join several clusters, FedSoft~\citep{ruan2022fedsoft} and FedEM~\citep{marfoq2021fedem} learn mixture weights, and FedRC~\citep{guo2024fedrc} and HCFL+~\citep{guo2025hcfl} combine soft assignment with robust bi-level objectives and split/merge rules. FedDrift~\citep{jothimurugesan2023feddrift} handles concept drift over time, FedCAM~\citep{ma2023fedcam} adds cluster-specific components to a global model, and AutoCFL~\citep{gong2024autocfl} adapts local training to imbalanced data. Client-side methods need a fixed or initial $K$, download $K$ models per round, and are sensitive to initialisation~\citep{benali2026survey}. Loss-based assignment also reacts to label proportions: a client whose labels are concentrated on a few classes prefers the model trained on a similar label mix.
+
+\subsection{Metadata-based CFL}
+Metadata-based methods share additional statistics. k-FED~\citep{dennis2021kfed} sends local $k$-means centroids of the data. FLT~\citep{jamalirad2022flt} sends autoencoder embeddings, PACFL~\citep{vahidian2023pacfl} principal subspaces of the raw data, FLIS~\citep{morafah2023flis} predictions on a public dataset, MD-ICFL~\citep{zhang2024mdicfl} label-weighted model outputs, pp-CFL~\citep{luo2024ppcfl} noisy label distributions, and TDCFL~\citep{ren2025tdcfl} and SnapCFL~\citep{cheng2025snapcfl} other data summaries. These signals are stable across rounds and cheap to cluster, but the survey rates most of them as a moderate to high privacy risk~\citep[Table~4]{benali2026survey}. Only pp-CFL adds a formal privacy mechanism.
+
+\subsection{Class-conditional comparisons and quantity skew}
+Two recent works also compare clients class by class. FedDAG~\citep{pramanik2026feddag} fuses gradient similarity with principal angles between class-wise \emph{data} subspaces, weights classes by their frequency, and selects the number of clusters with a compactness criterion. FedCCFA~\citep{chen2024fedccfa} clusters class-specific classifier vectors with DBSCAN under concept drift. For quantity skew, CORNFLQS~\citep{benali2025cornflqs} alternates weight-based and loss-based clustering. DisCo-CFL shares the intuition that concepts are best compared class by class. It differs in what is compared: expected class-conditional gradients at a frozen model, which are functionals of $\cP(X\mid Y)$ alone (Proposition~\ref{prop:inv}), rather than data subspaces or classifier rows. It also differs in how noise is handled: the similarity is disattenuated, so its population value for clients that share a concept is exactly~$1$ whatever the sample size or privacy noise. The number of clusters then follows from one threshold with a fixed meaning.
+
+\subsection{Neighbouring lines of work}
+\paragraph{Heterogeneity-robust and personalised FL.} FedProx~\citep{li2020fedprox} and SCAFFOLD~\citep{karimireddy2020scaffold} keep a single model and correct client drift. Personalised FL~\citep{tan2022pflsurvey} adapts one model per client, through meta-learning (Per-FedAvg,~\citealp{fallah2020perfedavg}), regularisation (pFedMe,~\citealp{tdinh2020pfedme}; Ditto,~\citealp{li2021ditto}), shared representations (FedRep,~\citealp{collins2021fedrep}) or class prototypes (FedProto,~\citealp{tan2022fedproto}). CFL assumes a few distinct distributions instead of one distribution with local deviations~\citep{benali2026survey}. We include FedAvg with local fine-tuning as the representative personalisation baseline.
+\paragraph{Label-distribution skew.} Logit calibration counters label skew in a single model (FedLC,~\citealp{zhang2022fedlc}), in the spirit of label-shift correction~\citep{lipton2018labelshift} and logit adjustment~\citep{menon2021logit}. DisCo-CFL uses the same Bayes argument at inference, but inside a concept cluster (Proposition~\ref{prop:pc}), and uses it to justify why label skew should not create clusters.
+\paragraph{Gradient similarity for grouping tasks.} Multi-task learning groups tasks by gradient affinity~\citep{fifty2021tag} and resolves gradient conflicts~\citep{yu2020pcgrad}; the gradient signal-to-noise ratio has been linked to generalisation~\citep{liu2020gsnr}. None of these corrects similarities for estimation noise.
+\paragraph{Measurement error.} Spearman's correction for attenuation~\citep{spearman1904,spearman1910,brown1910} is standard in psychometrics and meta-analysis~\citep{muchinsky1996attenuation}. To our knowledge it has not been used to calibrate client similarities in FL.
+\paragraph{Privacy and communication.} DP-FedAvg~\citep{mcmahan2018dpfedavg} and DP-SGD~\citep{abadi2016dpsgd} clip per-sample or per-client contributions and add Gaussian noise. Secure aggregation~\citep{bonawitz2017secagg} hides individual updates; sketching reduces communication~\citep{rothchild2020fetchsgd}. DisCo-CFL applies clipping, sketching and the Gaussian mechanism to the clustering signal itself.
+\paragraph{Fairness, explanations and accountability.} Fair FL usually equalises accuracy across clients~\citep{li2020qffl,mohri2019afl,li2021ditto}; see~\citet{mehrabi2021bias} for a broader view of bias. In CFL, unfairness arises earlier, in the grouping decision: a small group can be absorbed by a larger one, and a small client can be isolated because its statistics are noisy. Explanations that let an affected party understand and contest an automated decision~\citep{wachter2018counterfactual,doshivelez2017interpretable} have, to our knowledge, not been provided for client grouping. The survey likewise notes that clustering-specific evaluation is rare~\citep[Sec.~4.5.3]{benali2026survey}.
+
+\subsection{Positioning}
+Table~\ref{tab:position} compares representative methods on the properties this paper targets. The entries for other methods summarise what their papers and the survey~\citep[Tables~3 and~5]{benali2026survey} report; ``--'' means that we could not find the property claimed. SA-compat.: compatible with secure aggregation. DisCo-CFL is, to our knowledge, the first CFL method that combines (i) a similarity that is invariant to label and quantity skew by construction and calibrated across sample sizes and privacy noise, (ii) an automatic $K$ from a threshold with a fixed meaning, (iii) recovery guarantees independent of group size together with a matching lower bound, machine-checked in Lean~4, and (iv) explanations, certificates and an audit trail of the grouping decision.
+
+\begin{table}[!htbp]
+\centering
+\caption{Positioning of DisCo-CFL. S/C/M: server-side, client-side, metadata-based. Shared: what the server clusters on. $K$: fixed (given), threshold (implicit in another hyperparameter) or calibrated (fixed-meaning threshold). LS-inv.: invariant to label skew by design. QS: explicit treatment of quantity skew. Priv.: formal privacy mechanism for the clustering signal. Expl./Cert.: explanations or certificates of the grouping. Theory: main guarantee.}\label{tab:position}
+\scriptsize
+\setlength{\tabcolsep}{2.6pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llllcccccl}
+\toprule
+Method & Cat. & Shared & $K$ & LS-inv. & QS & Priv. & Expl. & Cert. & Theory \\
+\midrule
+CFL/MTCFL~\citep{sattler2021cfl} & S & updates & threshold & -- & -- & SA-compat. & -- & -- & bipartition exists \\
+FL+HC~\citep{briggs2020flhc} & S & updates & threshold & -- & -- & -- & -- & -- & -- \\
+FlexCFL~\citep{duan2021flexcfl} & S & updates (SVD) & fixed & -- & -- & -- & -- & -- & -- \\
+FeSEM~\citep{long2023fesem} & S & weights & fixed & -- & -- & -- & -- & -- & -- \\
+StoCFL~\citep{zeng2025stocfl} & S & frozen-model grads & threshold & -- & -- & -- & -- & -- & -- \\
+IFCA~\citep{ghosh2020ifca} & C & losses (local) & fixed & -- & -- & -- & -- & -- & convergence \\
+FedEM~\citep{marfoq2021fedem} & C & mixture weights & fixed & -- & -- & -- & -- & -- & convergence \\
+FedRC~\citep{guo2024fedrc} & C & losses (local) & fixed & -- & -- & -- & -- & -- & -- \\
+k-FED~\citep{dennis2021kfed} & M & data centroids & fixed & -- & -- & -- & -- & -- & one-shot recovery \\
+PACFL~\citep{vahidian2023pacfl} & M & data subspaces & threshold & -- & -- & -- & -- & -- & -- \\
+pp-CFL~\citep{luo2024ppcfl} & M & noisy label dists. & COPRA & -- & -- & DP & -- & -- & -- \\
+CORNFLQS~\citep{benali2025cornflqs} & S+C & weights + losses & iterative & -- & \checkmark & -- & -- & -- & -- \\
+FedCCFA~\citep{chen2024fedccfa} & S & class classifiers & DBSCAN & partial & -- & -- & -- & -- & -- \\
+FedDAG~\citep{pramanik2026feddag} & S+M & grads + class subspaces & selected & partial & weights & -- & -- & -- & -- \\
+\midrule
+\textbf{DisCo-CFL} & S & class-cond.\ grad.\ sketches & calibrated & \checkmark & \checkmark & DP & \checkmark & \checkmark & recovery + lower bound (Lean) \\
+\bottomrule
+\end{tabular}}
+\end{table}

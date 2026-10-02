@@ -1,0 +1,33 @@
+\subsection{Other datasets: MNIST, SVHN and CIFAR-10}\label{sec:datasets}
+Table~\ref{tab:other} repeats the two basic concept-shift scenarios on MNIST, SVHN and CIFAR-10 with the same hyperparameters.
+
+\paragraph{MNIST and SVHN.} On both datasets DisCo-CFL recovers the groups (ARI $0.97$--$1.00$), never merges conflicting clients, and reaches the accuracy of the Oracle within $0.1$ points. On SVHN, a harder dataset of natural photographs, its concept accuracy is 79.7\% (rotation) and 82.5\% (label swap), against at most 75.6\% and 72.7\% for any baseline. FeSEM is the strongest clustering baseline on these datasets (ARI $0.66$--$0.98$), and FedAvg-FT the strongest non-clustering one. Both remain 0.7--11.6 points below DisCo-CFL in concept accuracy. In the MNIST rotation scenario, two seeds leave one or two clients in singleton clusters. These clients are flagged as anomalous (mean ARI $0.97$, $K=5.0$) and train alone; the mean accuracy still equals the Oracle's.
+
+\paragraph{CIFAR-10.} CIFAR-10 is harder, and here DisCo-CFL is not the best method on every metric. With the default 10 warm-up rounds the reference model is only about 40\% accurate. Its class-conditional gradients then depend little on the orientation of most natural-image classes: the mean between-group similarity is 0.83--0.90, and only vehicle classes separate clearly. The separation $\Delta$ of Assumption~\ref{ass:sep} is therefore small. For label swaps DisCo-CFL still reaches ARI $0.87$ and a higher concept accuracy than every baseline (48.6\%), but for rotations it reaches only ARI $0.38$. The theory points to the remedy, a more informative reference model. With 30 warm-up rounds (DisCo-T30), ARI rises to $0.74$ (rotation) and $0.92$ (label swap), conflicting merges fall to 4.2\% and 0.1\%, and concept accuracy is 44.8\% and 49.8\%. That is the best of all non-oracle methods in both scenarios, tied with FeSEM on rotation. Table~\ref{tab:warm} gives the clustering-only trend. CFL/MTCFL has the highest \emph{local} accuracy on CIFAR-10 (67.0\% and 68.8\%, above the Oracle's 64.2\% and 64.7\%). It splits the federation into 33--35 clusters and personalises to each client's label mix with the small CNN, and its concept accuracy is 7--8 points below DisCo-T30's.
+
+\begin{table}[!htbp]
+\centering
+\caption{CIFAR-10 rotation, clustering step only: effect of the warm-up length $T_0$ (3 seeds).}\label{tab:warm}
+\small
+\begin{tabular}{lccc}
+\toprule
+$T_0$ & ARI & $K$ & conflict\% \\
+\midrule
+10 & 0.37 & 3.7 & 24.8 \\
+20 & 0.64 & 5.0 & 8.9 \\
+30 & 0.74 & 4.7 & 4.2 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\caption{MNIST, SVHN and CIFAR-10 (40 clients, 3 seeds; same settings and columns as Table~\ref{tab:main}). DisCo-T30: DisCo-CFL with 30 warm-up rounds.}\label{tab:other}
+\input{table_other_a.tex}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\captionsetup{labelformat=empty}\caption{Table~\ref{tab:other}\captionsetup{labelformat=default} (continued).}
+\input{table_other_b.tex}
+\end{table}

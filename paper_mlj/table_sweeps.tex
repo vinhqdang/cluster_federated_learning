@@ -1,0 +1,21 @@
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llcccccccc}
+\toprule
+& & \multicolumn{5}{c}{DisCo-CFL} & & & \\
+\cmidrule(lr){3-7}
+Factor & Setting & ARI & $K$ & Conflict\% & Acc & Concept & Best baseline Acc & Best baseline Concept & Oracle Acc \\
+\midrule
+Strength & $\theta=15^\circ$ & 0.42 & 3.0 & 32.1 & 90.0 & 82.8 & 90.2 (FeSEM) & 83.0 (FeSEM) & 90.5 \\
+Strength & $\theta=30^\circ$ & 0.93 & 4.3 & 1.7 & 90.3 & 83.1 & 90.0 (PACFL) & 81.2 (PACFL) & 90.4 \\
+Strength & $\theta=45^\circ$ & 1.00 & 4.0 & 0.0 & 90.4 & 83.8 & 89.9 (FeSEM) & 81.8 (FeSEM) & 90.4 \\
+Strength & $\theta=90^\circ$ & 1.00 & 4.0 & 0.0 & 90.5 & 83.9 & 90.2 (MTCFL) & 80.6 (FeSEM) & 90.5 \\
+Groups & $K=2$ & 0.94 & 3.3 & 0.0 & 91.4 & 86.5 & 88.5 (IFCA) & 80.2 (IFCA) & 91.5 \\
+Groups & $K=4$ & 1.00 & 4.0 & 0.0 & 90.8 & 84.9 & 90.6 (FedAvg-FT) & 80.9 (FedAvg-FT) & 90.8 \\
+Groups & $K=8$ & 0.92 & 8.0 & 0.3 & 90.4 & 81.7 & 88.0 (FeSEM) & 75.4 (FeSEM) & 90.5 \\
+Participation 30\% & rotation & 1.00 & 4.0 & 0.0 & 89.1 & 78.4 & 87.5 (PACFL) & 75.1 (FeSEM) & 89.1 \\
+Participation 30\% & label swap & 0.98 & 4.0 & 0.0 & 89.3 & 78.3 & 86.5 (FeSEM) & 73.0 (FeSEM) & 89.3 \\
+Scale & $N=200$ & 0.98 & 6.3 & 0.0 & 91.1 & 86.6 & 89.8 (PACFL) & 83.9 (FeSEM) & 91.1 \\
+\bottomrule
+\end{tabular}}
