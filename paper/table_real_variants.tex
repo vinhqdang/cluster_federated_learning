@@ -1,0 +1,22 @@
+\scriptsize
+\begin{tabular}{lccccc}
+\toprule
+Method & Acc & Concept & ARI & $K$ & Conflict\% \\
+\midrule
+\multicolumn{6}{l}{\textit{Office-Home (4 domains, 65 classes)}}\\
+FedAvg & 73.2 & 66.9 & 0.00 & 1 & 100.0 \\
+FeSEM & 73.4 & 67.2 & 0.49 & 4 & 13.2 \\
+Oracle & 73.9 & 69.0 & 1.00 & 4 & 0.0 \\
+DisCo-CFL (default) & 73.2 & 66.9 & 0.00 & 1 & 100.0 \\
+DisCo-CFL, full-layer signature & 72.8 & 66.0 & 0.13 & 4 & 34.5 \\
+DisCo-CFL, 30 warm-up rounds & 73.0 & 67.1 & 0.05 & 3 & 44.2 \\
+\midrule
+\multicolumn{6}{l}{\textit{CIFAR-100, rotations}}\\
+FedAvg & 54.7 & 47.7 & 0.00 & 1 & 100.0 \\
+FeSEM & 54.4 & 46.9 & 0.54 & 4 & 11.0 \\
+Oracle & 55.5 & 47.9 & 1.00 & 4 & 0.0 \\
+DisCo-CFL (default) & 54.7 & 47.7 & 0.00 & 1 & 100.0 \\
+DisCo-CFL, full-layer signature & 55.1 & 48.1 & 0.00 & 1 & 100.0 \\
+DisCo-CFL, 30 warm-up rounds & 54.9 & 48.0 & 0.02 & 3 & 72.0 \\
+\bottomrule
+\end{tabular}
