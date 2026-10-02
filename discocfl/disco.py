@@ -47,14 +47,14 @@ from torch.func import functional_call, grad, vmap
 class CountSketch:
     """Linear count-sketch R^d -> R^p; E<Sx, Sy> = <x, y>."""
 
-    def __init__(self, d, p, seed=0):
+    def __init__(self, d, p, seed=0, device="cpu"):
         g = torch.Generator().manual_seed(seed)
         self.p = p
-        self.bucket = torch.randint(0, p, (d,), generator=g)
-        self.sign = torch.randint(0, 2, (d,), generator=g).float() * 2 - 1
+        self.bucket = torch.randint(0, p, (d,), generator=g).to(device)
+        self.sign = (torch.randint(0, 2, (d,), generator=g).float() * 2 - 1).to(device)
 
     def __call__(self, v):  # v: (..., d)
-        out = torch.zeros(*v.shape[:-1], self.p)
+        out = torch.zeros(*v.shape[:-1], self.p, device=v.device)
         return out.index_add_(-1, self.bucket, v * self.sign)
 
 
@@ -67,6 +67,7 @@ class SignatureConfig:
     clip: float = 0.5               # per-sample clipping norm in sketch space (0 = none)
     dp_sigma: float = 0.0           # Gaussian noise multiplier (0 = no DP)
     dp_clip: float = 0.5            # per-sample clipping norm used with DP
+    mode: str = "full"              # "full": gradient of all parameters; "head": final linear layer
     seed: int = 0
 
 
@@ -86,13 +87,31 @@ def _per_sample_sketched_grads(model, params, x, y, sketch, chunk=64):
     return torch.cat(outs)
 
 
+@torch.no_grad()
+def _per_sample_head_grads(model, x, y, sketch, chunk=256):
+    """Per-sample gradient of the cross-entropy w.r.t. the final linear layer
+    (weights and bias), in closed form: r (x) h and r, with r = softmax - onehot
+    and h the penultimate features. Used for large models, where the gradient of
+    all parameters is too expensive; the theory holds for any fixed map g(x, c)."""
+    outs = []
+    fc = model.fc2 if hasattr(model, "fc2") else model.fc
+    for s in range(0, len(y), chunk):
+        xb, yb = x[s:s + chunk], y[s:s + chunk]
+        h = model.features(xb) if hasattr(model, "features") else F.relu(model.fc1(
+            F.max_pool2d(F.relu(model.conv2(F.max_pool2d(F.relu(model.conv1(xb)), 2))), 2).flatten(1)))
+        r = F.softmax(fc(h), 1) - F.one_hot(yb, fc.out_features).float()
+        g = torch.cat([(r[:, :, None] * h[:, None, :]).flatten(1), r], 1)
+        outs.append(sketch(g))
+    return torch.cat(outs)
+
+
 def client_signature(trainer, ref_vec, client, sketch, cfg: SignatureConfig, rng):
     """Returns {class: (a, b, n_class)} with a, b the sketched half-mean gradients."""
     trainer.set(ref_vec)
     model = trainer.model
     model.eval()
     params = {k: v.detach() for k, v in model.named_parameters()}
-    y = client.y.numpy()
+    y = client.y.cpu().numpy()
     groups = {int(c): np.where(y == c)[0] for c in np.unique(y)} if cfg.class_conditional \
         else {-1: np.arange(len(y))}
     sig = {}
@@ -104,7 +123,10 @@ def client_signature(trainer, ref_vec, client, sketch, cfg: SignatureConfig, rng
         halves = (idx[:h], idx[h:2 * h])
         vecs = []
         for part in halves:
-            g = _per_sample_sketched_grads(model, params, client.x[part], client.y[part], sketch)
+            if cfg.mode == "head":
+                g = _per_sample_head_grads(model, client.x[part], client.y[part], sketch)
+            else:
+                g = _per_sample_sketched_grads(model, params, client.x[part], client.y[part], sketch)
             if cfg.clip > 0 and cfg.dp_sigma <= 0:
                 # bounded per-sample signatures: robust to heavy-tailed gradients;
                 # the expected clipped gradient is still a functional of P(X|Y=c)
@@ -115,10 +137,10 @@ def client_signature(trainer, ref_vec, client, sketch, cfg: SignatureConfig, rng
                 g = g * torch.clamp(cfg.dp_clip / norms, max=1.0)
                 v = g.mean(0)
                 # replace-one sensitivity of a mean of h clipped vectors is 2C/h
-                v = v + torch.randn(v.shape) * cfg.dp_sigma * 2 * cfg.dp_clip / len(part)
+                v = v + torch.randn(v.shape, device=v.device) * cfg.dp_sigma * 2 * cfg.dp_clip / len(part)
             else:
                 v = g.mean(0)
-            vecs.append(v)
+            vecs.append(v.cpu())
         sig[c] = (vecs[0], vecs[1], len(idx))
     return sig
 

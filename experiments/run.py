@@ -102,7 +102,7 @@ def conflict_matrix(fed, min_count=4):
     each) whose input->label mapping differs between their concept groups."""
     n = len(fed.clients)
     C = fed.num_classes
-    counts = np.stack([np.bincount(c.y.numpy(), minlength=C) for c in fed.clients])
+    counts = np.stack([np.bincount(c.y.cpu().numpy(), minlength=C) for c in fed.clients])
     inv = []
     for c in fed.clients:
         g = fed.groups[c.group]

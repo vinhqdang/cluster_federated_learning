@@ -58,8 +58,10 @@ def run_disco(fed, tr, cfg, return_details=False):
                            class_conditional=cfg.get("class_conditional", True),
                            clip=cfg.get("clip", 0.5),
                            dp_sigma=cfg.get("dp_sigma", 0.0), dp_clip=cfg.get("dp_clip", 0.5),
+                           mode=cfg.get("sig", "head" if tr.kind == "l4" else "full"),
                            seed=cfg["seed"])
-    sketch = CountSketch(tr.dim, scfg.sketch_dim, seed=cfg["seed"])
+    sketch = CountSketch(tr.head_dim if scfg.mode == "head" else tr.dim, scfg.sketch_dim,
+                         seed=cfg["seed"], device=tr.device)
     rng = np.random.default_rng(cfg["seed"] + 7)
     t0 = time.time()
     sigs = [client_signature(tr, w_ref, c, sketch, scfg, rng) for c in fed.clients]
@@ -101,7 +103,7 @@ def run_flhc(fed, tr, cfg):
     """FL+HC (Briggs et al. 2020): warm-up FedAvg, then one-shot agglomerative
     clustering (Ward, Euclidean) of the clients' local updates; K given."""
     w = _fedavg_rounds(tr, fed, tr.get(), cfg["warmup"])
-    ups = torch.stack([tr.local_train(w, c.x, c.y) - w for c in fed.clients]).numpy()
+    ups = torch.stack([tr.local_train(w, c.x, c.y) - w for c in fed.clients]).cpu().numpy()
     K = cfg["K"]
     assign = np.zeros(len(fed.clients), int) if K == 1 else \
         AgglomerativeClustering(n_clusters=K, linkage="ward").fit_predict(ups)
@@ -143,7 +145,7 @@ def run_mtcfl(fed, tr, cfg):
             if (r >= cfg["warmup"] and len(members) > 2 and mean_norm < eps1 * avg_norm
                     and max_norm > eps2 * avg_norm):
                 U = torch.nn.functional.normalize(dW, dim=1)
-                sim = (U @ U.T).numpy()
+                sim = (U @ U.T).cpu().numpy()
                 lab = _bipartition(sim)
                 cross = sim[np.ix_(lab == 0, lab == 1)].max()
                 if cross < cfg.get("gamma", 1.0):
@@ -163,7 +165,8 @@ def run_pacfl(fed, tr, cfg):
     p = cfg.get("pacfl_p", 3)
     Us = []
     for c in fed.clients:
-        A = c.x[: min(200, c.n)].flatten(1).T.numpy()
+        xr = c.x_raw if getattr(c, "x_raw", None) is not None else c.x
+        A = xr[: min(200, c.n)].flatten(1).T.cpu().numpy().astype(np.float32)
         U, _, _ = np.linalg.svd(A, full_matrices=False)
         Us.append(U[:, :p])
     n = len(Us)
@@ -203,10 +206,10 @@ def run_fesem(fed, tr, cfg):
     idx = [int(rng.integers(len(fed.clients)))]
     for _ in range(1, K):                      # k-means++ seeding
         d2 = torch.cdist(local, local[idx]).min(1).values ** 2
-        p = (d2 / d2.sum()).numpy().astype(np.float64)
+        p = (d2 / d2.sum()).cpu().numpy().astype(np.float64)
         idx.append(int(rng.choice(len(fed.clients), p=p / p.sum())))
     centres = {k: local[i].clone() for k, i in enumerate(idx)}
-    assign = torch.cdist(local, torch.stack([centres[k] for k in range(K)])).argmin(1).numpy()
+    assign = torch.cdist(local, torch.stack([centres[k] for k in range(K)])).argmin(1).cpu().numpy()
     for k in range(K):
         mem = np.where(assign == k)[0]
         if len(mem):

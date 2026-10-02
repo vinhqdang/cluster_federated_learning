@@ -98,9 +98,15 @@ def _load_svhn(root):
 _CACHE: dict = {}
 
 
+RAW_LOADERS = {}
+
+
 def load_dataset(name: str):
     """Return normalised (x_train, y_train, x_test, y_test) torch tensors."""
     if name in _CACHE:
+        return _CACHE[name]
+    if name in RAW_LOADERS:               # raw uint8 images (featurised later)
+        _CACHE[name] = RAW_LOADERS[name]()
         return _CACHE[name]
     if name == "mnist":
         xtr, ytr, xte, yte = _load_idx_dataset(os.path.join(DATA_ROOT, "MNIST"))
@@ -198,6 +204,15 @@ def make_groups(kind: str, num_classes: int = 10):
     if kind.startswith("angle"):          # angleXX: 4 groups rotated by 0, X, 2X, 3X degrees
         a = float(kind[5:])
         return [Group(angle=k * a) for k in range(4)]
+    if kind.startswith("bigswap"):        # bigswapK: K groups, each swapping 10 random class pairs
+        K = int(kind[7:])
+        rng = np.random.default_rng(4321)
+        gs = [Group()]
+        for _ in range(K - 1):
+            c = rng.permutation(num_classes)[:20]
+            gs.append(Group(perm=swap_perm(num_classes, [(int(c[2 * i]), int(c[2 * i + 1]))
+                                                         for i in range(10)])))
+        return gs
     if kind.startswith("perm"):           # permK: K groups, each swapping two random class pairs
         K = int(kind[4:])
         rng = np.random.default_rng(1234)

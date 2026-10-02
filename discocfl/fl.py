@@ -27,14 +27,29 @@ class SmallCNN(nn.Module):
 class Trainer:
     """Holds one model instance and moves flat parameter vectors in and out."""
 
-    def __init__(self, fed, lr=0.05, batch_size=32, local_epochs=1, seed=0):
+    def __init__(self, fed, lr=0.05, batch_size=32, local_epochs=1, seed=0,
+                 arch="smallcnn", device="cpu", pretrained=True):
         c, h, _ = fed.in_shape
         torch.manual_seed(seed)
+        self.kind, self.pretrained = arch, pretrained
+        self.device = torch.device(device)
         self.arch = (c, fed.num_classes, h)
-        self.model = SmallCNN(*self.arch)
+        self.model = self._build().to(self.device)
         self.lr, self.bs, self.epochs = lr, batch_size, local_epochs
         self.rng = np.random.default_rng(seed + 12345)
         self.dim = self.get().numel()
+
+    def _build(self):
+        if self.kind == "l4":
+            from .models import L4Head
+            return L4Head(self.arch[1], self.pretrained)
+        return SmallCNN(*self.arch)
+
+    @property
+    def head_dim(self):
+        """Number of parameters of the final linear layer (weights + bias)."""
+        return self.model.fc2.weight.numel() + self.model.fc2.bias.numel() if self.kind == "smallcnn" \
+            else self.model.fc.weight.numel() + self.model.fc.bias.numel()
 
     def get(self):
         return parameters_to_vector(self.model.parameters()).detach().clone()
@@ -45,7 +60,7 @@ class Trainer:
     def init_vector(self, seed):
         """A fresh random initialisation (used by methods with several models)."""
         torch.manual_seed(seed)
-        m = SmallCNN(*self.arch)
+        m = self._build().to(self.device)
         return parameters_to_vector(m.parameters()).detach().clone()
 
     def local_train(self, vec, x, y, epochs=None):
@@ -54,7 +69,7 @@ class Trainer:
         opt = torch.optim.SGD(self.model.parameters(), lr=self.lr, momentum=0.0)
         n = len(y)
         for _ in range(epochs or self.epochs):
-            order = torch.from_numpy(self.rng.permutation(n))
+            order = torch.from_numpy(self.rng.permutation(n)).to(x.device)
             for s in range(0, n, self.bs):
                 b = order[s:s + self.bs]
                 opt.zero_grad()
@@ -66,16 +81,19 @@ class Trainer:
     def evaluate(self, vec, x, y):
         self.set(vec)
         self.model.eval()
-        out = self.model(x)
+        out = self._forward(x)
         loss = F.cross_entropy(out, y).item()
         acc = (out.argmax(1) == y).float().mean().item()
         return acc, loss
+
+    def _forward(self, x, chunk=1024):
+        return torch.cat([self.model(x[s:s + chunk]) for s in range(0, len(x), chunk)])
 
     @torch.no_grad()
     def logits(self, vec, x):
         self.set(vec)
         self.model.eval()
-        return self.model(x)
+        return self._forward(x)
 
     def mean_grad(self, vec, x, y):
         """Gradient of the mean loss on (x, y) at parameters vec."""
@@ -87,7 +105,7 @@ class Trainer:
 
 
 def weighted_average(vecs, weights):
-    w = torch.tensor(weights, dtype=torch.float32)
+    w = torch.tensor(weights, dtype=torch.float32, device=vecs[0].device)
     w = w / w.sum()
     return (torch.stack(vecs) * w[:, None]).sum(0)
 
@@ -130,13 +148,14 @@ def evaluate_assignment(trainer, fed, models, assign, prior_correction=False):
     the target prior is uniform, i.e. -log p_k(y) is added.
     """
     C = fed.num_classes
-    counts = {c.cid: np.bincount(c.y.numpy(), minlength=C) + 1.0 for c in fed.clients}
+    counts = {c.cid: np.bincount(c.y.cpu().numpy(), minlength=C) + 1.0 for c in fed.clients}
     assign = np.asarray(assign)
     cl_counts = {}
     for c in fed.clients:
         k = int(assign[c.cid])
         cl_counts[k] = cl_counts.get(k, 0) + counts[c.cid] - 1.0
-    log_pk = {k: torch.log(torch.tensor((v + 1.0) / (v + 1.0).sum(), dtype=torch.float32))
+    log_pk = {k: torch.log(torch.tensor((v + 1.0) / (v + 1.0).sum(), dtype=torch.float32,
+                                                    device=trainer.device))
               for k, v in cl_counts.items()}
     local, balanced = [], []
     cache = {}
@@ -144,7 +163,8 @@ def evaluate_assignment(trainer, fed, models, assign, prior_correction=False):
         k = int(assign[c.cid])
         out = trainer.logits(models[k], c.x_test)
         if prior_correction:
-            log_pi = torch.log(torch.tensor(counts[c.cid] / counts[c.cid].sum(), dtype=torch.float32))
+            log_pi = torch.log(torch.tensor(counts[c.cid] / counts[c.cid].sum(), dtype=torch.float32,
+                                            device=trainer.device))
             out = out + log_pi - log_pk[k]
         local.append((out.argmax(1) == c.y_test).float().mean().item())
         key = (k, c.group)
