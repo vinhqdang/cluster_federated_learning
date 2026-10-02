@@ -25,6 +25,14 @@ The experiments above use small CNNs trained from scratch on images with synthet
 \input{table_real_variants.tex}
 \end{table}
 
+\paragraph{Ablation on CIFAR-100 label swaps.} Table~\ref{tab:real_ablation} removes one component at a time (seed 0 only). The components matter more for the quality of the grouping than for the mean accuracy, because a fragmented federation still trains reasonable models. Without class conditioning, clients are grouped by their label mix: $K=35$, ARI $0.03$ and concept accuracy 49.0\% against 56.0\%. Without disattenuation the federation is split into 12 clusters (ARI $0.39$). Replacing the bottleneck linkage by the mean merges all groups ($K=1$), because the swaps touch only 20 of the 100 classes, and accuracy falls to 55.1\%, which equals that of FedAvg (55.3\%). Linkage-ordered merging gives 8 clusters (ARI $0.69$), and removing the clipping gives 6 (ARI $0.93$, no conflicting merge). These are the same effects as on Fashion-MNIST (Table~\ref{tab:abl}).
+
+\begin{table}[!htbp]
+\centering
+\caption{Ablation on CIFAR-100 with label-swap groups (seed 0). Columns as in Table~\ref{tab:real_variants}.}\label{tab:real_ablation}
+\input{table_real_ablation.tex}
+\end{table}
+
 \paragraph{Statistical comparison.} Table~\ref{tab:real_signif} compares DisCo-CFL with each baseline over the 15 (scenario, seed) pairs of the five benchmarks above. It is better than every baseline on mean, concept and worst-group accuracy ($p<0.05$, one-sided Wilcoxon signed-rank tests), except for the mean accuracy against FeSEM, where the two are statistically indistinguishable (6 wins, 3 ties and 6 losses, $p=0.26$). The pairs are not independent, since they share scenarios and the benchmarks with strong effects (CIFAR-100 label swaps) drive most of the wins, so these $p$-values should be read as descriptive.
 
 \begin{table}[!htbp]
