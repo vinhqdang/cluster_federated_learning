@@ -32,3 +32,11 @@ The experiments above use small CNNs trained from scratch on images with synthet
 \caption{Paired one-sided Wilcoxon signed-rank tests of DisCo-CFL against each baseline over the 15 (scenario, seed) pairs of PACS, PACS + QS, Office-Home and CIFAR-100 (rotations and label swaps). W/T/L: wins, ties ($|\Delta|<0.05$ points) and losses of DisCo-CFL.}\label{tab:real_signif}
 \input{table_real_signif.tex}
 \end{table}
+
+\paragraph{FEMNIST: natural writers without ground-truth groups.} FEMNIST~\citep{caldas2018leaf} has handwritten characters (62 classes) from thousands of writers. We take 100 writers with at least 150 samples and train the small CNN of the earlier experiments from scratch. There is no true number of groups, so IFCA, FeSEM and FL+HC are given $K=4$ without justification. DisCo-CFL has the highest mean accuracy (83.6\%; FedAvg 82.1\%, FedAvg with fine-tuning 82.7\%) and the highest accuracy for the worst 10\% of the clients (73.7\%; Table~\ref{tab:real_femnist}). It does so by forming 47 clusters on average (42--52) for 100 writers, so it treats many writers as having a distinct concept. The accuracy of its cluster models on the pooled test sets of 20 writers is lower than that of every method except local training (74.7\%; FedAvg 81.2\%, FeSEM 78.8\%, local training 59.9\%), which shows that the small clusters fit their own members and generalise less to other writers. Handwriting styles do differ between writers, so some of these splits may be real, but with no ground truth we cannot tell, and in this setting DisCo-CFL clearly errs on the side of too many clusters. The gains over FedAvg are 1.5 points in mean accuracy and 2.2 points for the worst 10\% with three seeds, which we regard as suggestive.
+
+\begin{table}[!htbp]
+\centering
+\caption{FEMNIST, 100 writers, 3 seeds. Pooled: accuracy on the pooled test sets of 20 writers. IFCA, FeSEM and FL+HC receive $K=4$.}\label{tab:real_femnist}
+\input{table_real_femnist.tex}
+\end{table}

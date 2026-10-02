@@ -167,7 +167,8 @@ if __name__ == "__main__":
     table(rows, ["c100_swap", "c100_rot", "pacs_qs"], "real_c100")
     fem = [r for r in rows if r["scenario"] == "femnist"]
     if fem:
-        table(rows, ["femnist"], "real_femnist", caption_cols=[c for c in COLS if c[0] not in ("ari", "conflict_merge_rate", "pc_worst_group_acc")])
+        table(rows, ["femnist"], "real_femnist", caption_cols=[("pc_acc_mean", "Acc", True), ("pc_acc_p10", "Acc@10\\%", True),
+                                                               ("pc_acc_concept_mean", "Pooled", True), ("k_found", "$K$", False)])
     signif_table(rows, {"pacs", "officehome", "c100_swap", "c100_rot", "pacs_qs"}, "real_signif")
     variants_table(rows, "real_variants")
     ablation_table(rows, "real_ablation")
