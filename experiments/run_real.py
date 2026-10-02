@@ -29,11 +29,11 @@ SCENARIOS = {
                     quantity_sigma=1.0),
     "officehome": dict(kind="domain", name="office-home", clients_per_domain=10, mean_size=300,
                        alpha=0.3),
-    "c100_rot": dict(kind="c100", groups="rotation", clients_per_group=10, mean_size=500, alpha=0.5),
-    "c100_swap": dict(kind="c100", groups="bigswap4", clients_per_group=10, mean_size=500, alpha=0.5),
+    "c100_rot": dict(kind="c100", groups="rotation", clients_per_group=10, mean_size=300, alpha=0.5),
+    "c100_swap": dict(kind="c100", groups="bigswap4", clients_per_group=10, mean_size=300, alpha=0.5),
     "femnist": dict(kind="femnist", n_writers=100),
 }
-TRAIN = dict(rounds=50, warmup=10, lr=0.01, batch_size=32, local_epochs=1)
+TRAIN = dict(rounds=50, warmup=10, lr=0.02, batch_size=64, local_epochs=1)
 FEMNIST_TRAIN = dict(rounds=50, warmup=10, lr=0.05, batch_size=32, local_epochs=1)
 
 METHODS = ["FedAvg", "Local", "FedAvg-FT", "IFCA", "FeSEM", "MTCFL", "FL+HC", "PACFL", "DisCo", "Oracle"]
@@ -114,7 +114,7 @@ if __name__ == "__main__":
     ap.add_argument("--shard", default="0/1", help="i/n: run every n-th job starting at i")
     a = ap.parse_args()
     s = SUITES[a.suite]
-    jobs = list(itertools.product(s["scenarios"], s["methods"], s["seeds"]))
+    jobs = [(sc, m, sd) for sc, sd, m in itertools.product(s["scenarios"], s["seeds"], s["methods"])]
     if a.only:
         jobs = [j for j in jobs if j[0] in a.only.split(",")]
     if a.methods:
