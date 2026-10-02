@@ -1,0 +1,17 @@
+\scriptsize
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{lcccc}
+\toprule
+Method & Acc & Acc@10\% & Pooled & $K$ \\
+\midrule
+\multicolumn{5}{l}{\textit{FEMNIST (100 writers)}}\\
+FedAvg & 82.1 & 71.5 & \textbf{81.2} & 1.0 \\
+Local & 75.3 & 62.6 & 59.9 & 100.0 \\
+FedAvg-FT & 82.7 & 71.8 & 78.3 & 100.0 \\
+IFCA & 81.9 & 70.8 & 80.7 & 1.0 \\
+FeSEM & 81.2 & 71.1 & 78.8 & 4.0 \\
+MTCFL & 82.3 & 71.8 & 80.1 & 30.3 \\
+FL+HC & 82.4 & 70.5 & 81.1 & 4.0 \\
+DisCo & \textbf{83.6} & \textbf{73.7} & 74.7 & 47.3 \\
+\bottomrule
+\end{tabular}

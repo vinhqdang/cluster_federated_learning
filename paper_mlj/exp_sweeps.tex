@@ -1,11 +1,11 @@
 \subsection{Robustness sweeps}\label{sec:sweeps}
 Table~\ref{tab:sweeps} varies one factor at a time on Fashion-MNIST: the strength of the concept shift, the number of groups, the fraction of participating clients and the number of clients. Baselines are given the true $K$ where they need it.
 
-\begin{table}[!htbp]
+\begin{tableorg}[!htbp]
 \centering
 \caption{Robustness sweeps (Fashion-MNIST, 3 seeds). For DisCo-CFL: ARI, number of clusters, conflict-merge rate, accuracy and concept accuracy. For comparison: the best baseline on accuracy and on concept accuracy (in parentheses), and the Oracle's accuracy.}\label{tab:sweeps}
 \input{table_sweeps.tex}
-\end{table}
+\end{tableorg}
 
 \paragraph{Strength of the shift.} With rotations of $0,\theta,2\theta,3\theta$ degrees, DisCo-CFL separates the groups perfectly from $\theta=45^\circ$ on and almost perfectly at $30^\circ$ (ARI $0.93$). At $15^\circ$ neighbouring concepts are so close that their class-conditional gradients agree above the threshold, and DisCo-CFL merges them (ARI $0.42$). This is the behaviour predicted by the separation assumption: the method groups what it cannot tell apart. It costs little, because nearby concepts can share a model: accuracy is 90.0\% against 90.5\% for the Oracle, and 0.2 points below FeSEM, which is given $K=4$. For every $\theta\ge30^\circ$, DisCo-CFL has the best accuracy and concept accuracy and is within $0.1$ points of the Oracle.
 

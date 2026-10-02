@@ -1,17 +1,17 @@
 \subsection{Main results: performance, fairness and clustering quality}
 Table~\ref{tab:main} reports all metrics on Fashion-MNIST for the ten methods. Accuracy is \emph{with} the prior correction~\eqref{eq:pc}, applied identically to every method; the uncorrected mean accuracy is shown in the first column.
 
-\begin{table}[!htbp]
+\begin{tableorg}[!htbp]
 \centering
 \caption{Fashion-MNIST, 40 clients, 3 seeds. Acc: mean local accuracy (with prior correction, $\pm$ std over seeds). Acc (raw): without correction. Acc@10\%: mean accuracy of the worst 10\% of clients. Worst-grp: accuracy of the worst concept group. Concept: accuracy on the class-balanced test set of the client's concept. Conflict\%: fraction of conflicting client pairs merged into one cluster (lower is better). IFCA, FeSEM, FL+HC and PACFL receive the true $K$; DisCo-CFL finds it. Oracle uses the ground-truth groups. Best non-oracle values in bold.}\label{tab:main}
 \input{table_main_a.tex}
-\end{table}
+\end{tableorg}
 
-\begin{table}[!htbp]
+\begin{tableorg}[!htbp]
 \centering
-\captionsetup{labelformat=empty}\caption{Table~\ref{tab:main}\captionsetup{labelformat=default} (continued).}
+\noindent\textit{Table~\ref{tab:main} (continued).}\par\smallskip
 \input{table_main_b.tex}
-\end{table}
+\end{tableorg}
 
 \paragraph{DisCo-CFL recovers the concept structure without being told $K$.} In \emph{Rotation}, \emph{Label swap} and \emph{Rotation + QS}, DisCo-CFL finds exactly the ground-truth partition in all seeds (ARI $=1$) and matches the Oracle on every metric. In \emph{Mixed + QS}, where two groups differ only on 4 of the 10 classes, it reaches ARI $0.94$ with $0.6\%$ conflicting pairs merged. In \emph{Minority groups} (25/9/4/2 clients) it reaches ARI $0.98$ with no conflicts. The baselines that are given the true $K$ merge 6--86\% of the conflicting pairs: FeSEM 6--12\%, IFCA 17--26\%, PACFL 18--35\% and FL+HC 75--86\%. CFL/MTCFL has few conflicts only in the scenarios where it fragments the federation into 16--35 clusters. FL+HC groups clients by label proportions instead of concepts, PACFL by the pixel subspace (which a label swap leaves unchanged), IFCA suffers from initialisation, and FeSEM, the strongest clustering baseline, confuses nearby groups in parameter space.
 
@@ -41,6 +41,7 @@ $m$ & recall & ARI & conflict\% & recall & ARI & conflict\% \\
 
 \input{exp_datasets.tex}
 \input{exp_sweeps.tex}
+\input{exp_real.tex}
 
 \subsection{Transparency: explanations and diagnosis}
 Table~\ref{tab:fat} evaluates the class-level explanations against the ground truth. For label-swap groups, the divergent classes reported by the server are \emph{exactly} the swapped classes in every pair (precision, recall and exact match $1.00$), and the diagnosis ``class-specific concept shift'' is always correct. A typical explanation reads: \emph{``cluster 0 vs.\ cluster 2: class-specific concept shift on classes [4, 5, 6, 7]''}. Here group 2 swaps $4\leftrightarrow5$ and $6\leftrightarrow7$. For rotations, precision is $1.00$, i.e.\ no class is ever wrongly reported as divergent. Recall is $0.93$: every miss occurs between $0^\circ$ and $180^\circ$ groups, on trouser, pullover, dress and shirt, items that are nearly invariant under a $180^\circ$ rotation. For these classes the two concepts \emph{are} statistically close, so the reported ``class-specific shift'' matches the data (Proposition~\ref{prop:expl}); it only disagrees with our coarse ground-truth label ``global''.
