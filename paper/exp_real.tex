@@ -1,0 +1,34 @@
+\subsection{Realistic benchmarks: natural domain shift and a pretrained network}\label{sec:real}
+The experiments above use small CNNs trained from scratch on images with synthetic concept groups. To test whether the method holds up in a more realistic setting, we repeat the comparison with an ImageNet-pretrained ResNet-18~\citep{he2016resnet} on two datasets whose clients differ by a \emph{natural} domain shift, and on CIFAR-100.
+
+\paragraph{Setup.} \emph{PACS}~\citep{li2017pacs} has 9{,}991 images of 7 classes in four domains (photo, art painting, cartoon, sketch). \emph{Office-Home}~\citep{venkateswara2017officehome} has 15{,}588 images of 65 classes in four domains (art, clipart, product, real world). Every domain is one concept group, with 10 clients per domain and Dirichlet label skew ($\alpha=0.3$). Clients hold 200 (PACS) or 300 (Office-Home) training images on average; \emph{PACS + QS} adds log-normal quantity skew ($\sigma=1$). \emph{CIFAR-100}~\citep{krizhevsky2009cifar} has 40 clients in four groups, either rotations ($0^\circ$--$270^\circ$) or label swaps (three groups that each swap ten random class pairs, and one group with the original labels). Images are resized to $112\times112$ ($96\times96$ for CIFAR-100). All methods train the same model, the layer-4 block and the classifier of the pretrained ResNet-18 (8.4M parameters). The earlier layers and the batch-normalisation statistics are frozen, so the layer-3 feature maps are computed once. Training uses SGD with learning rate $0.01$, batch size 64, one local epoch and 50 rounds; methods with a warm-up use 10 of them. The learning rate was chosen among $\{0.003,0.01,0.02\}$ on FedAvg, PACS, seed 0 only ($0.02$ did not train). DisCo-CFL uses the gradient with respect to the final linear layer, which has a closed form, and all its other hyperparameters are unchanged. IFCA, FeSEM, FL+HC and PACFL are given the true number of groups (4); PACFL uses $16\times16$ down-sampled images. Each configuration is run with three seeds (150 runs), and accuracy is reported with the prior correction of Section~\ref{sec:pc} for every method. For these datasets a conflict means that two clients come from different domains (or rotation or label groups), which is stricter than necessary: two visually similar domains may well be compatible.
+
+\begin{table}[!htbp]
+\centering
+\caption{PACS and Office-Home (40 clients, 3 seeds). Columns as in Table~\ref{tab:main}. IFCA, FeSEM, FL+HC and PACFL receive the true $K=4$; best non-oracle values in bold.}\label{tab:real_domains}
+\input{table_real_domains.tex}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\caption{CIFAR-100 with label-swap and rotation groups, and PACS with quantity skew (40 clients, 3 seeds). Columns as in Table~\ref{tab:main}.}\label{tab:real_c100}
+\input{table_real_c100.tex}
+\end{table}
+
+\paragraph{Where DisCo-CFL works.} With label-swap groups on CIFAR-100 (Table~\ref{tab:real_c100}), DisCo-CFL finds the groups without being told $K$ (ARI $0.98$, $K=4.0$), merges $0.5\%$ of the conflicting pairs, and reaches the accuracy of the oracle (63.0\%). The best baseline, FeSEM, which is given $K$, reaches 59.7\% and merges 16.4\% of the conflicting pairs, and FedAvg reaches 55.5\%. The worst concept group has 60.7\% accuracy with DisCo-CFL (oracle 61.0\%, FeSEM 56.9\%). On PACS, DisCo-CFL has the highest concept accuracy of all non-oracle methods (87.3\%; FeSEM 85.9\%, FedAvg 86.4\%, oracle 88.2\%) and the highest ARI ($0.59$), with a conflict-merge rate of 15.7\% against 20.1\% for FeSEM and 33--85\% for the other baselines (Table~\ref{tab:real_domains}). Most of the missing agreement comes from the art-painting and photo domains, which it often places together. Its mean accuracy (92.8\%) is 0.1 points below that of FeSEM and 0.5 points below the oracle. With quantity skew (PACS + QS) the picture is the same: accuracy 92.1\% (FeSEM 92.1\%, oracle 92.5\%), worst-group accuracy 89.4\% (FeSEM 88.9\%) and ARI $0.52$.
+
+\paragraph{Where it does not.} On Office-Home and on rotated CIFAR-100, DisCo-CFL does not separate the groups: ARI $0.01$ and $0.00$, and a mean of $K=1.7$ and $K=1.0$ clusters. It then behaves like FedAvg (Office-Home 71.5\% against 71.3\%; rotations 55.2\% against 55.2\%). It does not lose accuracy there, but only because there is little to gain: the oracle improves on FedAvg by 0.6 and 0.5 points in these two scenarios, against 7.5 points for CIFAR-100 label swaps and 0.9--1.2 points on PACS. FeSEM, with $K$ given, separates the groups only partly (ARI $0.49$--$0.50$) and is not more accurate than FedAvg either. Hence the failure is a failure to identify the groups, and, with a pretrained network, it costs little accuracy in these two settings. It shows that Assumption~\ref{ass:sep} does not hold there: the class-conditional gradients of the groups are too close at the reference model. We tried the two natural remedies on seed 0 (Table~\ref{tab:real_variants}). A signature built from the gradient of the whole layer-4 block, instead of the final linear layer, and a reference model trained for 30 instead of 10 rounds do not recover the groups either: ARI at most $0.13$, with 34--72\% of the conflicting pairs merged, and no gain in accuracy. We therefore do not know whether a better signature exists for such shifts, and we list this as a limitation.
+
+\begin{table}[!htbp]
+\centering
+\caption{Attempts to repair the failures of DisCo-CFL (seed 0 only).}\label{tab:real_variants}
+\input{table_real_variants.tex}
+\end{table}
+
+\paragraph{Statistical comparison.} Table~\ref{tab:real_signif} compares DisCo-CFL with each baseline over the 15 (scenario, seed) pairs of the five benchmarks above. It is better than every baseline on mean, concept and worst-group accuracy ($p<0.05$, one-sided Wilcoxon signed-rank tests), except for the mean accuracy against FeSEM, where the two are statistically indistinguishable (6 wins, 3 ties and 6 losses, $p=0.26$). The pairs are not independent, since they share scenarios and the benchmarks with strong effects (CIFAR-100 label swaps) drive most of the wins, so these $p$-values should be read as descriptive.
+
+\begin{table}[!htbp]
+\centering
+\caption{Paired one-sided Wilcoxon signed-rank tests of DisCo-CFL against each baseline over the 15 (scenario, seed) pairs of PACS, PACS + QS, Office-Home and CIFAR-100 (rotations and label swaps). W/T/L: wins, ties ($|\Delta|<0.05$ points) and losses of DisCo-CFL.}\label{tab:real_signif}
+\input{table_real_signif.tex}
+\end{table}

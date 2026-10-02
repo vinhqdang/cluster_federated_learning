@@ -41,6 +41,7 @@ $m$ & recall & ARI & conflict\% & recall & ARI & conflict\% \\
 
 \input{exp_datasets.tex}
 \input{exp_sweeps.tex}
+\input{exp_real.tex}
 
 \subsection{Transparency: explanations and diagnosis}
 Table~\ref{tab:fat} evaluates the class-level explanations against the ground truth. For label-swap groups, the divergent classes reported by the server are \emph{exactly} the swapped classes in every pair (precision, recall and exact match $1.00$), and the diagnosis ``class-specific concept shift'' is always correct. A typical explanation reads: \emph{``cluster 0 vs.\ cluster 2: class-specific concept shift on classes [4, 5, 6, 7]''}. Here group 2 swaps $4\leftrightarrow5$ and $6\leftrightarrow7$. For rotations, precision is $1.00$, i.e.\ no class is ever wrongly reported as divergent. Recall is $0.93$: every miss occurs between $0^\circ$ and $180^\circ$ groups, on trouser, pullover, dress and shirt, items that are nearly invariant under a $180^\circ$ rotation. For these classes the two concepts \emph{are} statistically close, so the reported ``class-specific shift'' matches the data (Proposition~\ref{prop:expl}); it only disagrees with our coarse ground-truth label ``global''.
