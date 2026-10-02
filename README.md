@@ -82,14 +82,19 @@ discocfl/
   algorithms.py   # DisCo-CFL and baselines: FedAvg, Local, FedAvg-FT, IFCA, FeSEM, CFL/MTCFL, FL+HC, PACFL, Oracle
   data.py         # federated non-IID generation (MNIST, Fashion-MNIST, SVHN, CIFAR-10): rotations, label swaps,
                   # label skew, quantity skew, minority groups, K groups, partial participation
-  fl.py           # model (small CNN) and FedAvg primitives
+  fl.py           # models (small CNN, pretrained ResNet-18 head), GPU support, FedAvg primitives
+  models.py       # frozen ResNet-18 backbone and trainable layer-4 head
+  real_data.py    # PACS, Office-Home, CIFAR-100 and FEMNIST federations
   synthetic.py    # synthetic signatures with known ground truth (tests, theory validation)
 experiments/
   run.py              # accuracy benchmark (scenarios x methods x seeds)
   clustering_study.py # tau / DP / sample size / minority / explanations / certificates / newcomers / scalability
   theory_sim.py       # synthetic validation of the theorems
   summarize.py        # tables (results/tables) and figures (results/figures)
+  run_real.py         # realistic benchmarks on GPU (results/raw_real); summarize_real.py makes their tables
 paper/            # LaTeX manuscript with full proofs (long version)
+paper_mlj/        # Springer Nature template version (flat directory; python build.py assembles it from paper/)
+submission_mlj/   # contribution information sheet and cover letter for the journal
 paper_tnnls/      # IEEE TNNLS version (submitted 28 Sep 2026, see SUBMISSION.md): main.pdf (8 pages) + supplement.pdf
                   #   submission/: anonymised single-file main.tex, figures, anonymised PDFs, cover_letter.pdf (set \anonfalse in main.tex/supplement.tex for the final version)
 lean/             # Lean 4 formalization of the proofs
@@ -198,6 +203,27 @@ accuracy (all p < 0.01). Against the strongest baseline, FeSEM (given K), the wi
 45/4/8 on accuracy and 48/2/7 on concept accuracy
 ([`results/tables/signif_all.md`](results/tables/signif_all.md)).
 
+### Realistic benchmarks (pretrained ResNet-18; 3 seeds, 40 clients)
+
+Layer 4 and the classifier of an ImageNet-pretrained ResNet-18 are trained (8.4M parameters; earlier layers
+frozen); DisCo-CFL uses the gradient of the final linear layer. IFCA, FeSEM, FL+HC and PACFL are given K = 4.
+Accuracy has the prior correction applied for every method.
+
+| Benchmark | FedAvg | FeSEM (K given) | DisCo-CFL | Oracle | DisCo-CFL ARI / K |
+|---|---|---|---|---|---|
+| CIFAR-100, label swaps (acc.) | 55.5 | 59.7 | **63.0** | 63.0 | 0.98 / 4.0 |
+| PACS (concept acc.) | 86.4 | 85.9 | **87.3** | 88.2 | 0.59 / 3.7 |
+| PACS + quantity skew (acc.) | 91.3 | 92.1 | 92.1 | 92.5 | 0.52 / 3.7 |
+| Office-Home (acc.) | 71.3 | 71.6 | 71.5 | 71.9 | 0.01 / 1.7 |
+| CIFAR-100, rotations (acc.) | 55.2 | 55.2 | 55.2 | 55.7 | 0.00 / 1.0 |
+
+DisCo-CFL does **not** separate the groups on Office-Home or on rotated CIFAR-100 (the oracle improves on
+FedAvg by less than 1 point there); a signature from the whole last block and a longer warm-up did not repair
+this (seed 0). On FEMNIST (100 writers, no true groups) it reaches the highest mean accuracy (83.6% against
+82.1% for FedAvg) but forms about 47 clusters. Over the 15 (scenario, seed) pairs its accuracy is
+indistinguishable from FeSEM's (p = 0.26); it is better on concept accuracy (p = 0.004) and worst-group accuracy
+(p = 0.015).
+
 ### Ablation (Fashion-MNIST, ARI / K)
 
 | Variant | Rotation | Label swap | Rot + QS | Mixed + QS | Label only |
@@ -217,5 +243,6 @@ accuracy (all p < 0.01). Against the strongest baseline, FeSEM (given K), the wi
   local accuracy.
 * The theory assumes sub-Gaussian per-sample signatures (ensured by clipping) and does not cover
   the attachment heuristics; the upper bound exceeds the lower bound by a factor 1/Δ.
-* Experiments use small CNNs and synthetic concept groups built from public image datasets.
+* The main experiments use small CNNs and synthetic concept groups built from public image datasets. With a pretrained
+  ResNet-18 the method fails on Office-Home and on rotated CIFAR-100 and over-splits natural writers (FEMNIST).
 
