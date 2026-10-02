@@ -4,8 +4,8 @@
 
 - **Submitted:** 28 September 2026
 - **Type:** Regular paper, double-anonymous review
-- **Manuscript ID:** _(fill in from the submission system)_
-- **Status:** Submitted, under review
+- **Manuscript ID:** TNNLS-2026-P-51613
+- **Status:** Desk rejected on 1 October 2026 (not sent to review; editorial office cited submission volume and the quality threshold for review)
 
 ### Files submitted (`submission/`)
 
