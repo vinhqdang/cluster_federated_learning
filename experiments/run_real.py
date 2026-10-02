@@ -38,8 +38,8 @@ FEMNIST_TRAIN = dict(rounds=50, warmup=10, lr=0.05, batch_size=32, local_epochs=
 
 METHODS = ["FedAvg", "Local", "FedAvg-FT", "IFCA", "FeSEM", "MTCFL", "FL+HC", "PACFL", "DisCo", "Oracle"]
 SUITES = {
-    "real": dict(scenarios=["pacs", "pacs_qs", "officehome", "c100_rot", "c100_swap"],
-                 methods=METHODS + ["DisCo-T30"], seeds=[0, 1, 2]),
+    "real": dict(scenarios=["pacs", "officehome", "c100_swap", "c100_rot", "pacs_qs"],
+                 methods=METHODS, seeds=[0, 1, 2]),
     "femnist": dict(scenarios=["femnist"], methods=["FedAvg", "Local", "FedAvg-FT", "IFCA", "FeSEM",
                                                       "MTCFL", "FL+HC", "DisCo"], seeds=[0, 1, 2]),
     "ablation_real": dict(scenarios=["pacs", "officehome", "c100_swap"],
