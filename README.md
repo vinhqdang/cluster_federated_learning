@@ -95,8 +95,6 @@ experiments/
 paper/            # LaTeX manuscript with full proofs (long version)
 paper_mlj/        # Springer Nature template version (flat directory; python build.py assembles it from paper/)
 submission_mlj/   # contribution information sheet and cover letter for the journal
-paper_tnnls/      # IEEE TNNLS version (submitted 28 Sep 2026, see SUBMISSION.md): main.pdf (8 pages) + supplement.pdf
-                  #   submission/: anonymised single-file main.tex, figures, anonymised PDFs, cover_letter.pdf (set \anonfalse in main.tex/supplement.tex for the final version)
 lean/             # Lean 4 formalization of the proofs
 tests/            # unit tests
 results/          # raw results, tables, figures
@@ -125,7 +123,7 @@ All numbers: mean over 3 seeds (618 training runs in total), 40 clients unless s
 "Acc" is mean local test accuracy with the Bayes prior correction applied **identically to every
 method**. IFCA, FeSEM, FL+HC and PACFL are **given the true K**; DisCo-CFL finds K on its own.
 Full tables: [`results/tables/main.md`](results/tables/main.md),
-[`results/tables/studies.md`](results/tables/studies.md); manuscript: [`paper/main.pdf`](paper/main.pdf); IEEE TNNLS version: [`paper_tnnls/main.pdf`](paper_tnnls/main.pdf) and [`paper_tnnls/supplement.pdf`](paper_tnnls/supplement.pdf).
+[`results/tables/studies.md`](results/tables/studies.md); manuscript: [`paper/main.pdf`](paper/main.pdf).
 
 ### Fashion-MNIST (main benchmark)
 
