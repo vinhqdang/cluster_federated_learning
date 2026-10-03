@@ -1,4 +1,4 @@
-\subsection{Robustness sweeps}\label{sec:sweeps}
+\paragraph{Robustness sweeps.}\label{sec:sweeps}
 Table~\ref{tab:sweeps} varies one factor at a time on Fashion-MNIST: the strength of the concept shift, the number of groups, the fraction of participating clients and the number of clients. Baselines are given the true $K$ where they need it.
 
 \begin{tableorg}[!htbp]
@@ -15,7 +15,7 @@ Table~\ref{tab:sweeps} varies one factor at a time on Fashion-MNIST: the strengt
 
 \paragraph{Number of clients.} With 200 clients of 200 samples each, DisCo-CFL reaches ARI $0.98$ with no conflicting merge. The extra clusters ($K=5$--$7$) are conflict-free splits of groups; three of them are singletons flagged as anomalous in the audit log. Accuracy equals the Oracle's (91.1\%), 1.3 points above the best baseline, and concept accuracy is 2.7 points above the best baseline. This is in line with the clustering-only scalability study of Section~\ref{sec:cost}.
 
-\subsection{Statistical significance}
+\paragraph{Statistical significance.}
 Table~\ref{tab:signif} compares DisCo-CFL with each baseline over all (scenario, seed) pairs with concept shift that both methods were run on. DisCo-CFL is significantly better than every baseline on mean accuracy, concept accuracy and worst-group accuracy (one-sided Wilcoxon signed-rank tests, all $p<0.01$). The closest competitors are FeSEM, MTCFL and FedAvg-FT. MTCFL and FedAvg-FT win on local accuracy mainly on CIFAR-10 (5--6 of the 6 CIFAR-10 pairs), and FeSEM wins on 8 of 57 pairs, mostly CIFAR-10 rotation and the $15^\circ$ rotation. On concept accuracy DisCo-CFL wins against every baseline in at least 84\% of the pairs.
 
 \begin{table}[!htbp]

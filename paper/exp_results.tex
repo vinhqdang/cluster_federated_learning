@@ -1,4 +1,5 @@
-\subsection{Main results: performance, fairness and clustering quality}
+\subsection{Small CNNs: performance, fairness and clustering quality}\label{sec:small}
+\paragraph{Main results.}
 Table~\ref{tab:main} reports all metrics on Fashion-MNIST for the ten methods. Accuracy is \emph{with} the prior correction~\eqref{eq:pc}, applied identically to every method; the uncorrected mean accuracy is shown in the first column.
 
 \begin{table}[!htbp]
@@ -43,7 +44,8 @@ $m$ & recall & ARI & conflict\% & recall & ARI & conflict\% \\
 \input{exp_sweeps.tex}
 \input{exp_real.tex}
 
-\subsection{Transparency: explanations and diagnosis}
+\subsection{Beyond accuracy: transparency, accountability and privacy}
+\paragraph{Transparency: explanations and diagnosis.}
 Table~\ref{tab:fat} evaluates the class-level explanations against the ground truth. For label-swap groups, the divergent classes reported by the server are \emph{exactly} the swapped classes in every pair (precision, recall and exact match $1.00$), and the diagnosis ``class-specific concept shift'' is always correct. A typical explanation reads: \emph{``cluster 0 vs.\ cluster 2: class-specific concept shift on classes [4, 5, 6, 7]''}. Here group 2 swaps $4\leftrightarrow5$ and $6\leftrightarrow7$. For rotations, precision is $1.00$, i.e.\ no class is ever wrongly reported as divergent. Recall is $0.93$: every miss occurs between $0^\circ$ and $180^\circ$ groups, on trouser, pullover, dress and shirt, items that are nearly invariant under a $180^\circ$ rotation. For these classes the two concepts \emph{are} statistically close, so the reported ``class-specific shift'' matches the data (Proposition~\ref{prop:expl}); it only disagrees with our coarse ground-truth label ``global''.
 
 \begin{table}[!htbp]
@@ -71,10 +73,10 @@ novel concept, flagged as novel & 1.00 & 1.00 & -- \\
 \end{tabular}
 \end{table}
 
-\subsection{Accountability: certificates, audit log, newcomers}
+\paragraph{Accountability: certificates, audit log, newcomers.}
 Certificates are informative (Table~\ref{tab:fat}). In the hardest scenario (\emph{Mixed + QS}), 91.9\% of the clients with a \emph{confident} certificate are in a conflict-free position, against 77.8\% of those with an \emph{uncertain} one. In the other scenarios all clients are correctly placed and 95--97\% receive confident certificates. The uncertain ones carry the bottleneck class that makes them ambiguous, which is what a client needs in order to contest its assignment. Newcomers that join after clustering, using the frozen reference model, are assigned to the right cluster in 96--100\% of cases. Clients with a labelling never seen during clustering are reported as a \emph{novel concept} in 100\% of cases instead of being forced into an existing cluster.
 
-\subsection{Privacy}\label{sec:privacy-exp}
+\paragraph{Privacy.}\label{sec:privacy-exp}
 Figure~\ref{fig:dp} shows the ARI of the clustering when the signatures are released with the Gaussian mechanism of Proposition~\ref{prop:dp} ($C_{\rm clip}=0.5$, $\delta=10^{-5}$). As predicted by Proposition~\ref{prop:dp}(iii), the \emph{raw} cosine collapses to ARI $\approx0$ at every noise level: DP noise attenuates all similarities and every client looks unrelated to every other. With disattenuation, the clustering degrades gracefully, and more data per client buys more privacy, as predicted by the $h\propto\sigma_{\rm dp}$ term. With 1{,}500 samples per client, DisCo-CFL keeps ARI $0.92$ (rotation) and $0.77$ (label swap) at $\varepsilon=4.4$, and $0.68/0.60$ at $\varepsilon=2$.
 
 \begin{figure}[!htbp]
@@ -83,8 +85,8 @@ Figure~\ref{fig:dp} shows the ARI of the clustering when the signatures are rele
 \caption{Clustering quality under $(\varepsilon,10^{-5})$-DP signatures. Solid: DisCo-CFL; dashed: raw cosine. Orange: 400 samples per client; blue: 1{,}500.}\label{fig:dp}
 \end{figure}
 
-\subsection{Calibration and sensitivity}\label{sec:sens}
-\paragraph{Calibration across sample sizes.} Varying the client size from 50 to 800 samples (Figure~\ref{fig:size} in Appendix~\ref{app:figs}), the mean disattenuated similarity between clients of the same group stays at $0.98$--$0.99$, whereas the raw cosine stays around $0.91$--$0.95$ and depends on the per-class sample counts. ARI reaches $1.00$ from 200 samples per client on (rotation) and from 400 (label swap).
+\subsection{Calibration, sensitivity, ablation and cost}
+\paragraph{Calibration across sample sizes.}\label{sec:sens} Varying the client size from 50 to 800 samples (Figure~\ref{fig:size} in Appendix~\ref{app:figs}), the mean disattenuated similarity between clients of the same group stays at $0.98$--$0.99$, whereas the raw cosine stays around $0.91$--$0.95$ and depends on the per-class sample counts. ARI reaches $1.00$ from 200 samples per client on (rotation) and from 400 (label swap).
 \paragraph{Threshold and shrinkage.} Figure~\ref{fig:tau} shows that DisCo-CFL is stable for $\tau\in[0.75,0.85]$ in all concept-shift scenarios (ARI $0.85$--$1.00$). With the raw cosine, every $\tau$ above $0.7$ causes over-splitting ($K$ up to 16 at $\tau=0.9$). The label-only scenario is the most sensitive: $\tau\le0.7$ gives $K=1$ in all seeds, and at $\tau=0.8$ one seed flags a single anomalous client. The shrinkage $\lambda$ has almost no effect between $0.02$ and $1$ (Appendix~\ref{app:figs}), including values that satisfy the condition of Corollary~\ref{cor:sc}.
 
 \begin{figure}[!htbp]
@@ -93,7 +95,7 @@ Figure~\ref{fig:dp} shows the ARI of the clustering when the signatures are rele
 \caption{Sensitivity to the threshold $\tau$ (3 seeds). The dashed line marks the default $\tau=0.8$, which was fixed before these runs.}\label{fig:tau}
 \end{figure}
 
-\subsection{Theory in practice}
+\paragraph{Theory in practice.}
 Figure~\ref{fig:theory} validates the theory on synthetic signatures with known ground truth ($p=512$, noise of effective rank 16). The disattenuated similarity is nearly unbiased for every half size $h$, whereas the raw cosine is biased by up to $-0.37$. Safety and maximality are reached with probability 1 once $h\ge64$ for all separations $\Delta\in[0.2,0.7]$, and exact recovery is reached under full class support. The required $h$ grows as $\Delta$ shrinks. Recovery of a minority group of 1, 2, 4 or 8 clients follows the same curve (Figure~\ref{fig:thminority} in Appendix~\ref{app:figs}), as Corollary~\ref{cor:sc} states.
 
 \begin{figure}[!htbp]
@@ -105,5 +107,5 @@ Figure~\ref{fig:theory} validates the theory on synthetic signatures with known 
 
 \input{exp_more.tex}
 
-\subsection{Cost and scalability}\label{sec:cost}
+\paragraph{Cost and scalability.}\label{sec:cost}
 Each client uploads its signature \emph{once}, about $1.2\times10^4$ floats with $p=1024$. The size is independent of the model dimension $d$; IFCA, by contrast, downloads $K$ models per client in \emph{every} round, and CFL/FL+HC cluster $d$-dimensional updates. Computing the signature takes 0.14--0.16\,s per client on one CPU core. Server-side clustering takes 0.05\,s for 40 clients and 2.3\,s for 320 clients, with ARI $\ge0.98$ at every scale.

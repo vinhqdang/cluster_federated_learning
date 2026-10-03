@@ -72,20 +72,21 @@ Federated learning (FL) trains a model across clients that keep their data local
 
 \input{related.tex}
 
-\section{Problem setting}\label{sec:setting}
+\section{The DisCo-CFL method}\label{sec:method}
+\subsection{Problem setting}\label{sec:setting}
 There are $N$ clients. Client $i$ holds $D_i=\{(x_{s},y_{s})\}_{s=1}^{n_i}$ with labels in $[C]$ drawn from $\cP_i(X,Y)=\cP_i(Y)\,\cP_i(X\mid Y)$. Let $S_i=\{c: n_i^c\ge m\}$ be the classes the client holds with at least $m$ samples.
 \begin{definition}[Concept equivalence and conflicts]\label{def:concept}
 Clients $i$ and $j$ \emph{conflict on class} $c\in S_i\cap S_j$ if $\cP_i(X\mid Y=c)\neq\cP_j(X\mid Y=c)$. They are \emph{compatible} if they conflict on no shared class. Clients belong to $K$ latent concept groups $G_1,\dots,G_K$: $\cP_i(X\mid Y=c)=\cP^{(k)}(X\mid Y=c)$ for $i\in G_k$.
 \end{definition}
 The target of clustering is concept equivalence, not equality of joint distributions. If $\cP_i(X\mid Y)=\cP_j(X\mid Y)$, the Bayes classifiers of $i$ and $j$ differ only through the priors $\cP_i(Y),\cP_j(Y)$, which a shared model can absorb by prior (logit) correction~\citep{lipton2018labelshift,menon2021logit}. Splitting such clients only reduces the data available to each model. Target skew and quantity skew therefore should \emph{not} create clusters, while concept shift on features and on targets should. In the survey's taxonomy~\citep{benali2026survey}, a rotation of the inputs changes $\cP(X\mid Y=c)$ for all classes, and a label swap $a\leftrightarrow b$ changes it for classes $a$ and $b$.
 
-\section{DisCo-CFL}\label{sec:method}
-\subsection{Class-conditional gradient signatures (client side)}
+\subsection{Class-conditional signatures and calibrated similarity}
+\paragraph{Signatures (client side).}
 After $T_0$ warm-up rounds of FedAvg the server broadcasts a reference model $w$ and the seed of a count-sketch $\Phi:\R^d\to\R^p$~\citep{charikar2002countsketch,weinberger2009hashing} ($p=1024$). For a sample $(x,c)$ let $g(x,c)=\Phi\nabla_w\ell(w;x,c)\in\R^p$. For every class $c\in S_i$ the client randomly splits its class-$c$ samples into halves $A_i^c,B_i^c$ of size $h_i^c$ and sends
 \[ a_i^c=\frac1{h_i^c}\sum_{s\in A_i^c}g(x_s,c),\qquad b_i^c=\frac1{h_i^c}\sum_{s\in B_i^c}g(x_s,c). \]
 Per-sample sketched gradients are clipped to a shared norm $C_{\rm clip}$ ($0.5$ in all experiments) before averaging. Per-sample gradients at a trained reference model are extremely heavy-tailed: in our Fashion-MNIST runs the median norm is $0.08$ and the 99th percentile about $23$, so a handful of hard examples would otherwise dominate a class signature. The expected clipped gradient is still a functional of $\cP_i(X\mid Y=c)$, so invariance is preserved, and clipping makes per-sample signatures bounded, hence sub-Gaussian as required by Assumption~\ref{ass:noise}. The upload happens \emph{once} and costs $2p|S_i|\le 2pC$ floats, independent of the model size $d$. For our small CNN ($d\approx4.7\times10^4$) this is comparable to one model upload; for realistic models with $d\gg 2pC$ it is negligible. For differential privacy (Proposition~\ref{prop:dp}), Gaussian noise is added to each clipped half-mean.
 
-\subsection{Disattenuated similarity (server side)}
+\paragraph{Disattenuated similarity (server side).}
 Let $m_i^c=(a_i^c+b_i^c)/2$. The split-half reliability and its Spearman--Brown extension to the full mean are
 \begin{equation}\label{eq:rel}
 r_i^c=\cos(a_i^c,b_i^c),\qquad R_i^c=\frac{2r_i^c}{1+r_i^c}\quad(R_i^c:=0 \text{ if } r_i^c\le 0).
@@ -96,7 +97,8 @@ The calibrated similarity of $i$ and $j$ on class $c$ is
 \end{equation}
 where $W_{ij}^c$ is the evidence weight. In the population version of~\eqref{eq:disatt} the attenuation factors cancel exactly (Lemma~\ref{lem:pop}), so $\rhohat$ targets $\rho_{ij}^c=\cos(\mu_i^c,\mu_j^c)$, the cosine between expected class-conditional gradients, whatever the sample sizes and noise levels.
 
-\subsection{Threshold clustering with bottleneck linkage}
+\subsection{Clustering, inference and outputs}
+\paragraph{Threshold clustering with bottleneck linkage.}
 For two sets of clients $A,B$ and a class $c$, let $\mathrm{num}^c_{AB}=\sum_{i\in A,j\in B}W_{ij}^c\rhohat_{ij}^c$ and $\mathrm{den}^c_{AB}=\sum W_{ij}^c$. The linkage is
 \begin{equation}\label{eq:link}
 L(A,B)=\min_{c}\;\frac{\mathrm{num}^c_{AB}+\lambda}{\mathrm{den}^c_{AB}+\lambda}\qquad\text{if }\textstyle\sum_c\mathrm{den}^c_{AB}\ge e_{\min},\ \text{else }-\infty.
@@ -118,14 +120,14 @@ The \emph{minimum} over classes encodes the definition of concept equivalence: t
 \end{algorithmic}
 \end{algorithm}
 
-\subsection{Inference: prior-corrected cluster models}\label{sec:pc}
+\paragraph{Inference with prior-corrected cluster models.}\label{sec:pc}
 Clusters are built so that their members share class-conditionals but may have very different label proportions. By Bayes' rule, the posterior of client $i$ is obtained from that of its cluster $k$ by re-weighting the prior (Proposition~\ref{prop:pc}). Client $i$ therefore predicts with
 \begin{equation}\label{eq:pc}
 \hat y(x)=\argmax_y\ \big[f_k(x)_y+\log\hat p_i(y)-\log\hat p_k(y)\big],
 \end{equation}
 where $f_k$ are the logits of the cluster model, $\hat p_i$ is the client's own (smoothed) label distribution, and $\hat p_k$ is the label distribution of the cluster's training data. The latter is a sum of label counts that the server can obtain by secure aggregation, so no individual histogram is revealed. This correction~\citep{lipton2018labelshift,menon2021logit} costs nothing at training time. It is exactly what concept-level clustering calls for: label skew is handled by the prior, not by more clusters. In the experiments we apply the same correction to \emph{every} method, for a fair comparison.
 
-\subsection{Transparency and accountability outputs}\label{sec:outputs}
+\paragraph{Transparency and accountability outputs.}\label{sec:outputs}
 \begin{itemize}[leftmargin=*,itemsep=1pt]
 \item \textbf{Class-level explanations.} For every pair of clusters the server reports the pooled per-class similarity and the set of \emph{divergent classes} $\hat D_{AB}=\{c:\rho^c_{AB}<\tau\}$.
 \item \textbf{Heterogeneity diagnosis.} If $\hat D_{AB}$ contains every shared class, the server reports a global (feature-level) concept shift; if it is a strict subset, a class-specific shift on the listed classes; if $\hat K=1$, it reports that the heterogeneity is explained by target and quantity skew only.
@@ -135,6 +137,7 @@ where $f_k$ are the logits of the cluster model, $\hat p_i$ is the client's own 
 \end{itemize}
 
 \section{Theory}\label{sec:theory}
+\subsection{Guarantees for the clustering step}
 Proofs are in Appendix~\ref{app:proofs}; their deterministic parts are formalised in Lean~4 (Appendix~\ref{app:lean}). Write $\mu_i^c=\E_{x\sim\cP_i(X\mid Y=c)}[g(x,c)]$ and $a_i^c=\|\mu_i^c\|^2$.
 
 \begin{proposition}[Invariance]\label{prop:inv}
@@ -236,7 +239,7 @@ Let cluster $k$ consist of concept-equivalent clients with pooled distribution $
 Theorem~\ref{thm:rec} covers the merging phase. The attachment of low-evidence clients and of non-significant singletons is a fairness heuristic: it avoids training a client alone because of noise, may violate safety when evidence is weak, and is logged in the audit trail. Corollary~\ref{cor:sc} asks for a small $\lambda$ so that a single pair of clients carries enough evidence. Our default $\lambda=0.5$ is larger. It makes the method more conservative about splitting on thin evidence, and merges quickly happen between clusters whose pooled evidence far exceeds $w_0$. Section~\ref{sec:exp} reports the sensitivity to $\lambda$, including values that satisfy the corollary.
 \end{remark}
 
-\section{Fairness, accountability, transparency and privacy}\label{sec:fat}
+\subsection{Fairness, accountability, transparency and privacy}\label{sec:fat}
 \paragraph{Fairness.} DisCo-CFL is fair in the clustering decision along two axes. \emph{Group size}: Corollary~\ref{cor:sc} makes recovery independent of cluster size. By contrast, objectives of the $k$-means type (FL+HC, IFCA) favour large clusters, and IFCA's analysis depends on the smallest cluster fraction~\citep{ghosh2020ifca}. \emph{Data size}: small clients are not pushed away by attenuation (Theorem~\ref{thm:conc}), and clients that are merely noisy are attached rather than isolated. We measure worst-group accuracy, the accuracy of the worst 10\% of clients, Jain's index~\citep{jain1984fairness}, and minority recall and purity.
 \paragraph{Accountability.} Certificates, audit log and anomaly flags make every grouping decision traceable and contestable. We measure the \emph{calibration} of certificates: how often a confident certificate belongs to a client that shares no conflict with its cluster.
 \paragraph{Transparency.} The explanations and diagnosis tell participants \emph{why} they were separated (``you differ from cluster 2 on classes 3 and 5''), with a fidelity guarantee (Proposition~\ref{prop:expl}). We measure precision, recall and exact match of the divergent-class sets, and the accuracy of the diagnosis.
@@ -245,11 +248,10 @@ Theorem~\ref{thm:rec} covers the merging phase. The attachment of low-evidence c
 \section{Experiments}\label{sec:exp}
 \input{experiments.tex}
 
-\section{Discussion and limitations}
+\section{Discussion, limitations and conclusion}\label{sec:discussion}
 \input{discussion.tex}
 
-\section{Conclusion}
-DisCo-CFL replaces ad hoc similarity heuristics in clustered FL with a \emph{calibrated} statistic: the disattenuated cosine between class-conditional gradients. The statistic is invariant to label and quantity skew and stays consistent under privacy noise. Its threshold has a fixed meaning, which gives an automatic $K$, and the resulting clustering has recovery guarantees that do not depend on group size and explanations whose fidelity is proven. The algorithm reports assignment certificates, an audit log, anomaly flags and class-level explanations together with the clusters, which extends the evaluation of CFL from accuracy alone to fairness, accountability, transparency and privacy. Its main weakness is identifiability: when the reference model does not separate the groups, as on Office-Home and rotated CIFAR-100 with a pretrained network, the method does not find them.
+\paragraph{Conclusion.} DisCo-CFL replaces ad hoc similarity heuristics in clustered FL with a \emph{calibrated} statistic: the disattenuated cosine between class-conditional gradients. The statistic is invariant to label and quantity skew and stays consistent under privacy noise. Its threshold has a fixed meaning, which gives an automatic $K$, and the resulting clustering has recovery guarantees that do not depend on group size and explanations whose fidelity is proven. The algorithm reports assignment certificates, an audit log, anomaly flags and class-level explanations together with the clusters, which extends the evaluation of CFL from accuracy alone to fairness, accountability, transparency and privacy. Its main weakness is identifiability: when the reference model does not separate the groups, as on Office-Home and rotated CIFAR-100 with a pretrained network, the method does not find them.
 
 
 
@@ -274,10 +276,11 @@ None.
 \section{Proofs}\label{app:proofs}
 \input{proofs.tex}
 
-\section{Lean 4 verification}\label{app:lean}
+\section{Formal verification and additional results}
+\subsection{Lean 4 verification}\label{app:lean}
 \input{lean_appendix.tex}
 
-\section{Additional results}\label{app:figs}
+\subsection{Additional results}\label{app:figs}
 \input{appendix_figs.tex}
 
 

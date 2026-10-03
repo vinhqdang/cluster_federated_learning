@@ -1,4 +1,4 @@
-\subsection{Ablation}
+\paragraph{Ablation.}
 Table~\ref{tab:abl} removes one component at a time. Every component contributes. Without class conditioning (one signature per client over all its data), clients are grouped by their label mix, exactly the failure mode reported in the survey~\citep{benali2026survey}: 13--23 clusters and a concept accuracy 10--12 points lower. Without disattenuation, noise-attenuated similarities fall below the threshold and the federation is over-split, including the label-only case. The mean linkage averages class-specific shifts away and merges conflicting clients (up to 6.9\% in \emph{Mixed + QS}). Linkage-ordered merging creates bridges through ambiguous clients and over-splits. Without clipping, heavy-tailed per-sample gradients inflate the number of clusters.
 \begin{tableorg}[!htbp]
 \centering
