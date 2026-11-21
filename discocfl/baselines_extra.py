@@ -358,7 +358,11 @@ def run_fedccfa(fed, tr, cfg):
     for i in range(N):
         key = last[i] if last[i] is not None else ("unseen", i)
         partition[i] = keys.setdefault(key, len(keys))
-    models = {c.cid: torch.cat([ext, _flat(P[c.cid], Fd)]) for c in fed.clients}
+    # Each client predicts with its personal model: the final extractor and its
+    # classifier after the local classifier step that FedCCFA performs at the start
+    # of every round (one epoch on its own data), as in the reference evaluation.
+    models = {c.cid: _sgd(tr, torch.cat([ext, _flat(P[c.cid], Fd)]), c.x, c.y, "clf", epochs=1)
+              for c in fed.clients}
     return {"assign": np.arange(N), "models": models, "partition_assign": partition,
             "cluster_floats": int(floats)}
 
