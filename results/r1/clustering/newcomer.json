@@ -1,0 +1,506 @@
+[
+ {
+  "scenario": "rot",
+  "seed": 0,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9859700096557765
+ },
+ {
+  "scenario": "rot",
+  "seed": 0,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.990595025911489
+ },
+ {
+  "scenario": "rot",
+  "seed": 0,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9873688607575399
+ },
+ {
+  "scenario": "rot",
+  "seed": 0,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9868799339631004
+ },
+ {
+  "scenario": "rot",
+  "seed": 0,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.8936927820742593
+ },
+ {
+  "scenario": "rot",
+  "seed": 0,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9767736937843271
+ },
+ {
+  "scenario": "rot",
+  "seed": 0,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9849908686918362
+ },
+ {
+  "scenario": "rot",
+  "seed": 0,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.983499236725983
+ },
+ {
+  "scenario": "rot",
+  "seed": 0,
+  "kind": "novel",
+  "correct": true,
+  "similarity": -0.009689859282186747
+ },
+ {
+  "scenario": "rot",
+  "seed": 0,
+  "kind": "novel",
+  "correct": true,
+  "similarity": -0.004317618732243003
+ },
+ {
+  "scenario": "rot",
+  "seed": 0,
+  "kind": "novel",
+  "correct": true,
+  "similarity": -0.008749817199981632
+ },
+ {
+  "scenario": "rot",
+  "seed": 0,
+  "kind": "novel",
+  "correct": true,
+  "similarity": 0.03462956509490514
+ },
+ {
+  "scenario": "rot",
+  "seed": 1,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9628622230584993
+ },
+ {
+  "scenario": "rot",
+  "seed": 1,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.8502816165835015
+ },
+ {
+  "scenario": "rot",
+  "seed": 1,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9870165172960559
+ },
+ {
+  "scenario": "rot",
+  "seed": 1,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9917789616721088
+ },
+ {
+  "scenario": "rot",
+  "seed": 1,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9916998859644566
+ },
+ {
+  "scenario": "rot",
+  "seed": 1,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9834308175961622
+ },
+ {
+  "scenario": "rot",
+  "seed": 1,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9933428898884477
+ },
+ {
+  "scenario": "rot",
+  "seed": 1,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9863428789207057
+ },
+ {
+  "scenario": "rot",
+  "seed": 1,
+  "kind": "novel",
+  "correct": true,
+  "similarity": 0.03384724952419588
+ },
+ {
+  "scenario": "rot",
+  "seed": 1,
+  "kind": "novel",
+  "correct": true,
+  "similarity": 0.035314914967904336
+ },
+ {
+  "scenario": "rot",
+  "seed": 1,
+  "kind": "novel",
+  "correct": true,
+  "similarity": 0.04195829487217507
+ },
+ {
+  "scenario": "rot",
+  "seed": 1,
+  "kind": "novel",
+  "correct": true,
+  "similarity": 0.034999031680781084
+ },
+ {
+  "scenario": "rot",
+  "seed": 2,
+  "kind": "known",
+  "correct": false,
+  "similarity": 0.6939466129842926
+ },
+ {
+  "scenario": "rot",
+  "seed": 2,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9667963368830526
+ },
+ {
+  "scenario": "rot",
+  "seed": 2,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9692248202634778
+ },
+ {
+  "scenario": "rot",
+  "seed": 2,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9910392125303714
+ },
+ {
+  "scenario": "rot",
+  "seed": 2,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9810306377569286
+ },
+ {
+  "scenario": "rot",
+  "seed": 2,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9775105574405846
+ },
+ {
+  "scenario": "rot",
+  "seed": 2,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9944726725052123
+ },
+ {
+  "scenario": "rot",
+  "seed": 2,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9858586546503542
+ },
+ {
+  "scenario": "rot",
+  "seed": 2,
+  "kind": "novel",
+  "correct": true,
+  "similarity": 0.04568523834973829
+ },
+ {
+  "scenario": "rot",
+  "seed": 2,
+  "kind": "novel",
+  "correct": true,
+  "similarity": 0.039498374987074
+ },
+ {
+  "scenario": "rot",
+  "seed": 2,
+  "kind": "novel",
+  "correct": true,
+  "similarity": 0.05407605216974483
+ },
+ {
+  "scenario": "rot",
+  "seed": 2,
+  "kind": "novel",
+  "correct": true,
+  "similarity": 0.04847311622595881
+ },
+ {
+  "scenario": "swap",
+  "seed": 0,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9944387408540384
+ },
+ {
+  "scenario": "swap",
+  "seed": 0,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.99287052362579
+ },
+ {
+  "scenario": "swap",
+  "seed": 0,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9921981449296543
+ },
+ {
+  "scenario": "swap",
+  "seed": 0,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9855637294591392
+ },
+ {
+  "scenario": "swap",
+  "seed": 0,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9194468050067619
+ },
+ {
+  "scenario": "swap",
+  "seed": 0,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9878022840990128
+ },
+ {
+  "scenario": "swap",
+  "seed": 0,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9928810216404282
+ },
+ {
+  "scenario": "swap",
+  "seed": 0,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9871838690731242
+ },
+ {
+  "scenario": "swap",
+  "seed": 0,
+  "kind": "novel",
+  "correct": true,
+  "similarity": 0.005480357219633629
+ },
+ {
+  "scenario": "swap",
+  "seed": 0,
+  "kind": "novel",
+  "correct": true,
+  "similarity": 0.01615236910278745
+ },
+ {
+  "scenario": "swap",
+  "seed": 0,
+  "kind": "novel",
+  "correct": true,
+  "similarity": 0.008270196782099814
+ },
+ {
+  "scenario": "swap",
+  "seed": 0,
+  "kind": "novel",
+  "correct": true,
+  "similarity": 0.02927456020481554
+ },
+ {
+  "scenario": "swap",
+  "seed": 1,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9749808521037184
+ },
+ {
+  "scenario": "swap",
+  "seed": 1,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9218493156146282
+ },
+ {
+  "scenario": "swap",
+  "seed": 1,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.988580277507891
+ },
+ {
+  "scenario": "swap",
+  "seed": 1,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9899088249414444
+ },
+ {
+  "scenario": "swap",
+  "seed": 1,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9833498088591013
+ },
+ {
+  "scenario": "swap",
+  "seed": 1,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9910063875850412
+ },
+ {
+  "scenario": "swap",
+  "seed": 1,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9849183652145252
+ },
+ {
+  "scenario": "swap",
+  "seed": 1,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9914026426520572
+ },
+ {
+  "scenario": "swap",
+  "seed": 1,
+  "kind": "novel",
+  "correct": true,
+  "similarity": -0.0026616726681375955
+ },
+ {
+  "scenario": "swap",
+  "seed": 1,
+  "kind": "novel",
+  "correct": true,
+  "similarity": 0.007691428117547876
+ },
+ {
+  "scenario": "swap",
+  "seed": 1,
+  "kind": "novel",
+  "correct": true,
+  "similarity": 0.019855120486744555
+ },
+ {
+  "scenario": "swap",
+  "seed": 1,
+  "kind": "novel",
+  "correct": true,
+  "similarity": 0.0006715509217126861
+ },
+ {
+  "scenario": "swap",
+  "seed": 2,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9893600088951641
+ },
+ {
+  "scenario": "swap",
+  "seed": 2,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9927779503919324
+ },
+ {
+  "scenario": "swap",
+  "seed": 2,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9792924048969026
+ },
+ {
+  "scenario": "swap",
+  "seed": 2,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9892236329048448
+ },
+ {
+  "scenario": "swap",
+  "seed": 2,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.987873371788439
+ },
+ {
+  "scenario": "swap",
+  "seed": 2,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9814979877950485
+ },
+ {
+  "scenario": "swap",
+  "seed": 2,
+  "kind": "known",
+  "correct": true,
+  "similarity": 0.9973469686492484
+ },
+ {
+  "scenario": "swap",
+  "seed": 2,
+  "kind": "known",
+  "correct": false,
+  "similarity": 0.9965905982741747
+ },
+ {
+  "scenario": "swap",
+  "seed": 2,
+  "kind": "novel",
+  "correct": true,
+  "similarity": 0.043738311548454416
+ },
+ {
+  "scenario": "swap",
+  "seed": 2,
+  "kind": "novel",
+  "correct": true,
+  "similarity": 0.04274993428982036
+ },
+ {
+  "scenario": "swap",
+  "seed": 2,
+  "kind": "novel",
+  "correct": true,
+  "similarity": 0.00807969570687416
+ },
+ {
+  "scenario": "swap",
+  "seed": 2,
+  "kind": "novel",
+  "correct": true,
+  "similarity": 0.043435821653993255
+ }
+]

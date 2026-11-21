@@ -1,0 +1,50 @@
+[
+ {
+  "n_clients": 40,
+  "seed": 0,
+  "sig_time_per_client_s": 0.09491768479347229,
+  "server_time_s": 0.09254312515258789,
+  "upload_floats_per_client": 12236.8,
+  "model_dim": 46730,
+  "ari": 0.6768905341089371,
+  "k": 4,
+  "conflict_merge_rate": 0.1,
+  "compatible_split_rate": 0.18888888888888888
+ },
+ {
+  "n_clients": 80,
+  "seed": 0,
+  "sig_time_per_client_s": 0.09121314883232116,
+  "server_time_s": 0.3551461696624756,
+  "upload_floats_per_client": 12236.8,
+  "model_dim": 46730,
+  "ari": 0.6025188287133973,
+  "k": 4,
+  "conflict_merge_rate": 0.125,
+  "compatible_split_rate": 0.24078947368421053
+ },
+ {
+  "n_clients": 160,
+  "seed": 0,
+  "sig_time_per_client_s": 0.07972232550382614,
+  "server_time_s": 1.228900671005249,
+  "upload_floats_per_client": 12134.4,
+  "model_dim": 46730,
+  "ari": 0.8175349044302388,
+  "k": 5,
+  "conflict_merge_rate": 0.048854166666666664,
+  "compatible_split_rate": 0.12724358974358974
+ },
+ {
+  "n_clients": 320,
+  "seed": 0,
+  "sig_time_per_client_s": 0.0775887429714203,
+  "server_time_s": 5.949119806289673,
+  "upload_floats_per_client": 11820.8,
+  "model_dim": 46730,
+  "ari": 0.5907805407887953,
+  "k": 5,
+  "conflict_merge_rate": 0.124609375,
+  "compatible_split_rate": 0.26139240506329114
+ }
+]
