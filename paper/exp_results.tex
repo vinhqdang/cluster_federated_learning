@@ -1,26 +1,32 @@
 \subsection{Small CNNs: performance, fairness and clustering quality}\label{sec:small}
 \paragraph{Main results.}
-Table~\ref{tab:main} reports all metrics on Fashion-MNIST for the ten methods. Accuracy is \emph{with} the prior correction~\eqref{eq:pc}, applied identically to every method; the uncorrected mean accuracy is shown in the first column.
+Table~\ref{tab:main} reports Fashion-MNIST results for all methods with five seeds: means with 95\% $t$-intervals over seeds. Accuracy is \emph{with} the prior correction~\eqref{eq:pc}, applied identically to every method. Table~\ref{tab:failure} gives failure rates, Table~\ref{tab:hier} the hierarchical comparison over scenarios, and Table~\ref{tab:diag} the separation and coverage diagnostics of Section~\ref{sec:theory} for every scenario.
 
 \begin{table}[!htbp]
 \centering
-\caption{Fashion-MNIST, 40 clients, 3 seeds. Acc: mean local accuracy (with prior correction, $\pm$ std over seeds). Acc (raw): without correction. Acc@10\%: mean accuracy of the worst 10\% of clients. Worst-grp: accuracy of the worst concept group. Concept: accuracy on the class-balanced test set of the client's concept. Conflict\%: fraction of conflicting client pairs merged into one cluster (lower is better). IFCA, FeSEM, FL+HC and PACFL receive the true $K$; DisCo-CFL finds it. Oracle uses the ground-truth groups. Best non-oracle values in bold.}\label{tab:main}
-\input{table_main_a.tex}
+\caption{Fashion-MNIST, 40 clients, 5 seeds: mean $\pm$ half-width of the 95\% $t$-interval over seeds. Acc: mean local accuracy with prior correction. Concept: accuracy on the class-balanced test set of the client's concept. Worst-grp: accuracy of the worst concept group. Conflict: fraction of conflicting client pairs placed in one cluster. IFCA, FeSEM, FL+HC, PACFL and FedDAG-C receive the true $K$ (in \emph{Label skew only}, $K=1$); DisCo-CFL, MTCFL, StoCFL and FedCCFA find it. For FedCCFA, ARI and $K$ refer to the client partition induced by its per-class clusters.}\label{tab:main}
+\input{table_r1_ci_main_a.tex}
 \end{table}
 
 \begin{table}[!htbp]
 \centering
 \caption*{Table~\ref{tab:main} (continued).}
-\input{table_main_b.tex}
+\input{table_r1_ci_main_b.tex}
 \end{table}
 
-\paragraph{DisCo-CFL recovers the concept structure without being told $K$.} In \emph{Rotation}, \emph{Label swap} and \emph{Rotation + QS}, DisCo-CFL finds exactly the ground-truth partition in all seeds (ARI $=1$) and matches the Oracle on every metric. In \emph{Mixed + QS}, where two groups differ only on 4 of the 10 classes, it reaches ARI $0.94$ with $0.6\%$ conflicting pairs merged. In \emph{Minority groups} (25/9/4/2 clients) it reaches ARI $0.98$ with no conflicts. The baselines that are given the true $K$ merge 6--86\% of the conflicting pairs: FeSEM 6--12\%, IFCA 17--26\%, PACFL 18--35\% and FL+HC 75--86\%. CFL/MTCFL has few conflicts only in the scenarios where it fragments the federation into 16--35 clusters. FL+HC groups clients by label proportions instead of concepts, PACFL by the pixel subspace (which a label swap leaves unchanged), IFCA suffers from initialisation, and FeSEM, the strongest clustering baseline, confuses nearby groups in parameter space.
+\paragraph{Recovery of the concept groups (H2).} In all six Fashion-MNIST scenarios DisCo-CFL recovers the groups without being told $K$: mean ARI $0.92$--$1.00$, at most $1.1\%$ of the conflicting pairs merged, and no run with ARI below $0.5$ (Table~\ref{tab:failure}). The weakest scenario is \emph{Rotation} (ARI $0.92\pm0.06$, $K=4.4$): the $0^\circ$ and $180^\circ$ groups are close on the nearly symmetric classes, and some clients that hold mostly such classes are split off or merged. The diagnostics agree with the assumptions of Theorem~\ref{thm:rec}: the estimated separation is $\hat\Delta=0.44$--$0.61$, well above $1-\tau=0.1$, and $94$--$100\%$ of the conflicting pairs share a discriminative class (Table~\ref{tab:diag}). Accuracy and worst-group accuracy are within $0.2$ points of the Oracle in every scenario, and concept accuracy within $1.0$ point.
 
-\paragraph{Label skew does not create clusters.} With a single concept and strong target and quantity skew (\emph{Label skew only}), DisCo-CFL returns $K=1$ in two seeds. In the third it isolates one client whose signature for one class disagrees with all others, and flags it as \emph{anomalous} in the audit log. Accuracy equals FedAvg's. CFL/MTCFL, in contrast, splits the federation into about 20 clusters, and its concept accuracy drops from 85.8\% to 77.1\%.
+The baselines that are given the true $K$ merge many conflicting pairs: IFCA 18--24\%, FeSEM 15--40\%, PACFL 18--35\%, FedDAG-C 12--32\% and FL+HC 8--30\%, and they fail (ARI $<0.5$) in 36--88\% of the runs. The closest methods do not recover the groups either. StoCFL compares whole-model gradients at the initial model and fragments the federation into 11--14 clusters with ARI at most $0.05$; with gradients at the warm-up model (StoCFL-W) it forms 15--17 clusters, ARI $\le0.17$. The raw gradient mixes the concept with each client's label mix, exactly the entanglement that the class-conditional signature removes. FedCCFA clusters the classifier of each class separately; its per-class clusters rarely differ between concept groups at the published radius, so the induced partition is almost a single cluster (ARI $0.00$) and its accuracy is 3--6 points below DisCo-CFL. FedDAG-C, which also compares clients class by class but uses data subspaces and gradient angles, is the strongest new baseline on \emph{Rotation} (ARI $0.69$) and much weaker on label swaps (ARI $0.37$), where the data subspaces do not change.
 
-\paragraph{Performance.} With the prior correction, DisCo-CFL has the best mean accuracy in every Fashion-MNIST scenario. Personalising and fragmenting methods (Local, FedAvg-FT, MTCFL with 16--35 clusters) obtain competitive \emph{local} accuracy, because local test sets share the client's skewed label mix. In the concept-shift scenarios their \emph{concept} accuracy is 4--23 points lower: their models do not generalise to the rest of the client's concept, e.g.\ to classes whose frequency will change. DisCo-CFL is best on concept accuracy in every concept-shift scenario (82.1--84.9\%, against at most 81.8\% for any baseline). The prior correction adds 5--17 points to every method that shares models across clients. It is what makes concept-level clustering competitive on local metrics, as Proposition~\ref{prop:pc} predicts.
+\paragraph{Label skew does not create clusters (H1).} With a single concept and strong target and quantity skew (\emph{Label skew only}), DisCo-CFL returns $K=1$ in all five seeds, and its accuracy equals FedAvg's. MTCFL splits the federation into 26 clusters, StoCFL and StoCFL-W into 9--10, and their concept accuracy drops by 6--22 points. The baselines that receive $K$ are given $K=1$ here, so their single cluster is not a decision.
 
-\paragraph{Fairness.} DisCo-CFL has the best accuracy on the worst 10\% of clients in every scenario with concept shift, and the best worst-group accuracy in all of them except \emph{Label swap}, where FedAvg-FT is 0.5 points higher (89.7\% vs.\ 89.2\%). The gap is largest for minority concepts. In \emph{Minority groups}, the worst concept group reaches 86.5\% with DisCo-CFL, against 35.7\% with FedAvg, 51.9\% with MTCFL, 67.3\% with IFCA, 74.5\% with FL+HC and 79.4\% with FeSEM: the size-independence of Corollary~\ref{cor:sc} in practice. Table~\ref{tab:minority} isolates the clustering step. DisCo-CFL recovers minority groups of 1, 2, 3 and 5 clients with recall and purity $1.00$ and no conflicting merges. FL+HC isolates the minority only by spending its fixed $K$ on it while merging 81\% of the conflicting pairs among the majority groups, and PACFL does not find the minority at all.
+\paragraph{Performance.} DisCo-CFL is within the confidence interval of the Oracle in every Fashion-MNIST scenario. Its mean accuracy is the highest of all non-oracle methods in the five concept-shift scenarios; in \emph{Label skew only} it equals FedAvg's, and FeSEM is $0.1$ points higher. The margins over the strongest baseline are small on local accuracy (0.5--1.3 points against FedDAG-C, FL+HC, IFCA or MTCFL) and larger on concept accuracy (2.1--5.2 points). Methods that fragment the federation (Local, FedAvg-FT, MTCFL) obtain competitive \emph{local} accuracy, because local test sets share the client's label mix, but their concept accuracy is 10--22 points lower: their models do not generalise to the rest of the client's concept. Across all small-CNN scenarios, the hierarchical bootstrap gives DisCo-CFL a positive mean advantage over every baseline, with 95\% intervals that exclude zero (Table~\ref{tab:hier}); the smallest is $+1.5$ points against FL+HC.
+
+\paragraph{Prior correction and clustering are separate effects.} Table~\ref{tab:decomp} evaluates every method with and without the prior correction. On Fashion-MNIST the correction adds 10--16 points to every method that shares models across clients and 1--4 points to the fragmenting ones (MTCFL, StoCFL); it adds $10.8$ points to DisCo-CFL and $10.9$ to the Oracle. Without the correction DisCo-CFL is $12$ points above FedAvg (79.2\% against 66.8\%) and as accurate as the Oracle; with it, the gap to FedAvg is $7$ points. The correction therefore does not explain the advantage of DisCo-CFL over the other clustering methods, which all receive it; it explains why concept-level clustering, which deliberately keeps clients with different label mixes together, is competitive on local metrics.
+
+\paragraph{Attachment.} Post-processing rarely acts: on Fashion-MNIST it attaches 0.2--0.6 clients per run, and it never created a conflicting pair except in \emph{Minority groups} (0.1\% of the conflicting pairs). DisCo-noAttach has the same accuracy within $0.1$ points. The attachment stage matters in \emph{Label skew only}, where without it a client with a noisy signature stays alone in one seed out of five (ARI $0.80$ instead of $1.00$).
+
+\paragraph{Fairness.} DisCo-CFL has the highest worst-group accuracy among non-oracle methods in all concept-shift scenarios. The gap is largest for minority concepts: in \emph{Minority groups} (25/9/4/2 clients) the worst group reaches 87.2\% with DisCo-CFL, against 67.5\% with FedAvg, 75.5\% with FedCCFA, 80.9--81.2\% with FeSEM and IFCA, and 83.8--84.2\% with FL+HC, PACFL and FedDAG-C. Table~\ref{tab:minority} isolates the clustering step: DisCo-CFL recovers minority groups of 1, 2, 3 and 5 clients with recall and purity $1.00$ and no conflicting merge. FL+HC, which is given $K$, recovers a single-client minority in none of the seeds and merges 8--10\% of the conflicting pairs; PACFL does not find the minority.
 
 \begin{table}[!htbp]
 \centering
@@ -32,80 +38,40 @@ Table~\ref{tab:main} reports all metrics on Fashion-MNIST for the ten methods. A
 \cmidrule(lr){2-4}\cmidrule(lr){5-7}
 $m$ & recall & ARI & conflict\% & recall & ARI & conflict\% \\
 \midrule
-1 & 1.00 & 0.98 & 0.0 & 1.00 & 0.09 & 81.5\\
-2 & 1.00 & 0.98 & 0.0 & 1.00 & 0.11 & 81.0\\
-3 & 1.00 & 1.00 & 0.0 & 1.00 & 0.12 & 80.6\\
-5 & 1.00 & 0.98 & 0.0 & 0.60 & 0.09 & 82.9\\
+1 & 1.00 & 1.00 & 0.0 & 0.00 & 0.64 & 10.4\\
+2 & 1.00 & 1.00 & 0.0 & 0.33 & 0.73 & 8.5\\
+3 & 1.00 & 1.00 & 0.0 & 0.89 & 0.81 & 9.1\\
+5 & 1.00 & 1.00 & 0.0 & 0.67 & 0.71 & 8.6\\
 \bottomrule
 \end{tabular}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\caption{Failure rates: fraction of runs with ARI below $0.5$ in scenarios with more than one group (number of runs in parentheses). Main: the five Fashion-MNIST concept-shift scenarios; Other: MNIST, SVHN, CIFAR-10; Sweep: the robustness sweeps; Real: PACS, Office-Home, CIFAR-100.}\label{tab:failure}
+\input{table_r1_failure.tex}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\caption{Hierarchical comparison of DisCo-CFL with each baseline (percentage points). $\Delta$: mean difference with a 95\% hierarchical-bootstrap interval (scenarios, then seeds within scenarios; $10^4$ replicates). W/T/L and $p$: wins, ties ($|\Delta|<0.05$) and losses over scenario-level means, and the one-sided Wilcoxon signed-rank test on them.}\label{tab:hier}
+\input{table_r1_hier.tex}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\caption{Accuracy without (raw) and with prior correction (PC), averaged over scenarios.}\label{tab:decomp}
+\input{table_r1_decomp.tex}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\caption{Diagnostics of DisCo-CFL per scenario (means over seeds). $\hat\Delta$: estimated separation $1-\max_{k\neq l}L(G_k,G_l)$ of the true groups; within-min: smallest pooled linkage within a true group; coverage: fraction of conflicting pairs that share a discriminative class; Otsu $\tau$ and $\eta$: label-free threshold and separation index on the pairwise similarities; ARI (Otsu): ARI with the Otsu threshold instead of $\tau=0.9$; conflicts created at the merge and at the attachment stage; clients attached per run.}\label{tab:diag}
+\input{table_r1_diag.tex}
 \end{table}
 
 \input{exp_datasets.tex}
 \input{exp_sweeps.tex}
 \input{exp_real.tex}
 
-\subsection{Beyond accuracy: transparency, accountability and privacy}
-\paragraph{Transparency: explanations and diagnosis.}
-Table~\ref{tab:fat} evaluates the class-level explanations against the ground truth. For label-swap groups, the divergent classes reported by the server are \emph{exactly} the swapped classes in every pair (precision, recall and exact match $1.00$), and the diagnosis ``class-specific concept shift'' is always correct. A typical explanation reads: \emph{``cluster 0 vs.\ cluster 2: class-specific concept shift on classes [4, 5, 6, 7]''}. Here group 2 swaps $4\leftrightarrow5$ and $6\leftrightarrow7$. For rotations, precision is $1.00$, i.e.\ no class is ever wrongly reported as divergent. Recall is $0.93$: every miss occurs between $0^\circ$ and $180^\circ$ groups, on trouser, pullover, dress and shirt, items that are nearly invariant under a $180^\circ$ rotation. For these classes the two concepts \emph{are} statistically close, so the reported ``class-specific shift'' matches the data (Proposition~\ref{prop:expl}); it only disagrees with our coarse ground-truth label ``global''.
-
-\begin{table}[!htbp]
-\centering
-\caption{Transparency and accountability (Fashion-MNIST, 3 seeds, default settings).}\label{tab:fat}
-\small
-\begin{tabular}{lccc}
-\toprule
-& Rotation & Label swap & Mixed + QS \\
-\midrule
-\multicolumn{4}{l}{\emph{Explanations: divergent classes between clusters}}\\
-precision & 1.00 & 1.00 & 1.00 \\
-recall & 0.93 & 1.00 & 0.92 \\
-exact set / diagnosis correct & 0.67 & 1.00 & 0.39 \\
-\midrule
-\multicolumn{4}{l}{\emph{Certificates}}\\
-share of confident certificates & 0.95 & 0.97 & 0.93 \\
-conflict-free among confident & 1.000 & 1.000 & 0.919 \\
-conflict-free among uncertain & 1.000 & 1.000 & 0.778 \\
-\midrule
-\multicolumn{4}{l}{\emph{Newcomers}}\\
-known concept, correctly assigned & 1.00 & 0.96 & -- \\
-novel concept, flagged as novel & 1.00 & 1.00 & -- \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\paragraph{Accountability: certificates, audit log, newcomers.}
-Certificates are informative (Table~\ref{tab:fat}). In the hardest scenario (\emph{Mixed + QS}), 91.9\% of the clients with a \emph{confident} certificate are in a conflict-free position, against 77.8\% of those with an \emph{uncertain} one. In the other scenarios all clients are correctly placed and 95--97\% receive confident certificates. The uncertain ones carry the bottleneck class that makes them ambiguous, which is what a client needs in order to contest its assignment. Newcomers that join after clustering, using the frozen reference model, are assigned to the right cluster in 96--100\% of cases. Clients with a labelling never seen during clustering are reported as a \emph{novel concept} in 100\% of cases instead of being forced into an existing cluster.
-
-\paragraph{Privacy.}\label{sec:privacy-exp}
-Figure~\ref{fig:dp} shows the ARI of the clustering when the signatures are released with the Gaussian mechanism of Proposition~\ref{prop:dp} ($C_{\rm clip}=0.5$, $\delta=10^{-5}$). As predicted by Proposition~\ref{prop:dp}(iii), the \emph{raw} cosine collapses to ARI $\approx0$ at every noise level: DP noise attenuates all similarities and every client looks unrelated to every other. With disattenuation, the clustering degrades gracefully, and more data per client buys more privacy, as predicted by the $h\propto\sigma_{\rm dp}$ term. With 1{,}500 samples per client, DisCo-CFL keeps ARI $0.92$ (rotation) and $0.77$ (label swap) at $\varepsilon=4.4$, and $0.68/0.60$ at $\varepsilon=2$.
-
-\begin{figure}[!htbp]
-\centering
-\includegraphics[width=0.85\linewidth]{../results/figures/dp.pdf}
-\caption{Clustering quality under $(\varepsilon,10^{-5})$-DP signatures. Solid: DisCo-CFL; dashed: raw cosine. Orange: 400 samples per client; blue: 1{,}500.}\label{fig:dp}
-\end{figure}
-
-\subsection{Calibration, sensitivity, ablation and cost}
-\paragraph{Calibration across sample sizes.}\label{sec:sens} Varying the client size from 50 to 800 samples (Figure~\ref{fig:size} in Appendix~\ref{app:figs}), the mean disattenuated similarity between clients of the same group stays at $0.98$--$0.99$, whereas the raw cosine stays around $0.91$--$0.95$ and depends on the per-class sample counts. ARI reaches $1.00$ from 200 samples per client on (rotation) and from 400 (label swap).
-\paragraph{Threshold and shrinkage.} Figure~\ref{fig:tau} shows that DisCo-CFL is stable for $\tau\in[0.75,0.85]$ in all concept-shift scenarios (ARI $0.85$--$1.00$). With the raw cosine, every $\tau$ above $0.7$ causes over-splitting ($K$ up to 16 at $\tau=0.9$). The label-only scenario is the most sensitive: $\tau\le0.7$ gives $K=1$ in all seeds, and at $\tau=0.8$ one seed flags a single anomalous client. The shrinkage $\lambda$ has almost no effect between $0.02$ and $1$ (Appendix~\ref{app:figs}), including values that satisfy the condition of Corollary~\ref{cor:sc}.
-
-\begin{figure}[!htbp]
-\centering
-\includegraphics[width=0.85\linewidth]{../results/figures/tau_sensitivity.pdf}
-\caption{Sensitivity to the threshold $\tau$ (3 seeds). The dashed line marks the default $\tau=0.8$, which was fixed before these runs.}\label{fig:tau}
-\end{figure}
-
-\paragraph{Theory in practice.}
-Figure~\ref{fig:theory} validates the theory on synthetic signatures with known ground truth ($p=512$, noise of effective rank 16). The disattenuated similarity is nearly unbiased for every half size $h$, whereas the raw cosine is biased by up to $-0.37$. Safety and maximality are reached with probability 1 once $h\ge64$ for all separations $\Delta\in[0.2,0.7]$, and exact recovery is reached under full class support. The required $h$ grows as $\Delta$ shrinks. Recovery of a minority group of 1, 2, 4 or 8 clients follows the same curve (Figure~\ref{fig:thminority} in Appendix~\ref{app:figs}), as Corollary~\ref{cor:sc} states.
-
-\begin{figure}[!htbp]
-\centering
-\includegraphics[width=0.49\linewidth]{../results/figures/theory_estimation.pdf}\hfill
-\includegraphics[width=0.49\linewidth]{../results/figures/theory_recovery.pdf}
-\caption{Synthetic validation. Left: bias of the similarity estimate. Right: probability of the guarantees of Theorem~\ref{thm:rec}.}\label{fig:theory}
-\end{figure}
-
-\input{exp_more.tex}
-
-\paragraph{Cost and scalability.}\label{sec:cost}
-Each client uploads its signature \emph{once}, about $1.2\times10^4$ floats with $p=1024$. The size is independent of the model dimension $d$; IFCA, by contrast, downloads $K$ models per client in \emph{every} round, and CFL/FL+HC cluster $d$-dimensional updates. Computing the signature takes 0.14--0.16\,s per client on one CPU core. Server-side clustering takes 0.05\,s for 40 clients and 2.3\,s for 320 clients, with ARI $\ge0.98$ at every scale.
+\input{exp_fat.tex}

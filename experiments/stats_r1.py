@@ -761,7 +761,26 @@ def main(argv=None):
                              "writing files with the suffix _heldout")
     args = parser.parse_args(argv)
     text = run(args.heldout)
+    if not args.heldout:
+        split_main_table()
     print(text, end="")
+
+
+def split_main_table(n_first=3):
+    """Split paper/table_r1_ci_main.tex after the first ``n_first`` scenario blocks
+    into table_r1_ci_main_a.tex and table_r1_ci_main_b.tex (one page each)."""
+    path = os.path.join(PAPER_DIR, "table_r1_ci_main.tex")
+    if not os.path.exists(path):
+        return
+    t = open(path).read().split("\n")
+    idx = [i for i, l in enumerate(t) if l.startswith("\\multicolumn{8}{l}{\\textit")]
+    if len(idx) <= n_first:
+        return
+    end = max(i for i, l in enumerate(t) if l.startswith("\\bottomrule"))
+    head, foot = t[:idx[0]], t[end:]
+    for suffix, body in (("a", t[idx[0]:idx[n_first]]), ("b", t[idx[n_first]:end])):
+        with open(os.path.join(PAPER_DIR, f"table_r1_ci_main_{suffix}.tex"), "w") as f:
+            f.write("\n".join(head + body + foot) + "\n")
 
 
 if __name__ == "__main__":

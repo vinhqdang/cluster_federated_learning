@@ -1,0 +1,107 @@
+\subsection{Beyond accuracy: transparency, accountability and privacy}
+\paragraph{Transparency: explanations and diagnosis (H5).}
+Table~\ref{tab:fat} evaluates the class-level explanations against the ground truth. For label-swap groups the divergent classes reported by the server are \emph{exactly} the swapped classes in every pair of clusters (precision, recall and exact match $1.00$), and the diagnosis ``class-specific concept shift'' is always correct. A typical explanation reads: \emph{``cluster 0 vs.\ cluster 2: class-specific concept shift on classes [4, 5, 6, 7]''}, where group 2 swaps $4\leftrightarrow5$ and $6\leftrightarrow7$. For rotations, precision is again $1.00$: no class is reported as divergent when it is not. Recall is lower ($0.75$ for rotations, $0.78$ for \emph{Mixed + QS}). The misses are classes on which the two concepts are close at the reference model, such as nearly symmetric items under a $180^\circ$ rotation. Proposition~\ref{prop:expl} guarantees fidelity only for classes with enough pooled evidence and a separation $\Delta$, so these misses are within its scope, but they make the diagnosis ``global shift'' correct for only 43\% of the rotation pairs.
+
+\begin{table}[!htbp]
+\centering
+\caption{Transparency and accountability (Fashion-MNIST, 3 seeds, default settings). Certificates: share of clients with a confident certificate, and share of correctly placed clients (no conflict with any member of their cluster) among confident and among uncertain certificates.}\label{tab:fat}
+\small
+\begin{tabular}{lccc}
+\toprule
+& Rotation & Label swap & Mixed + QS \\
+\midrule
+\multicolumn{4}{l}{\emph{Explanations: divergent classes between clusters}}\\
+precision & 1.00 & 1.00 & 1.00 \\
+recall & 0.75 & 1.00 & 0.78 \\
+exact set / diagnosis correct & 0.43 & 1.00 & 0.33 \\
+\midrule
+\multicolumn{4}{l}{\emph{Certificates}}\\
+share of confident certificates & 0.76 & 0.87 & 0.77 \\
+correct among confident & 0.923 & 1.000 & 1.000 \\
+correct among uncertain & 0.690 & 1.000 & 1.000 \\
+\midrule
+\multicolumn{4}{l}{\emph{Newcomers}}\\
+known concept, correctly assigned & 0.96 & 0.96 & -- \\
+novel concept, flagged as novel & 1.00 & 1.00 & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Accountability: certificates, audit log, newcomers (H5).}
+With the jackknife standard errors of Eq.~\eqref{eq:cert}, 76--87\% of the clients receive a confident certificate. Confident certificates are correct in all cases for label swaps and \emph{Mixed + QS}, and in 92.3\% of the cases for rotations, against 69.0\% for uncertain ones. Where every client is correctly placed, the uncertain certificates are therefore conservative, as the simulation of Section~\ref{sec:outputs} predicts; under rotations they do point to the clients whose placement is in doubt. A confident certificate is informative but not a guarantee, and we report it as an empirical rate, not as a coverage probability. Newcomers that join after clustering, using the frozen reference model, are assigned to the right cluster in 96\% of the cases, and clients with a concept never seen during clustering are reported as \emph{novel} in all cases.
+
+\paragraph{Privacy.}\label{sec:privacy-exp}
+Figure~\ref{fig:dp} shows the ARI of the clustering when the signatures are released with the Gaussian mechanism of Proposition~\ref{prop:dp} ($C_{\rm clip}=0.5$, $\delta=10^{-5}$). These results measure the utility cost of noising the clustering signal only; the warm-up and the cluster training are not private (Remark~\ref{rem:dp}). As Proposition~\ref{prop:dp}(iii) predicts, the \emph{raw} cosine collapses to ARI $\approx0$ at every noise level, with 22--40 clusters: the noise attenuates all similarities. With disattenuation the clustering degrades gradually, and more data per client buys more privacy, as the $h\propto\sigma_{\rm dp}$ term predicts. Recovery is only partial, however. With 1{,}500 samples per client, ARI is $0.75$ and $0.76$ (rotation and label swap) at $\varepsilon=10$, $0.58$ and $0.65$ at $\varepsilon=4.4$, and $0.41$ and $0.55$ at $\varepsilon=2$; with 400 samples it is at most $0.43$ at any noise level we tried. Strong privacy for the clustering signal therefore needs much larger clients than our benchmarks have.
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.85\linewidth]{../results/figures/dp.pdf}
+\caption{Clustering quality under $(\varepsilon,10^{-5})$-DP signatures (3 seeds). Solid: DisCo-CFL; dashed: raw cosine. Orange: 400 samples per client; blue: 1{,}500.}\label{fig:dp}
+\end{figure}
+
+\paragraph{Class support.} The signatures reveal which classes a client holds (Section~\ref{sec:method}). Table~\ref{tab:support} evaluates padding: under DP noise, every client also sends, for each class it does not hold, two independent noise vectors with the noise scale of its median class. Without padding the server knows the support exactly from the list of reported classes; even from the reliabilities alone ($R_i^c>0$) it would infer it with 77--92\% accuracy. With padding the list no longer reveals the support, but the reliabilities still do, with 63--84\% accuracy: a noise vector has a positive split-half correlation by chance in about 37\% of the cases, whereas a held class with enough data has a clearly positive one. Padding also costs clustering quality (ARI falls by up to $0.3$), because the noise classes add spurious evidence. It is therefore a weak mitigation. Hiding the support would need a mechanism that releases the support itself under DP, which we leave open.
+
+\begin{table}[!htbp]
+\centering
+\caption{Class-support disclosure under DP (rotation and label swap, 3 seeds). Plain: only the held classes are reported. Padded: noise vectors are sent for the other classes. Support acc.: accuracy of the server's guess ``class held iff $R_i^c>0$''; FPR: rate at which padded classes are guessed as held.}\label{tab:support}
+\input{table_support.tex}
+\end{table}
+
+\subsection{Calibration, sensitivity, ablation and cost}
+\paragraph{Calibration and threshold (H3).}\label{sec:sens} Figure~\ref{fig:tau} varies $\tau$ on the clustering step. With disattenuation, ARI is $0.85$--$1.00$ for $\tau\in[0.85,0.95]$ in every concept-shift scenario, and the label-only scenario keeps $K=1$ up to $\tau=0.9$. With the raw cosine the useful range is narrower and higher thresholds over-split: at $\tau=0.95$ the label-only federation is split into 3 clusters and \emph{Rotation + QS} into 9.7 on average. Disattenuation therefore makes the threshold less sensitive, as H3 states. The gain at the default threshold is moderate: without disattenuation (Table~\ref{tab:abl}) ARI drops by $0.04$--$0.11$ in the concept-shift scenarios and by $0.33$ in the label-only one. The sample-size study (Figure~\ref{fig:size} in Appendix~\ref{app:figs}) shows why. With clipped per-sample gradients, the raw cosine between clients of the same group is already $0.98$ on Fashion-MNIST, so there is little attenuation to correct; the disattenuated similarity is $0.99$--$1.00$. Attenuation becomes large under DP noise, where the raw cosine fails completely (Figure~\ref{fig:dp}). With very small clients (50--100 samples) both versions fail, for another reason: the groups become close at the reference model (between-group similarity $0.89$--$0.93$), i.e.\ the separation shrinks, and disattenuation does not help (ARI $0.13$--$0.63$, against $0.21$--$0.60$ for the raw cosine). Otsu's label-free threshold (Table~\ref{tab:diag}) lies at $0.76$--$0.83$ in the concept-shift scenarios. It recovers label swaps as well as $\tau=0.9$ (ARI $0.97$) but merges groups under rotations (ARI $0.58$--$0.71$). Its separation index is a useful diagnostic ($\eta=0.82$--$0.89$ when the groups are well separated, $0.62$--$0.73$ for the $15^\circ$ rotation and FEMNIST), but it does not yet replace $\tau$. The shrinkage $\lambda$ has almost no effect between $0.02$ and $1$ (Table~\ref{tab:lambda} in Appendix~\ref{app:figs}), including the values $0.02$ and $0.1$ that satisfy the condition of Corollary~\ref{cor:sc}.
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.85\linewidth]{../results/figures/tau_sensitivity.pdf}
+\caption{Sensitivity to the threshold $\tau$ (3 seeds). The dashed line marks the default $\tau=0.9$, selected on the pilot runs (Section~\ref{sec:setup}).}\label{fig:tau}
+\end{figure}
+
+\paragraph{Edge cases.} Table~\ref{tab:edge} varies the minimum class size $m$ in three federations. The default $m=4$ is best or close to best. A larger $m$ discards classes and hence evidence, and the effect is strongest with small clients ($m=16$: ARI $0.28$, 30\% of the conflicting pairs merged), because clients then report few classes and share few discriminative ones. With extreme label skew ($\alpha=0.1$) and with small clients, ARI falls to $0.66$--$0.72$ at the default, with 3--9\% conflicting merges; these are the coverage failures anticipated in Remark~\ref{rem:scope}(d). The reliability floor $r_{\min}$ has no measurable effect between $0$ and $0.2$ (largest change in ARI $0.017$ over 144 configurations).
+
+\begin{table}[!htbp]
+\centering
+\caption{Edge cases: minimum class size $m$ in three federations (Rotation, Label swap, \emph{Mixed + QS} and label-only scenarios, 3 seeds, $r_{\min}=0.02$).}\label{tab:edge}
+\input{table_edge.tex}
+\end{table}
+
+\paragraph{Theory in practice.}
+Figure~\ref{fig:theory} validates the theory on synthetic signatures with known ground truth ($p=512$, noise of effective rank 16). The disattenuated similarity is nearly unbiased for every half size $h$, whereas the raw cosine is biased by up to $-0.37$. Safety and maximality are reached with probability 1 once $h\ge64$ for all separations $\Delta\in[0.2,0.7]$, and exact recovery is reached under full class support. The required $h$ grows as $\Delta$ shrinks. Recovery of a minority group of 1, 2, 4 or 8 clients follows the same curve (Figure~\ref{fig:thminority} in Appendix~\ref{app:figs}), as Corollary~\ref{cor:sc} states.
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.49\linewidth]{../results/figures/theory_estimation.pdf}\hfill
+\includegraphics[width=0.49\linewidth]{../results/figures/theory_recovery.pdf}
+\caption{Synthetic validation. Left: bias of the similarity estimate. Right: probability of the guarantees of Theorem~\ref{thm:rec}.}\label{fig:theory}
+\end{figure}
+
+\paragraph{Ablation (H3, H4).}
+Table~\ref{tab:abl} removes one component at a time. Without class conditioning (one signature per client over all its data), clients are grouped by their label mix, the failure mode reported in the survey~\citep{benali2026survey}: 18--33 clusters and a concept accuracy 19 points lower. The mean linkage averages class-specific shifts away and merges conflicting clients (11.3\% on average, ARI $0.48$ under rotations), which supports H4: the minimum over classes matters. Linkage-ordered merging over-splits label swaps and \emph{Mixed + QS}. Without disattenuation or without clipping the federation is split more often, most visibly in the label-only scenario. Without the attachment stage, a noisy client stays alone in the label-only scenario in one of three seeds.
+
+\begin{table}[!htbp]
+\centering
+\caption{Ablation (Fashion-MNIST, 3 seeds): ARI / number of clusters $K$ per scenario, mean conflict-merge rate (\%) and mean concept accuracy (\%) over the five scenarios.}\label{tab:abl}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lccccccc}
+\toprule
+Variant & Rotation & Label swap & Rot.\,+\,QS & Mixed\,+\,QS & Label only & Conflict\% & Concept \\
+\midrule
+DisCo-CFL (full) & 0.93 / 4.3 & 0.98 / 4.0 & 0.98 / 4.3 & 0.96 / 4.0 & 1.00 / 1.0 & 0.2 & 76.9 \\
+without disattenuation (raw cosine) & 0.89 / 5.0 & 0.91 / 4.7 & 0.87 / 5.3 & 0.86 / 5.0 & 0.67 / 1.3 & 0.4 & 76.0 \\
+without class conditioning & 0.05 / 31.7 & 0.04 / 32.7 & 0.03 / 33.0 & 0.02 / 29.0 & 0.00 / 17.7 & 0.8 & 57.9 \\
+mean instead of bottleneck linkage & 0.48 / 3.0 & 0.70 / 4.0 & 0.79 / 4.0 & 0.58 / 4.0 & 1.00 / 1.0 & 11.3 & 73.6 \\
+linkage-ordered merging & 0.95 / 4.7 & 0.85 / 5.3 & 0.97 / 4.3 & 0.77 / 6.3 & 0.67 / 1.3 & 0.0 & 75.7 \\
+without per-sample clipping & 0.93 / 4.3 & 1.00 / 4.0 & 0.93 / 5.0 & 0.93 / 4.3 & 0.33 / 1.7 & 0.2 & 76.6 \\
+without attachment stage & 0.91 / 5.0 & 0.98 / 4.0 & 0.97 / 4.7 & 0.96 / 4.0 & 0.67 / 1.3 & 0.1 & 76.7 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Cost and scalability.}\label{sec:cost}
+Table~\ref{tab:cost} reports wall-clock time per run and the floats each client uploads for clustering. Each DisCo-CFL client uploads its signature \emph{once}, about $1.4\times10^4$ floats with $p=1024$, independent of the model dimension $d$ (46{,}730 for the small CNN, 8.4M for the ResNet-18 block). FL+HC and StoCFL upload $d$-dimensional updates or gradients for clustering, IFCA downloads $K$ models per client in every round, and FedCCFA exchanges classifiers and class anchors in every round. A DisCo-CFL run takes about as long as a FedAvg run; StoCFL takes about twice as long because it trains two models per round. Computing the signature takes about 0.09\,s per client on one CPU core, and server-side clustering 0.09\,s for 40 clients and 6\,s for 320 clients. In the clustering-only scalability study, which uses 200 samples per client, ARI is $0.59$--$0.82$ for 40 to 320 clients. With 200 clients in the full pipeline (Table~\ref{tab:sweeps}) ARI is $0.88$ and accuracy is within $0.7$ points of the Oracle. As in the sample-size study, the small clients rather than the size of the federation explain the lower ARI.
+
+\begin{table}[!htbp]
+\centering
+\caption{Cost per run: mean wall-clock time (minutes; one CPU core for the small CNN, one GPU for the realistic benchmarks) and floats uploaded per client for the clustering signal.}\label{tab:cost}
+\input{table_r1_cost.tex}
+\end{table}
