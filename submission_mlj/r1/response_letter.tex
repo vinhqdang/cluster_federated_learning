@@ -1,0 +1,154 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{microtype}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+\newcommand{\TBD}[1]{\textcolor{red}{[#1]}}
+\newenvironment{comment}{\par\medskip\noindent\begin{minipage}{\linewidth}\color{blue!45!black}\itshape}{\end{minipage}\par\smallskip}
+\newcommand{\resp}{\par\noindent\textbf{Response.} }
+\newcommand{\chg}{\par\noindent\textbf{Changes.} }
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+
+\begin{document}
+\begin{center}
+{\large\bfseries Response to the reviewers}\\[4pt]
+Manuscript: ``DisCo-CFL: Calibrated, Fair and Explainable Clustered Federated Learning via Disattenuated Class-Conditional Gradient Signatures''\\
+Submission ID 0be006c7-a304-4145-9451-f6289c9e780d, \emph{Machine Learning}
+\end{center}
+
+Dear Editor, dear Reviewers,
+
+Thank you for the careful and constructive reviews. We have revised the manuscript to address every comment. Below, the comments are reproduced in italics and followed by our response and the changes made. Section, table and equation numbers refer to the revised manuscript. A version with the changes marked is attached.
+
+\section*{An implementation error found during the revision, and its consequences}
+
+While implementing the new baselines we found an error in the training primitive that all methods share. When the same model vector was passed to several clients in one round, local training modified that vector in place, so that the clients of a cluster effectively trained one after another instead of in parallel from the same starting point. The error affected every method (including FedAvg, Local, FedAvg-FT and the clustering signals of FL+HC and FeSEM), and therefore every number in the original manuscript. We corrected it, added a regression test, and \emph{reran all experiments} with the corrected code. All results in the revised manuscript come from the new runs.
+
+With the corrected code the threshold $\tau=0.8$ merged concept groups on the pilot runs (ARI $0.60$ on Rotation and $0.64$ on Mixed + QS). We therefore re-selected $\tau$ on the \emph{same} pilot runs as before (seed 0 of the four pilot configurations), over $\tau\in\{0.70,\dots,0.90\}$ and warm-up lengths $T_0\in\{10,20,30\}$. $\tau=0.9$ with $T_0=10$ gave ARI $0.93$, $1.00$, $1.00$ and $1.00$ and is used throughout; no other constant was changed. The thresholds of the baselines that find $K$ themselves (StoCFL and FedCCFA) were selected on the same pilot runs. The revised Section~5.1 states this, and every result is reported both on all runs and on the held-out runs that exclude the development runs. Some conclusions of the original manuscript changed with the corrected code; we point this out under the relevant comments below and in the revised text. \TBD{summarise the main changes in conclusions once all runs are in}
+
+\section*{Editor}
+
+\begin{comment}
+Please report results accurately, rewrite overstated conclusions, explain limitations fully, and provide a point-by-point response.
+\end{comment}
+\resp We rewrote the abstract, the introduction, the theory remarks and the conclusion so that every claim states its conditions: the guarantees cover the merging stage only, invariance holds at a fixed reference model, the privacy statement is conditional on the reference model and covers same-label record replacement only, and DisCo-CFL needs no predefined $K$ but is not hyperparameter-free. The failures (Office-Home, rotated CIFAR-100, FEMNIST \TBD{update}) are now reported in the abstract, with their costs, together with failure rates per dataset. The point-by-point response follows.
+
+\section*{Reviewer 1}
+
+\subsection*{1. Abstract}
+\begin{comment}
+The abstract should state the conditions under which the guarantees apply. A similarity of one is a population quantity. Recovery requires coverage, identifiability and evidence. The theorem covers only the merging stage, and the attachment step may violate safety. The privacy scope should be stated. The failures on Office-Home, rotated CIFAR-100 and FEMNIST should be acknowledged in the abstract.
+\end{comment}
+\resp We agree with each point and rewrote the abstract. It now says that a similarity of one holds for population quantities at a fixed reference model; that recovery is proven for the merging stage under separation, coverage and evidence conditions; that the post-processing (attachment) stage is a logged heuristic outside the guarantee; that the DP guarantee covers the signature for same-label record replacement, conditional on the reference model, with the class support revealed; and that the method fails to separate the groups on Office-Home and rotated CIFAR-100 and forms many small clusters on FEMNIST.
+\chg Abstract rewritten.
+
+\subsection*{2. Introduction}
+\begin{comment}
+Distinguish ``no predefined $K$'' from ``hyperparameter-free'' ($\tau=0.8$ was chosen on pilot runs). Invariance holds only under a fixed reference model, which depends on the participating clients. Define the scope of the fairness, explainability and robustness contributions. State the independent novelty of the split-half correction, class-wise bottleneck clustering and certificates relative to the closest methods. Formulate testable hypotheses.
+\end{comment}
+\resp (a) The introduction now states that DisCo-CFL needs no predefined $K$ but is not hyperparameter-free: $K$ follows from $\tau$, which was chosen on pilot runs with ground-truth labels, and the other constants were also chosen (new paragraph ``The threshold is a hyperparameter'' in Section~3.3). We also report a label-free alternative (Otsu's threshold on the pairwise similarities of each run) and its accuracy. (b) Invariance is now stated as invariance at a fixed reference model, and we say that the reference model depends on the clients that took part in the warm-up (Introduction; Remark~\ref{rem:scope}(c) in the manuscript). (c) The fairness, accountability, transparency and privacy contributions are now defined narrowly (Section~4.2, first paragraph): fairness means minority-group recovery and worst-client accuracy; robustness to adversarial clients is explicitly out of scope. (d) A new paragraph ``What is new relative to the closest methods'' separates the three components (split-half disattenuation, class-wise bottleneck clustering, certificates) and names the closest counterpart of each (StoCFL, FedCCFA, FedDAG). The ablations isolate (i) and (ii). (e) Five hypotheses H1--H5 are stated in the introduction, and Section~5 reports for each whether it is supported. \TBD{H-by-H verdicts}
+\chg Introduction: new paragraphs on scope, novelty and hypotheses; contributions reworded.
+
+\subsection*{3. Related work and baselines}
+\begin{comment}
+StoCFL, FedCCFA and FedDAG must be included as baselines under identical datasets, models and budgets, or the reason for not reproducing them must be stated. Table 1 should systematically separate the clustering signal, the determination of $K$, theoretical assumptions, privacy scope and communication cost.
+\end{comment}
+\resp We reimplemented all three methods and ran them on every benchmark of the paper (Fashion-MNIST, MNIST, SVHN, CIFAR-10, the sweeps, PACS, Office-Home, CIFAR-100 and FEMNIST) with the same model, optimiser, data, seeds and number of rounds as all other methods. We also added StoCFL-W, which computes StoCFL's gradients at the same warm-up model as DisCo-CFL, so that the two differ only in the signal and the clustering rule. For FedDAG we implemented the clustering stage (FedDAG-C) and give it the true $K$; its training stage, which exchanges data-subspace information across clusters, is not reproduced, and we say so. Thresholds of StoCFL and FedCCFA were selected on the same pilot runs as ours (Section~5.1). Table~1 was rebuilt with the columns the reviewer suggests: signal, rule for $K$, assumptions of the guarantee, privacy scope and communication cost.
+\TBD{one-sentence summary of how DisCo compares with the three}
+\chg Section~2 (Table~1 rebuilt); Section~5.1 (baselines); all result tables.
+
+\subsection*{4. Method}
+\begin{comment}
+(a) The attachment rules for low-evidence clients and singletons are not covered by the safety theorem. (b) The handling of $R\le0$, missing classes, tiny classes and near-zero gradients needs systematic validation. (c) The standard errors of the certificates are computed from correlated pairs. (d) Clarify whether the selection of $\tau$ used ground-truth labels. (e) Separate the contributions of prior correction and clustering. (f) Give full pseudocode for post-processing, anomaly handling and certificate calibration. (g) Disclose the class-support information revealed by the signatures, with ablation and sensitivity experiments.
+\end{comment}
+\resp
+(a) Agreed. Remark~\ref{rem:scope}(a) now says that the guarantee covers the merging stage only and that attachment can violate safety. We added a variant without attachment (DisCo-noAttach) to every experiment, and we report conflicts created at the merge stage and at the attachment stage separately. \TBD{numbers: attach-stage conflict rate, noAttach vs DisCo}
+
+(b) A new paragraph ``Edge cases'' in Section~3.2 states the rule for each case (missing classes, $R\le0$ or below $r_{\min}$, zero-norm halves, disjoint supports, low total evidence). Each rule has a unit test in the repository. A new study varies the minimum class size $m\in\{2,4,8,16\}$ and the reliability floor $r_{\min}\in\{0,0.02,0.1,0.2\}$ on federations with extreme label skew (Dirichlet $\alpha=0.1$) and with small clients (100 samples on average). \TBD{result}
+
+(c) Correct: the pairs $(i,j)$, $j$ in the cluster, share client $i$. We replaced the spread over pairs with a delete-one-member jackknife over the cluster members plus a term for the noise of the client's own signature, obtained from its two halves (Eq.~\ref{eq:cert}). A simulation with known population similarity shows that the standard error has the right scale but that the minimum over classes is biased downwards by about two standard errors, so the nominal interval does not reach its coverage (48\% instead of 95\%). We state this, describe the verdict as conservative on the own-cluster side, and report the empirical correctness of confident certificates instead of claiming nominal coverage. \TBD{empirical calibration numbers}
+
+(d) Yes. The pilot runs scored clustering quality against the ground-truth groups. The revised Sections~3.3 and~5.1 say so explicitly, name the development runs, and report all results also on the held-out runs only. We add a label-free threshold (Otsu) as a diagnostic.
+
+(e) A new table decomposes the accuracy gain over FedAvg into the part due to prior correction and the part due to clustering, by evaluating every method with and without the correction. \TBD{numbers}
+
+(f) Algorithm~2 (new) gives the full post-processing: attachment of singletons with the significance test, attachment of low-evidence clients, anomaly flags, the DisCo-noAttach branch, and the certificate verdicts with the standard error of Eq.~\ref{eq:cert}.
+
+(g) A new paragraph ``What a signature reveals'' states that the class support and the half sizes are released, i.e.\ the label histogram up to a cut-off. A new experiment evaluates a mitigation in which clients pad their signatures with noise vectors for classes they do not hold, under DP noise, and measures both the clustering quality and how well the server can still infer the class support from the reliabilities. \TBD{result}
+
+\chg Sections~3.2, 3.3 (new paragraphs, Algorithm~2, Eq.~\ref{eq:cert}), Remarks in Section~4, Section~5 (new studies).
+
+\subsection*{5. Theory}
+\begin{comment}
+Map the assumptions to the experiments: $\tau=0.8$ requires $\Delta>0.2$; exact recovery requires coverage and evidence; the bound on $\lambda$ is not met by $\lambda=0.5$. Lean covers only the deterministic core. DP covers only label-preserving record replacement; class support and counts are exposed; the guarantee does not cover full training. Check whether the assumptions hold on real data. Distinguish population calibration from finite-sample estimation.
+\end{comment}
+\resp We added Table~\ref{tab:assumptions}, which maps every assumption to its requirement at the default parameters and to its status in the experiments. With $\tau=0.9$ separation now requires $\Delta>0.1$. We estimate the separation $\hat\Delta$ and the coverage of discriminative classes in every run and report them per dataset: \TBD{$\hat\Delta$ on synthetic vs Office-Home / rotated CIFAR-100}. The new Remark~\ref{rem:scope} states (a) merging-stage scope, (b) population versus finite-sample statements, (c) the dependence on the fixed reference model, (d) the three conditions of exact recovery and the fact that coverage fails for some clients under Dirichlet label skew, (e) that $\lambda=0.5$ violates the condition of Corollary~1, with a sensitivity study that includes values satisfying it, and (f) what the Lean development covers: the deterministic core, with the probabilistic ingredients entering as hypotheses. Proposition~3(i) now names its neighbouring relation (replacement of a record by another of the same label, conditional on the reference model) and says that class support and counts are released. The new Remark~\ref{rem:dp} explains that the end-to-end release, including the warm-up and the cluster training, is not covered, and gives the composition bound that applies if the warm-up is made private.
+\chg Section~4: Proposition~3, Remarks~\ref{rem:dp} and~\ref{rem:scope}, Table~\ref{tab:assumptions}; Section~5: diagnostics.
+
+\subsection*{6. Experiments}
+\begin{comment}
+Claim superiority cautiously. Only three seeds were used, and the Wilcoxon test was applied to non-independent scenario--seed pairs. Budget fairness: warm-up, baselines given the true $K$, tuning. Report dataset-specific means, confidence intervals and failure rates; use more seeds and hierarchical statistics. Add the closest baselines, communication and computation costs, and failure diagnostics. Quantify the separate contributions of clustering, prior correction and attachment.
+\end{comment}
+\resp
+\emph{Seeds and statistics.} The main Fashion-MNIST scenarios, the other small-CNN datasets and all realistic benchmarks now use five seeds (sweeps and ablations three). We no longer pool (scenario, seed) pairs in a single test. We report per-dataset means with 95\% confidence intervals and failure rates, a hierarchical bootstrap that resamples scenarios and then seeds, and Wilcoxon tests on scenario-level means. All of these are reported on all runs and on held-out runs. \TBD{headline numbers}
+
+\emph{Budgets.} Warm-up rounds count towards the 50 rounds of every method; StoCFL uses two local epochs per round and FedDAG-C two warm-up epochs, as in their papers, and the cost table reports the resulting computation. Five baselines receive the true $K$; DisCo-CFL, MTCFL, StoCFL and FedCCFA do not. Baselines were not tuned beyond their published values, except the thresholds of the methods that find $K$, which were selected on the same pilot runs as ours.
+
+\emph{Closest baselines, costs, diagnostics.} StoCFL, StoCFL-W, FedCCFA and FedDAG-C are included everywhere (see point 3). A new cost table reports wall-clock time and the floats uploaded and downloaded for clustering by every method. Every run records the separation $\hat\Delta$, the coverage, the Otsu threshold and its separation index, so failures can be diagnosed.
+
+\emph{Decomposition.} Prior correction versus clustering: new table (point 4e). Attachment: DisCo versus DisCo-noAttach and stage-wise conflict rates (point 4a). Calibration and class-wise bottleneck: ablations (DisCo-noDisatt, DisCo-mean).
+
+\emph{Wording.} We removed claims of superiority that the statistics do not support and report ties as ties. \TBD{specific examples}
+\chg Section~5 throughout; new tables of confidence intervals, failure rates, hierarchical tests, costs, decomposition and diagnostics.
+
+\subsection*{7. Conclusion}
+\begin{comment}
+Distinguish recoverable class-conditional concepts, synthetic ground truth and non-unique natural concept structures. Fairness covers only minority-group clustering and worst-client accuracy. Attach assumptions to the privacy and explainability claims. Include the failures and their costs. Propose verifiable strategies for threshold selection, adaptive warm-up and concept drift. At minimum: align the guarantees with the post-processing, narrow the privacy claims, compare fairly with the closest methods, and reassess the statistics.
+\end{comment}
+\resp The conclusion was rewritten. It distinguishes (i) class-conditional concepts that are recoverable when separated at the reference model, (ii) synthetic ground truth, where recovery can be measured, and (iii) natural heterogeneity (domains, writers), where the concept structure is not unique and ARI against domains is only a proxy. It restricts the fairness claim to minority-group clustering and worst-client accuracy, attaches the assumptions to the privacy and explanation claims, and lists the failures with their accuracy costs. It proposes three strategies that can be checked on held-out data: a label-free threshold from the bimodality of pairwise similarities (Otsu), evaluated in the paper; an adaptive warm-up that stops when the median split-half reliability and the Otsu separation index stabilise; and drift detection by recomputing signatures at the same reference model and applying the newcomer test. Each item of the reviewer's minimum list is addressed in points 1, 3, 4a, 5 and 6.
+\chg Section~6 rewritten.
+
+\section*{Reviewer 2}
+
+\subsection*{1. Reference model and privacy}
+\begin{comment}
+The fixed reference model is trained on the same private data, so this dependence must be accounted for and the privacy scope defined precisely.
+\end{comment}
+\resp We agree. Proposition~3 is now stated conditionally on the reference model, and the new Remark~\ref{rem:dp} says that the reference model is trained on the same clients, that the end-to-end release is therefore not covered by the proposition, and that a private warm-up with budget $(\varepsilon_0,\delta_0)$ would give $(\varepsilon_0+\varepsilon,\delta_0+\delta)$ for warm-up plus signature by sequential composition; cluster training adds its own budget. Our experiments do not use a private warm-up, and we say that the DP results measure only the utility cost of noising the clustering signal. The dependence also affects the statistics: the population similarities are defined at a reference model that depends on the participating clients (Remark~\ref{rem:scope}(c)), so invariance is a statement at fixed $w$.
+\chg Proposition~3, Remarks~\ref{rem:dp} and~\ref{rem:scope}, Table~\ref{tab:assumptions}, Section~4.2.
+
+\subsection*{2. Comparison with the closest methods and uncertainty}
+\begin{comment}
+Compare with FedCCFA or StoCFL, report uncertainty, and separate development runs from independent evaluation runs.
+\end{comment}
+\resp FedCCFA, StoCFL (also with a warm-up gradient, StoCFL-W) and the clustering stage of FedDAG are now baselines on all benchmarks (see Reviewer~1, point 3). All tables report 95\% confidence intervals over five seeds and failure rates, and the cross-scenario comparisons use a hierarchical bootstrap and scenario-level Wilcoxon tests. The development runs are listed in Section~5.1, and every summary is reported on all runs and on the held-out runs that exclude them.
+\chg Section~5.
+
+\subsection*{3. CRFed}
+\begin{comment}
+Discuss ``Confusion-Resistant Federated Learning via Diffusion-Based Data Harmonization on Non-IID Data'' (NeurIPS 2024).
+\end{comment}
+\resp Thank you for the pointer. Section~2 has a new paragraph on data harmonisation. CRFed translates client data towards a common distribution with a diffusion model and trains one global model. Harmonisation treats differences in $P(X)$ as nuisance, which suits feature shift; when $P(Y\mid X)$ differs between groups, as in our label-swap scenarios, no translation of the inputs can reconcile them and separate models are needed. The two ideas can be combined, with harmonisation inside a concept cluster. Because CRFed targets one global model after input translation, we discuss it but do not include it as a baseline.
+\chg Section~2, new paragraph and reference.
+
+\subsection*{4. Certificate standard errors and single clusters}
+\begin{comment}
+Justify the standard errors of the certificates. A single detected cluster is not evidence that no concept difference exists.
+\end{comment}
+\resp The standard errors are now computed with a delete-one-member jackknife plus a self-noise term (Eq.~\ref{eq:cert}), which accounts for the correlation of pairs that share the client; the simulation and its limitation (downward bias of the minimum, coverage below nominal) are reported, and we no longer claim nominal coverage (see Reviewer~1, point 4c). We agree with the second point. The diagnosis output for $\hat K=1$ now reads ``no concept difference was detected at the reference model; this is not evidence that no difference exists'', and the manuscript points to the separation diagnostic. Assumption~2 makes explicit that a concept shift that does not change the gradient at the reference model is invisible.
+\chg Section~3.3 (certificates, diagnosis), Section~6.
+
+\medskip
+We thank the reviewers again. We believe the revision makes the claims of the paper accurate and the evidence for them stronger.
+
+\medskip
+Sincerely,\\
+Quang-Vinh Dang\\
+British University Vietnam
+\end{document}
