@@ -85,7 +85,7 @@ SCEN_NAMES = {
     "femnist": "FEMNIST",
 }
 
-METHOD_ORDER = ["DisCo", "DisCo-noAttach", "FedAvg", "Local", "FedAvg-FT", "IFCA", "FeSEM",
+METHOD_ORDER = ["DisCo", "DisCo-noAttach", "DisCo-T30", "FedAvg", "Local", "FedAvg-FT", "IFCA", "FeSEM",
                 "MTCFL", "FL+HC", "PACFL", "StoCFL", "StoCFL-W", "FedCCFA", "FedDAG-C", "Oracle"]
 FAIL_METHODS = ["DisCo", "DisCo-noAttach", "IFCA", "FeSEM", "MTCFL", "FL+HC",
                 "PACFL", "StoCFL", "StoCFL-W", "FedCCFA", "FedDAG-C"]
