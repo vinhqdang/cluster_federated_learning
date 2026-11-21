@@ -69,7 +69,7 @@ def run_disco(fed, tr, cfg, return_details=False):
     t0 = time.time()
     res = disco_cluster(sigs, tau=cfg.get("tau", 0.8), disattenuate=cfg.get("disattenuate", True),
                         lam=cfg.get("lam", 0.5), mode=cfg.get("linkage", "min"),
-                        order=cfg.get("order", "evidence"))
+                        order=cfg.get("order", "evidence"), attach=cfg.get("attach", True))
     t_srv = time.time() - t0
     assign = res.labels
     models = _train_clusters(tr, fed, w_ref, assign, cfg["rounds"] - cfg["warmup"])
@@ -77,9 +77,9 @@ def run_disco(fed, tr, cfg, return_details=False):
     out = {"assign": assign, "models": models, "cluster_floats": floats,
            "time_signature_s": t_sig, "time_server_s": t_srv,
            "n_confident": sum(c["verdict"] == "confident" for c in res.certificates),
-           "flags": res.flags}
+           "flags": res.flags, "sim": res.sim, "result": res}
     if return_details:
-        out.update({"result": res, "signatures": sigs, "w_ref": w_ref, "sketch": sketch})
+        out.update({"signatures": sigs, "w_ref": w_ref, "sketch": sketch})
     return out
 
 
@@ -227,6 +227,8 @@ def run_fesem(fed, tr, cfg):
     return {"assign": np.asarray(assign).copy(), "models": centres, "cluster_floats": 0}
 
 
+from .baselines_extra import run_fedccfa, run_feddag, run_stocfl  # noqa: E402
+
 ALGORITHMS = {
     "FedAvg": run_fedavg,
     "Local": run_local,
@@ -238,4 +240,7 @@ ALGORITHMS = {
     "PACFL": run_pacfl,
     "DisCo": run_disco,
     "Oracle": run_oracle,
+    "StoCFL": run_stocfl,
+    "FedCCFA": run_fedccfa,
+    "FedDAG-C": run_feddag,
 }

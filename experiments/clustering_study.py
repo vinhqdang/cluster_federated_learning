@@ -22,8 +22,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, ".."))
 sys.path.insert(0, HERE)
 
-OUT = os.path.join(HERE, "..", "results", "clustering")
-CACHE = os.path.join(HERE, "..", "results", "cache")
+OUT = os.path.join(HERE, "..", "results", "r1", "clustering")
+CACHE = os.path.join(HERE, "..", "results", "r1", "cache")
 
 
 def _setup():

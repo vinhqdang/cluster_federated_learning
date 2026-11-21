@@ -233,3 +233,5 @@ paper_mlj/*.log
 paper_mlj/*.out
 paper_mlj/*.blg
 paper_mlj/*.bbl
+
+results/r1/cache/

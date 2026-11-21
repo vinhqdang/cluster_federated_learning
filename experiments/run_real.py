@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 from run import VARIANTS, metrics  # noqa: E402
 
-RESULTS = os.path.join(os.path.dirname(__file__), "..", "results", "raw_real")
+RESULTS = os.path.join(os.path.dirname(__file__), "..", "results", "r1", "raw_real")
 
 # size: image side; arch: l4 = pretrained ResNet-18 head, smallcnn = small CNN
 SCENARIOS = {
@@ -47,6 +47,14 @@ SUITES = {
     "ablation_real": dict(scenarios=["pacs", "c100_swap"],
                           methods=["DisCo-noDisatt", "DisCo-noClass", "DisCo-mean", "DisCo-linkorder",
                                    "DisCo-noClip"], seeds=[0, 1, 2]),
+    # round 1 of revisions
+    "r1_real": dict(scenarios=["pacs", "officehome", "c100_swap", "c100_rot", "pacs_qs"],
+                    methods=METHODS + ["StoCFL", "FedCCFA", "FedDAG-C", "DisCo-noAttach"],
+                    seeds=[0, 1, 2, 3, 4]),
+    "r1_femnist": dict(scenarios=["femnist"],
+                       methods=["FedAvg", "Local", "FedAvg-FT", "IFCA", "FeSEM", "MTCFL", "FL+HC", "DisCo",
+                                "StoCFL", "FedCCFA", "FedDAG-C", "DisCo-noAttach"],
+                       seeds=[0, 1, 2, 3, 4]),
 }
 FEMNIST_K = [1, 3, 5]      # IFCA / FeSEM / FL+HC have no true K on natural writers
 

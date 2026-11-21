@@ -35,7 +35,7 @@ import numpy as np
 from scipy import stats
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-RAW_DIRS = [os.path.join(ROOT, "results", "raw"), os.path.join(ROOT, "results", "raw_real")]
+RAW_DIRS = [os.path.join(ROOT, "results", "r1", "raw"), os.path.join(ROOT, "results", "r1", "raw_real")]
 PAPER_DIR = os.path.join(ROOT, "paper")
 MD_DIR = os.path.join(ROOT, "results", "tables")
 

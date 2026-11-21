@@ -178,16 +178,31 @@ class SimilarityResult:
     W: np.ndarray            # (C, N, N) per-class weights
     R: np.ndarray            # (N, C) reliabilities
     classes: list
+    # half-level data used by the jackknife standard errors (None for old objects)
+    Ah: np.ndarray | None = None       # (N, C, p) unit half vector a/||a|| (0 if ||a|| = 0 or class missing)
+    Bh: np.ndarray | None = None       # (N, C, p) unit half vector b/||b||
+    U: np.ndarray | None = None        # (N, C, p) unit mean (a+b)/(2||a+b||)
+    r_half: np.ndarray | None = None   # (N, C) max(cos(a, b), 0); 0 when R = 0 or class missing
 
 
 def compute_similarity(signatures, disattenuate=True, r_min=0.02):
+    # Edge cases (explicit):
+    # * classes a client does not report are missing: all of its entries stay 0 and
+    #   W = 0 for every pair involving that class, so they carry no evidence;
+    # * R <= 0 (non-positive split-half reliability, or below r_min) is treated as
+    #   "no evidence" for that (client, class): R = 0, hence W = 0 on that class;
+    # * a zero-norm half gives cos 0 (torch clamps the denominator), hence R = 0;
+    #   its unit vector is set to the zero vector instead of dividing by zero.
     n = len(signatures)
     classes = sorted({c for s in signatures for c in s})
     ci = {c: k for k, c in enumerate(classes)}
     C = len(classes)
     p = next(iter(next(s for s in signatures if s).values()))[0].numel()
     U = torch.zeros(n, C, p)
+    Ah = torch.zeros(n, C, p)
+    Bh = torch.zeros(n, C, p)
     R = np.zeros((n, C))
+    r_half = np.zeros((n, C))
     for i, sig in enumerate(signatures):
         for c, (a, b, _) in sig.items():
             k = ci[c]
@@ -195,7 +210,11 @@ def compute_similarity(signatures, disattenuate=True, r_min=0.02):
             rel = 2 * r / (1 + r) if r > 0 else 0.0
             m = (a + b) / 2
             U[i, k] = m / m.norm().clamp_min(1e-12)
+            Ah[i, k] = a / a.norm().clamp_min(1e-12)
+            Bh[i, k] = b / b.norm().clamp_min(1e-12)
+            # R <= 0 (r <= 0 or rel < r_min): no evidence for this class
             R[i, k] = rel if rel >= r_min else 0.0
+            r_half[i, k] = max(r, 0.0) if R[i, k] > 0 else 0.0
     rho = np.full((C, n, n), np.nan)
     W = np.zeros((C, n, n))
     for k in range(C):
@@ -218,7 +237,9 @@ def compute_similarity(signatures, disattenuate=True, r_min=0.02):
     num = np.nansum(np.where(W > 0, W * rho, 0.0), axis=0)
     S = np.where(E > 0, num / np.maximum(E, 1e-12), np.nan)
     np.fill_diagonal(S, 1.0)
-    return SimilarityResult(S, E, rho, W, R, classes)
+    return SimilarityResult(S, E, rho, W, R, classes, Ah=Ah.numpy().astype(np.float64),
+                            Bh=Bh.numpy().astype(np.float64), U=U.numpy().astype(np.float64),
+                            r_half=r_half)
 
 
 # ----------------------------------------------------------------------------
@@ -316,6 +337,79 @@ def client_to_cluster(sim: SimilarityResult, i, members, lam=0.2):
     return s, se, float(den_c.sum())
 
 
+def _bottleneck_from(W, rho, lam):
+    """W, rho: (C, m) per-class weights and similarities of one client to m others.
+    Returns (s, class index, evidence); s = nan when there is no evidence at all."""
+    num_c = (W * rho).sum(1)
+    den_c = W.sum(1)
+    if den_c.sum() <= 0:
+        return np.nan, -1, 0.0
+    vals = (num_c + lam) / (den_c + lam)
+    c = int(np.argmin(vals))
+    return float(vals[c]), c, float(den_c.sum())
+
+
+def client_to_cluster_jk(sim: SimilarityResult, i, members, lam=0.2):
+    """Bottleneck similarity of client i to `members` with a standard error that
+    respects the dependence structure: all pairs (i, j) share client i.
+
+    se_members : delete-one-member jackknife over j in members (the spread of the
+                 estimate across members, with the pairs of j removed together);
+    se_self    : uncertainty of client i's own signature. Client i is represented
+                 by a single half (A, then B) with the single-half reliability
+                 r_half[i, c]; |s_A - s_B| / 2 estimates the extra noise from i's
+                 own estimation (the full-client s averages both halves);
+    se         : sqrt(se_members^2 + se_self^2), ignoring NaN components.
+    Classes are "missing" for a pair when r_half[i, c] <= 0 or R[j, c] <= 0.
+    Returns a dict with s, se, se_members, se_self, evidence, bottleneck_class
+    (the class label, as in client_to_cluster; None when undefined)."""
+    if sim.Ah is None or sim.U is None or sim.r_half is None:
+        raise ValueError("similarity object lacks half-level data; recompute with compute_similarity")
+    nan = float("nan")
+    out = {"s": nan, "se": nan, "se_members": nan, "se_self": nan, "evidence": 0.0,
+           "bottleneck_class": None}
+    members = np.asarray([j for j in members if j != i], dtype=int)
+    if len(members) == 0:
+        return out
+    W = sim.W[:, i, members]                       # (C, m)
+    rho = np.nan_to_num(sim.rho[:, i, members])    # (C, m)
+    s, c, ev = _bottleneck_from(W, rho, lam)
+    out["evidence"] = ev
+    if np.isnan(s):
+        return out
+    out["s"] = s
+    out["bottleneck_class"] = int(sim.classes[c])
+
+    # (a) delete-one-member jackknife; leave-one-out values that are undefined
+    # (no evidence left) are dropped and the factor uses the count actually used
+    m = len(members)
+    if m >= 2:
+        loo = np.array([_bottleneck_from(W[:, np.arange(m) != t], rho[:, np.arange(m) != t], lam)[0]
+                        for t in range(m)])
+        loo = loo[np.isfinite(loo)]
+        k = len(loo)
+        if k >= 2:
+            out["se_members"] = float(math.sqrt((k - 1) / k * ((loo - loo.mean()) ** 2).sum()))
+
+    # (b) client i represented by one half only
+    def half_s(H):                                  # H: (C, p) unit half vectors of client i
+        cos_ij = np.einsum("cp,mcp->cm", H, sim.U[members])          # (C, m)
+        r_i = sim.r_half[i][:, None]                                 # (C, 1)
+        R_j = sim.R[members].T                                       # (C, m)
+        ok = (r_i > 0) & (R_j > 0)                                   # class present for the pair
+        denom = np.sqrt(np.where(ok, r_i * R_j, 1.0))
+        rho_h = np.where(ok, np.clip(cos_ij / denom, -1.0, 1.0), 0.0)
+        return _bottleneck_from(np.where(ok, W, 0.0), rho_h, lam)[0]
+
+    sA, sB = half_s(sim.Ah[i]), half_s(sim.Bh[i])
+    if np.isfinite(sA) and np.isfinite(sB):
+        out["se_self"] = float(abs(sA - sB) / 2)
+
+    comps = [x for x in (out["se_members"], out["se_self"]) if not np.isnan(x)]
+    out["se"] = float(math.sqrt(sum(x * x for x in comps))) if comps else nan
+    return out
+
+
 # ----------------------------------------------------------------------------
 # Full clustering procedure with FAT outputs
 # ----------------------------------------------------------------------------
@@ -330,32 +424,47 @@ class DisCoResult:
 
 
 def disco_cluster(signatures, tau=0.8, min_evidence=0.3, disattenuate=True, z=2.0,
-                  lam=0.5, mode="min", order="evidence", small=1):
+                  lam=0.5, mode="min", order="evidence", small=1, attach=True):
+    """attach=True (default): small clusters are attached to their closest cluster
+    when not significantly separated, and low-evidence clients join their most
+    similar cluster. attach=False: neither happens; every low-evidence client
+    becomes its own singleton cluster (ids after the existing ones)."""
     sim = compute_similarity(signatures, disattenuate=disattenuate)
     n = len(signatures)
     evidence = sim.R.sum(1)                    # total reliability mass of the client
     low = np.where(evidence < min_evidence)[0]
     active = np.setdiff1d(np.arange(n), low)
     labels, log = threshold_cluster(sim, tau, active, lam=lam, mode=mode, order=order)
-    labels, anomalies = _attach_small(sim, labels, tau, z, lam, small, log, active)
-    # low-evidence clients are not allowed to shape the clusters; they are attached
-    # to the most similar cluster (or the largest one if nothing can be said)
-    K = labels.max() + 1
-    for i in low:
-        best, arg = -np.inf, 0
-        for k in range(K):
-            s, _, _ = client_to_cluster(sim, i, np.where(labels == k)[0], lam)
-            if not np.isnan(s) and s > best:
-                best, arg = s, k
-        labels[i] = arg
-        log.append({"attach_low_evidence": int(i), "cluster": int(arg),
-                    "similarity": None if best == -np.inf else float(best)})
+    if attach:
+        labels, anomalies = _attach_small(sim, labels, tau, z, lam, small, log, active)
+        attached_small = sorted({int(i) for e in log if "attach_small" in e for i in e["attach_small"]})
+        # low-evidence clients are not allowed to shape the clusters; they are attached
+        # to the most similar cluster (or the largest one if nothing can be said)
+        K = labels.max() + 1
+        for i in low:
+            best, arg = -np.inf, 0
+            for k in range(K):
+                s, _, _ = client_to_cluster(sim, i, np.where(labels == k)[0], lam)
+                if not np.isnan(s) and s > best:
+                    best, arg = s, k
+            labels[i] = arg
+            log.append({"attach_low_evidence": int(i), "cluster": int(arg),
+                        "similarity": None if best == -np.inf else float(best)})
+        attached_low = [int(i) for i in low]
+    else:
+        anomalies, attached_small, attached_low = [], [], []
+        K = labels.max() + 1
+        for i in low:
+            labels[i] = K
+            log.append({"singleton_low_evidence": int(i), "cluster": int(K)})
+            K += 1
     certs = certificates(sim, labels, tau, z, low, lam)
     expl = explain(sim, labels, tau, lam)
     sizes = np.bincount(labels)
     flags = {"low_evidence": low.tolist(), "anomalous": anomalies,
              "singletons": [int(np.where(labels == k)[0][0]) for k in range(len(sizes))
-                            if sizes[k] == 1]}
+                            if sizes[k] == 1],
+             "attached_small": attached_small, "attached_low": attached_low}
     return DisCoResult(labels, sim, log, certs, expl, flags)
 
 
@@ -385,9 +494,9 @@ def _attach_small(sim, labels, tau, z, lam, small, log, active):
             others = np.where(labels == k2)[0]
             if len(others) <= small:
                 continue
-            vals = [client_to_cluster(sim, i, others, lam) for i in mem]
-            s = np.nanmean([v[0] for v in vals])
-            se = np.nanmean([0.0 if np.isnan(v[1]) else v[1] for v in vals])
+            vals = [client_to_cluster_jk(sim, i, others, lam) for i in mem]
+            s = np.nanmean([v["s"] for v in vals])
+            se = np.nanmean([0.0 if np.isnan(v["se"]) else v["se"] for v in vals])
             if not np.isnan(s) and s > best[0]:
                 best = (s, k2, se)
         s, k2, se = best
@@ -408,12 +517,14 @@ def certificates(sim, labels, tau, z=2.0, low=(), lam=0.2):
     K = labels.max() + 1
     for i in range(len(labels)):
         own = labels[i]
-        s_own, se_own, ev = client_to_cluster(sim, i, np.where(labels == own)[0], lam)
+        r_own = client_to_cluster_jk(sim, i, np.where(labels == own)[0], lam)
+        s_own, se_own, ev = r_own["s"], r_own["se"], r_own["evidence"]
         best_o, se_o, k_o = np.nan, np.nan, None
         for k in range(K):
             if k == own:
                 continue
-            s, se, _ = client_to_cluster(sim, i, np.where(labels == k)[0], lam)
+            r_k = client_to_cluster_jk(sim, i, np.where(labels == k)[0], lam)
+            s, se = r_k["s"], r_k["se"]
             if not np.isnan(s) and (np.isnan(best_o) or s > best_o):
                 best_o, se_o, k_o = s, se, k
         se_own_ = 0.0 if np.isnan(se_own) else se_own
@@ -424,6 +535,7 @@ def certificates(sim, labels, tau, z=2.0, low=(), lam=0.2):
         if i in low:
             verdict = "low-evidence"
         out.append({"client": i, "cluster": int(own), "sim_own": _f(s_own), "se_own": _f(se_own),
+                    "se_own_members": _f(r_own["se_members"]), "se_own_self": _f(r_own["se_self"]),
                     "closest_other": k_o, "sim_other": _f(best_o), "se_other": _f(se_o),
                     "margin": _f(s_own - best_o) if not (np.isnan(s_own) or np.isnan(best_o)) else None,
                     "evidence": float(ev), "verdict": verdict})
@@ -465,11 +577,12 @@ def explain(sim, labels, tau, lam=0.2):
             elif div:
                 kind = "class-specific concept shift (P(Y|X) / P(X|Y) differs on classes %s)" % div
             else:
-                kind = "no class-level divergence above threshold"
+                kind = "no class-level divergence detected at the threshold"
             pairs[f"{a}-{b}"] = {"per_class": pc, "divergent_classes": div,
                                  "fraction_divergent": frac, "diagnosis": kind}
     if K == 1:
-        overall = "single concept: heterogeneity is explained by target/quantity skew only"
+        overall = ("one cluster: no concept difference was detected at the reference model; "
+                   "this is not evidence that no difference exists (see the identifiability diagnostic)")
     else:
         overall = f"{K} concept groups detected"
     return {"within": within, "between": pairs, "overall": overall}

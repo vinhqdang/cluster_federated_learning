@@ -7,6 +7,7 @@ from __future__ import annotations
 import argparse
 import itertools
 import json
+import math
 import os
 import sys
 import time
@@ -16,7 +17,7 @@ import numpy as np
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-RESULTS = os.path.join(os.path.dirname(__file__), "..", "results", "raw")
+RESULTS = os.environ.get("DISCO_RESULTS", os.path.join(os.path.dirname(__file__), "..", "results", "r1", "raw"))
 
 BASE = dict(dataset="fmnist", clients_per_group=10, mean_size=400, alpha=0.3,
             quantity_sigma=0.0)
@@ -59,6 +60,7 @@ TRAIN = dict(rounds=50, warmup=10, lr=0.05, batch_size=32, local_epochs=1)
 
 METHODS = ["FedAvg", "Local", "IFCA", "MTCFL", "FL+HC", "PACFL", "DisCo", "Oracle"]
 NEW_BASELINES = ["FeSEM", "FedAvg-FT"]
+NEW_R1 = ["StoCFL", "FedCCFA", "FedDAG-C"]    # registered in ALGORITHMS by a later change
 ALL = METHODS + NEW_BASELINES
 SWEEP = ["FedAvg", "IFCA", "FL+HC", "PACFL", "FeSEM", "DisCo", "Oracle"]
 
@@ -85,6 +87,26 @@ SUITES = {
                      methods=["DisCo-noDisatt", "DisCo-noClass", "DisCo-mean", "DisCo-linkorder",
                               "DisCo-noClip"],
                      seeds=[0, 1, 2]),
+    # round 1 of revisions: new baselines, DisCo without attachment, and the seeds 3-4
+    "r1_main": dict(scenarios=["rot", "swap", "rot_qs", "mixed_qs", "label", "minority"],
+                    methods=METHODS + NEW_BASELINES + NEW_R1 + ["DisCo-noAttach"], seeds=[0, 1, 2, 3, 4]),
+    "r1_other": dict(scenarios=["mnist_rot", "mnist_swap", "svhn_rot", "svhn_swap", "cifar_rot", "cifar_swap"],
+                     methods=NEW_R1 + ["DisCo-noAttach"], seeds=[0, 1, 2]),
+    "r1_other_seeds": dict(scenarios=["mnist_rot", "mnist_swap", "svhn_rot", "svhn_swap", "cifar_rot",
+                                      "cifar_swap"],
+                           methods=METHODS + NEW_BASELINES + NEW_R1 + ["DisCo-noAttach", "DisCo-T30"],
+                           seeds=[3, 4]),
+    # full re-run of the revision with the corrected training primitive
+    "r1_other_all": dict(scenarios=["mnist_rot", "mnist_swap", "svhn_rot", "svhn_swap", "cifar_rot",
+                                    "cifar_swap"],
+                         methods=METHODS + NEW_BASELINES + NEW_R1 + ["DisCo-noAttach", "DisCo-T30"],
+                         seeds=[0, 1, 2, 3, 4]),
+    "r1_sweeps": dict(scenarios=["angle15", "angle30", "angle45", "perm2", "perm8", "rot_part30",
+                                 "swap_part30", "rot_n200"],
+                      methods=SWEEP + ["MTCFL"] + NEW_R1, seeds=[0, 1, 2]),
+    "r1_ablation": dict(scenarios=["rot", "swap", "rot_qs", "mixed_qs", "label"],
+                        methods=["DisCo-noDisatt", "DisCo-noClass", "DisCo-mean", "DisCo-linkorder",
+                                 "DisCo-noClip"], seeds=[0, 1, 2]),
 }
 
 VARIANTS = {
@@ -95,12 +117,18 @@ VARIANTS = {
     "DisCo-noClip": dict(clip=0.0),
     "DisCo-T30": dict(warmup=30),
     "DisCo-full": dict(sig="full"),
+    "DisCo-noAttach": dict(attach=False),
 }
 
 
-def conflict_matrix(fed, min_count=4):
-    """Two clients conflict when they hold a common label (>= min_count samples
-    each) whose input->label mapping differs between their concept groups."""
+def conflict_classes(fed, min_count=4):
+    """Conflict matrix and, for every conflicting pair i < j, the discriminative
+    classes. Two clients conflict when they hold a common label (>= min_count
+    samples each) whose input->label mapping differs between their concept groups.
+    If the feature transformations differ (key() differs, e.g. rotations or
+    domains) every shared class is discriminative; otherwise only the shared
+    classes whose label permutation differs are.
+    Returns (M, disc) with disc = {(i, j): np.ndarray of class indices}."""
     n = len(fed.clients)
     C = fed.num_classes
     counts = np.stack([np.bincount(c.y.cpu().numpy(), minlength=C) for c in fed.clients])
@@ -110,15 +138,55 @@ def conflict_matrix(fed, min_count=4):
         perm = np.arange(C) if g.perm is None else np.array(g.perm)
         inv.append((g.key(), np.argsort(perm)))
     M = np.zeros((n, n), bool)
+    disc = {}
     for i in range(n):
         for j in range(i + 1, n):
+            shared = (counts[i] >= min_count) & (counts[j] >= min_count)
             if inv[i][0] != inv[j][0]:
                 bad = True
+                cls = shared
             else:
-                shared = (counts[i] >= min_count) & (counts[j] >= min_count)
-                bad = bool((shared & (inv[i][1] != inv[j][1])).any())
+                cls = shared & (inv[i][1] != inv[j][1])
+                bad = bool(cls.any())
             M[i, j] = M[j, i] = bad
-    return M
+            if bad:
+                disc[(i, j)] = np.where(cls)[0]
+    return M, disc
+
+
+def conflict_matrix(fed, min_count=4):
+    """Two clients conflict when they hold a common label (>= min_count samples
+    each) whose input->label mapping differs between their concept groups."""
+    return conflict_classes(fed, min_count)[0]
+
+
+def _fl(x):
+    """JSON-safe float: NaN / inf become None."""
+    x = float(x)
+    return x if math.isfinite(x) else None
+
+
+def _diagnostics(fed, sim, conf_disc):
+    """Identifiability / threshold diagnostics of the stored similarity object."""
+    from sklearn.metrics import adjusted_rand_score
+    from discocfl.diagnostics import coverage, group_linkage, otsu_threshold, pairwise_bottleneck
+    from discocfl.disco import threshold_cluster
+
+    g = fed.true_labels
+    n = len(g)
+    gl = group_linkage(sim, g, lam=0.5)
+    cov = coverage(sim, conf_disc)
+    iu = np.triu_indices(n, 1)
+    vals = pairwise_bottleneck(sim, 0.5)[iu]
+    tau, eta = otsu_threshold(vals[np.isfinite(vals)])
+    lab_o, _ = threshold_cluster(sim, tau, lam=0.5)
+    if len(np.unique(g)) == 1 and len(np.unique(lab_o)) == 1:
+        ari_o = 1.0
+    else:
+        ari_o = float(adjusted_rand_score(g, lab_o))
+    return {"delta_hat": _fl(gl["delta_hat"]), "within_min": _fl(gl["within_min"]),
+            "coverage": _fl(cov), "otsu_tau": _fl(tau), "otsu_eta": _fl(eta),
+            "ari_otsu": _fl(ari_o), "k_otsu": int(len(np.unique(lab_o)))}
 
 
 def metrics(fed, tr, out):
@@ -128,12 +196,14 @@ def metrics(fed, tr, out):
     local, bal = evaluate_assignment(tr, fed, out["models"], out["assign"])
     local_pc, bal_pc = evaluate_assignment(tr, fed, out["models"], out["assign"], prior_correction=True)
     g = fed.true_labels
-    A = np.asarray(out["assign"])
+    # clustering metrics use the partition before attachment when a method reports one;
+    # accuracy always uses the final assignment (out["assign"]) and the cluster models
+    A = np.asarray(out.get("partition_assign", out["assign"]))
     group_acc = [float(local[g == k].mean()) for k in np.unique(g)]
-    conf = conflict_matrix(fed)
+    conf, disc = conflict_classes(fed)
     same = np.equal.outer(A, A) & ~np.eye(len(A), dtype=bool)
     compatible = ~conf & ~np.eye(len(A), dtype=bool)
-    return {
+    res = {
         "acc_mean": float(local.mean()),
         "acc_p10": float(np.percentile(local, 10)),
         "acc_min": float(local.min()),
@@ -156,6 +226,30 @@ def metrics(fed, tr, out):
         "pc_acc_concept_mean": float(bal_pc.mean()),
         "pc_per_client_acc": local_pc.tolist(),
     }
+    # attachment accounting. A conflicting pair (i < j) is an error of the merge stage
+    # when both clients stay in their clustering-stage cluster and share the final
+    # cluster; it is an error of the attach stage when one of them was attached.
+    flags = out.get("flags") or {}
+    if "attached_small" in flags or "attached_low" in flags:
+        att_ids = [int(i) for i in list(flags.get("attached_small", [])) + list(flags.get("attached_low", []))]
+        att = np.zeros(len(g), bool)
+        att[att_ids] = True
+        A_final = np.asarray(out["assign"])
+        iu = np.triu_indices(len(g), 1)
+        conf_u = conf[iu]
+        same_final = np.equal.outer(A_final, A_final)[iu]
+        touched = att[iu[0]] | att[iu[1]]
+        n_conf = max(int(conf_u.sum()), 1)
+        res["n_attached"] = int(att.sum())
+        res["conflict_rate_merge_stage"] = float((conf_u & same_final & ~touched).sum() / n_conf)
+        res["conflict_rate_attach_stage"] = float((conf_u & same_final & touched).sum() / n_conf)
+    # identifiability and threshold diagnostics; never allowed to break a run
+    if "sim" in out:
+        try:
+            res["diag"] = _diagnostics(fed, out["sim"], disc)
+        except Exception as e:  # noqa: BLE001
+            res["diag"] = {"error": f"{type(e).__name__}: {e}"}
+    return res
 
 
 def run_one(job):
@@ -205,8 +299,10 @@ def run_one(job):
 
 
 def jobs_for(suite):
+    # seed-major: all methods (and scenarios) of seed s come before seed s+1, so an
+    # interrupted run leaves complete seeds behind
     s = SUITES[suite]
-    return [(sc, m, sd, {}) for sc, m, sd in itertools.product(s["scenarios"], s["methods"], s["seeds"])]
+    return [(sc, m, sd, {}) for sd, sc, m in itertools.product(s["seeds"], s["scenarios"], s["methods"])]
 
 
 if __name__ == "__main__":
@@ -215,7 +311,13 @@ if __name__ == "__main__":
     ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--only", default=None, help="comma-separated scenario filter")
     ap.add_argument("--methods", default=None)
+    ap.add_argument("--seeds", default=None, help="comma-separated seed filter")
+    ap.add_argument("--out", default=None, help="results directory")
+    ap.add_argument("--shard", default="0/1", help="i/n: run every n-th job starting at i")
     a = ap.parse_args()
+    if a.out:
+        RESULTS = a.out
+        os.environ["DISCO_RESULTS"] = a.out
     jobs = jobs_for(a.suite)
     if a.only:
         keep = set(a.only.split(","))
@@ -223,9 +325,15 @@ if __name__ == "__main__":
     if a.methods:
         keep = set(a.methods.split(","))
         jobs = [j for j in jobs if j[1] in keep]
-    # longest jobs first
+    # seed-major, longest methods first within a seed (stable sort keeps seed order)
     order = {"IFCA": 0, "FeSEM": 1, "MTCFL": 1, "Local": 2}
-    jobs.sort(key=lambda j: order.get(j[1], 5))
+    jobs.sort(key=lambda j: (j[2], order.get(j[1], 5)))
+    if a.seeds:
+        keep = set(int(v) for v in a.seeds.split(","))
+        jobs = [j for j in jobs if j[2] in keep]
+    i, n = map(int, a.shard.split("/"))
+    jobs = jobs[i::n]
+    print(f"{len(jobs)} jobs, {a.workers} workers -> {RESULTS}", flush=True)
     with Pool(a.workers) as p:
         for _ in p.imap_unordered(run_one, jobs):
             pass
