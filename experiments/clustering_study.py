@@ -259,6 +259,80 @@ def job_scale(args):
                  upload_floats_per_client=up, model_dim=tr.dim, **cluster_scores(fed, r.labels))]
 
 
+def job_edge(args):
+    """Edge-case constants: minimum class size m reported in a signature, the
+    reliability floor r_min, and an extreme label-skew federation (alpha = 0.1,
+    many missing and tiny classes) and a small-client federation (mean size 100)."""
+    scen, seed = args
+    _setup()
+    from run import SCENARIOS
+    from discocfl.disco import compute_similarity, disco_cluster
+    variants = {"base": {}, "alpha0.1": {"alpha": 0.1}, "size100": {"mean_size": 100}}
+    rows = []
+    for vname, over in variants.items():
+        fed, tr, w = prepare(base(**dict(SCENARIOS[scen], **over)), seed)
+        for m in (2, 4, 8, 16):
+            sigs = signatures(fed, tr, w, seed, min_per_class=m)
+            held = [len(s) for s in sigs]
+            for r_min in (0.0, 0.02, 0.1, 0.2):
+                import discocfl.disco as D
+                orig = D.compute_similarity
+                D.compute_similarity = (lambda sg, disattenuate=True, r_min=r_min, _o=orig:
+                                        _o(sg, disattenuate=disattenuate, r_min=r_min))
+                try:
+                    r = disco_cluster(sigs)
+                finally:
+                    D.compute_similarity = orig
+                rows.append(dict(scenario=scen, variant=vname, seed=seed, m=m, r_min=r_min,
+                                 mean_classes_reported=float(np.mean(held)),
+                                 n_low_evidence=len(r.flags["low_evidence"]),
+                                 n_anomalous=len(r.flags["anomalous"]),
+                                 **cluster_scores(fed, r.labels)))
+    return rows
+
+
+def job_support(args):
+    """Class-support disclosure. With DP noise, every client also sends, for each
+    class it does not report, two independent noise vectors with the noise scale of
+    a class with the client's median half size ("padding"). We measure clustering
+    quality and how well the server can infer the class support from R > 0."""
+    scen, size, seed, sigma = args
+    _setup()
+    import torch
+    from run import SCENARIOS
+    from discocfl.disco import compute_similarity, disco_cluster, gaussian_dp_epsilon
+    fed, tr, w = prepare(base(**dict(SCENARIOS[scen], mean_size=size)), seed)
+    sigs = signatures(fed, tr, w, seed, dp_sigma=sigma, dp_clip=0.5, max_per_class=10 ** 6)
+    C = fed.num_classes
+    g = torch.Generator().manual_seed(seed + 11)
+    padded = []
+    for s in sigs:
+        hs = [n // 2 for (_, _, n) in s.values()] or [2]
+        h = int(np.median(hs))
+        std = sigma * 2 * 0.5 / max(h, 1)
+        p = next(iter(s.values()))[0].numel() if s else 1024
+        q = dict(s)
+        for c in range(C):
+            if c not in q:
+                q[c] = (torch.randn(p, generator=g) * std, torch.randn(p, generator=g) * std, 2 * h)
+        padded.append(q)
+    rows = []
+    for name, sg in (("plain", sigs), ("padded", padded)):
+        r = disco_cluster(sg)
+        sim = compute_similarity(sg)
+        pred = sim.R > 0                                    # (N, classes present in sim)
+        cls = list(sim.classes)
+        truth = np.array([[c in s0 for c in cls] for s0 in sigs])
+        tp = float((pred & truth).sum()); fp = float((pred & ~truth).sum())
+        fn = float((~pred & truth).sum()); tn = float((~pred & ~truth).sum())
+        rows.append(dict(scenario=scen, mean_size=size, seed=seed, sigma=sigma, signature=name,
+                         epsilon=gaussian_dp_epsilon(sigma),
+                         support_acc=(tp + tn) / max(tp + tn + fp + fn, 1),
+                         support_fpr=fp / max(fp + tn, 1), support_tpr=tp / max(tp + fn, 1),
+                         **cluster_scores(fed, r.labels)))
+    return rows
+
+
 STUDIES = {
     "tau": (job_tau, lambda: [(s, sd) for s in ["rot", "swap", "rot_qs", "mixed_qs", "label", "minority"]
                               for sd in range(3)]),
@@ -269,6 +343,9 @@ STUDIES = {
     "minority": (job_minority, lambda: [(m, sd) for m in [1, 2, 3, 5] for sd in range(3)]),
     "explain": (job_explain, lambda: [(s, sd) for s in ["swap", "mixed_qs", "rot"] for sd in range(3)]),
     "newcomer": (job_newcomer, lambda: [(s, sd) for s in ["rot", "swap"] for sd in range(3)]),
+    "edge": (job_edge, lambda: [(s, sd) for s in ["rot", "swap", "mixed_qs", "label"] for sd in range(3)]),
+    "support": (job_support, lambda: [(s, n, sd, sg) for s in ["rot", "swap"] for n in [400, 1500]
+                                      for sd in range(3) for sg in [0.5, 1.0, 2.0]]),
     "scale": (job_scale, lambda: [(n, 0) for n in [40, 80, 160, 320]]),
 }
 
