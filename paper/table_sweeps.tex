@@ -7,7 +7,15 @@
 \cmidrule(lr){3-7}
 Factor & Setting & ARI & $K$ & Conflict\% & Acc & Concept & Best baseline Acc & Best baseline Concept & Oracle Acc \\
 \midrule
-Strength & $\theta=90^\circ$ & 0.93 & 4.0 & 1.7 & 88.4 & 76.8 & 88.9 (FedDAG-C) & 76.9 (FedDAG-C) & 89.1 \\
-Groups & $K=4$ & 1.00 & 4.0 & 0.0 & 88.9 & 77.3 & 88.4 (FL+HC) & 75.1 (FL+HC) & 88.6 \\
+Strength & $\theta=15^\circ$ & 0.52 & 2.7 & 30.0 & 88.7 & 76.0 & 88.7 (PACFL) & 75.1 (PACFL) & 89.3 \\
+Strength & $\theta=30^\circ$ & 0.93 & 4.0 & 1.7 & 88.8 & 76.3 & 88.3 (FedDAG-C) & 74.5 (PACFL) & 89.1 \\
+Strength & $\theta=45^\circ$ & 1.00 & 4.0 & 0.0 & 89.1 & 77.0 & 89.3 (FedDAG-C) & 76.6 (FedDAG-C) & 89.2 \\
+Strength & $\theta=90^\circ$ & 0.92 & 4.4 & 1.1 & 89.1 & 76.4 & 88.6 (FedDAG-C) & 74.3 (FL+HC) & 89.3 \\
+Groups & $K=2$ & 1.00 & 2.0 & 0.0 & 89.5 & 78.2 & 89.3 (FL+HC) & 77.3 (FL+HC) & 89.5 \\
+Groups & $K=4$ & 0.97 & 4.0 & 0.0 & 89.2 & 76.7 & 88.3 (FL+HC) & 72.6 (FL+HC) & 89.2 \\
+Groups & $K=8$ & 0.79 & 8.7 & 1.7 & 88.2 & 70.7 & 87.2 (MTCFL) & 59.8 (MTCFL) & 88.6 \\
+Participation 30\% & rotation & 0.93 & 4.3 & 0.8 & 87.1 & 72.3 & 86.9 (FedDAG-C) & 70.0 (FedDAG-C) & 87.2 \\
+Participation 30\% & label swap & 0.98 & 4.0 & 0.0 & 87.3 & 73.1 & 85.7 (FedCCFA) & 66.4 (FL+HC) & 87.2 \\
+Scale & $N=200$ & 0.88 & 4.7 & 2.9 & 86.5 & 73.1 & 85.2 (IFCA) & 70.6 (FedDAG-C) & 87.2 \\
 \bottomrule
 \end{tabular}}
