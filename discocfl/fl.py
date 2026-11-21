@@ -55,7 +55,10 @@ class Trainer:
         return parameters_to_vector(self.model.parameters()).detach().clone()
 
     def set(self, vec):
-        vector_to_parameters(vec, self.model.parameters())
+        # vector_to_parameters makes the parameters views of `vec`; copy it so that
+        # training never writes back into the caller's vector (e.g. a shared
+        # cluster model passed to several clients in the same round)
+        vector_to_parameters(vec.detach().clone(), self.model.parameters())
 
     def init_vector(self, seed):
         """A fresh random initialisation (used by methods with several models)."""
