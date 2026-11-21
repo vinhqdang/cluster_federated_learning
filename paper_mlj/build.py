@@ -20,7 +20,7 @@ abstract = re.search(r"\\begin\{abstract\}(.*?)\\end\{abstract\}", body, re.S).g
 WIDE = {"table_main_a.tex", "table_main_b.tex", "table_other_a.tex", "table_other_b.tex",
         "table_r1_ci_main_a.tex", "table_r1_ci_main_b.tex", "table_r1_ci_other.tex",
         "table_r1_ci_real.tex", "table_r1_hier.tex", "table_r1_diag.tex", "table_r1_decomp.tex",
-        "table_support.tex", "table_real_domains.tex", "table_real_c100.tex"}
+        "table_support.tex"}
 
 
 def flat(s):

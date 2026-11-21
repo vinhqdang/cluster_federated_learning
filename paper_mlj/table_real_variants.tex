@@ -4,15 +4,19 @@
 Method & Acc & Concept & ARI & $K$ & Conflict\% \\
 \midrule
 \multicolumn{6}{l}{\textit{Office-Home (4 domains, 65 classes)}}\\
-FedAvg & 69.7 & 59.5 & 0.00 & 1 & 100.0 \\
-FeSEM & 69.0 & 56.7 & 0.10 & 4 & 33.0 \\
-Oracle & 70.9 & 63.4 & 1.00 & 4 & 0.0 \\
-DisCo-CFL (default) & 70.4 & 61.6 & 0.45 & 3 & 27.2 \\
+FedAvg & 68.7 & 58.1 & 0.00 & 1.0 & 100.0 \\
+FeSEM & 68.1 & 54.6 & 0.05 & 4.0 & 37.7 \\
+Oracle & 70.5 & 61.4 & 1.00 & 4.0 & 0.0 \\
+DisCo-CFL (default) & 69.4 & 58.1 & 0.32 & 3.3 & 29.1 \\
+DisCo-CFL, full-layer signature & 70.0 & 59.7 & 0.75 & 4.7 & 6.7 \\
+DisCo-CFL, 30 warm-up rounds & 70.0 & 59.5 & 0.41 & 4.3 & 19.1 \\
 \midrule
 \multicolumn{6}{l}{\textit{CIFAR-100, rotations}}\\
-FedAvg & 52.5 & 41.4 & 0.00 & 1 & 100.0 \\
-FeSEM & 48.5 & 36.5 & -0.03 & 4 & 29.0 \\
-Oracle & 51.5 & 40.7 & 1.00 & 4 & 0.0 \\
-DisCo-CFL (default) & 51.0 & 39.1 & 0.05 & 3 & 63.7 \\
+FedAvg & 52.8 & 42.2 & 0.00 & 1.0 & 100.0 \\
+FeSEM & 49.1 & 37.3 & -0.01 & 4.0 & 31.3 \\
+Oracle & 51.7 & 41.3 & 1.00 & 4.0 & 0.0 \\
+DisCo-CFL (default) & 50.8 & 39.7 & 0.06 & 3.0 & 56.3 \\
+DisCo-CFL, full-layer signature & 50.8 & 39.9 & 0.32 & 3.7 & 27.8 \\
+DisCo-CFL, 30 warm-up rounds & 52.2 & 41.4 & 0.01 & 2.3 & 71.0 \\
 \bottomrule
 \end{tabular}
