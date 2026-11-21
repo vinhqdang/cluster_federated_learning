@@ -93,8 +93,8 @@ def job_tau(args):
             rows.append(dict(scenario=scen, seed=seed, tau=float(tau), disattenuate=dis, lam=0.5,
                              **cluster_scores(fed, r.labels)))
     for lam in (0.02, 0.1, 0.2, 1.0):
-        r = disco_cluster(sigs, tau=0.8, lam=lam)
-        rows.append(dict(scenario=scen, seed=seed, tau=0.8, disattenuate=True, lam=lam,
+        r = disco_cluster(sigs, tau=0.9, lam=lam)
+        rows.append(dict(scenario=scen, seed=seed, tau=0.9, disattenuate=True, lam=lam,
                          **cluster_scores(fed, r.labels)))
     return rows
 

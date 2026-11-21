@@ -169,6 +169,14 @@ def _stocfl_cluster(G, tau):
     return labels
 
 
+def _fedavg(tr, fed, w, rounds):
+    for _ in range(rounds):
+        ups = [(tr.local_train(w.clone(), c.x, c.y), c.n) for c in participating(tr, fed)]
+        if ups:
+            w = weighted_average([u for u, _ in ups], [n for _, n in ups])
+    return w
+
+
 def run_stocfl(fed, tr, cfg):
     """StoCFL (Zeng et al., Neural Networks 2025), following the paper's
     Algorithm 1 under full participation in the first round.
@@ -194,15 +202,21 @@ def run_stocfl(fed, tr, cfg):
     tau = cfg.get("stocfl_tau", 0.5)
     lam = cfg.get("stocfl_lambda", 0.05)
     w0 = tr.get()
+    # stocfl_warmup > 0 computes the gradient representation at a FedAvg model
+    # after that many rounds (the same reference model DisCo-CFL uses) instead of
+    # the initial anchor; those rounds count towards the budget.
+    T_w = cfg.get("stocfl_warmup", 0)
+    T_w = int(cfg["warmup"] if T_w == "warmup" else T_w)
+    w_rep = _fedavg(tr, fed, w0, T_w) if T_w else w0
     G = []
     for c in fed.clients:
-        g = tr.mean_grad(w0, c.x, c.y)
+        g = tr.mean_grad(w_rep, c.x, c.y)
         G.append(g / g.norm().clamp_min(1e-12))
     labels = _stocfl_cluster(G, tau)
     K = int(labels.max()) + 1
-    omega = w0.clone()
-    theta = {k: w0.clone() for k in range(K)}
-    for _ in range(cfg["rounds"]):
+    omega = w_rep.clone()
+    theta = {k: w_rep.clone() for k in range(K)}
+    for _ in range(cfg["rounds"] - T_w):
         omegas, thetas = [], {}
         for c in participating(tr, fed):
             k = int(labels[c.cid])

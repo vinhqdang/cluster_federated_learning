@@ -423,7 +423,7 @@ class DisCoResult:
     flags: dict = field(default_factory=dict)
 
 
-def disco_cluster(signatures, tau=0.8, min_evidence=0.3, disattenuate=True, z=2.0,
+def disco_cluster(signatures, tau=0.9, min_evidence=0.3, disattenuate=True, z=2.0,
                   lam=0.5, mode="min", order="evidence", small=1, attach=True):
     """attach=True (default): small clusters are attached to their closest cluster
     when not significantly separated, and low-evidence clients join their most

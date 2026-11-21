@@ -60,7 +60,7 @@ TRAIN = dict(rounds=50, warmup=10, lr=0.05, batch_size=32, local_epochs=1)
 
 METHODS = ["FedAvg", "Local", "IFCA", "MTCFL", "FL+HC", "PACFL", "DisCo", "Oracle"]
 NEW_BASELINES = ["FeSEM", "FedAvg-FT"]
-NEW_R1 = ["StoCFL", "FedCCFA", "FedDAG-C"]    # registered in ALGORITHMS by a later change
+NEW_R1 = ["StoCFL", "StoCFL-W", "FedCCFA", "FedDAG-C"]
 ALL = METHODS + NEW_BASELINES
 SWEEP = ["FedAvg", "IFCA", "FL+HC", "PACFL", "FeSEM", "DisCo", "Oracle"]
 
@@ -118,6 +118,8 @@ VARIANTS = {
     "DisCo-T30": dict(warmup=30),
     "DisCo-full": dict(sig="full"),
     "DisCo-noAttach": dict(attach=False),
+    # StoCFL with its gradient representation computed at the warm-up model
+    "StoCFL-W": dict(_base="StoCFL", stocfl_warmup="warmup"),
 }
 
 
@@ -276,7 +278,7 @@ def run_one(job):
     base_method = method
     if method in VARIANTS:
         cfg.update(VARIANTS[method])
-        base_method = "DisCo"
+        base_method = cfg.pop("_base", "DisCo")
     cfg.update(extra)
     t0 = time.time()
     out = ALGORITHMS[base_method](fed, tr, cfg)

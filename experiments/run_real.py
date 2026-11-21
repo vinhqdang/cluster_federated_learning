@@ -49,11 +49,11 @@ SUITES = {
                                    "DisCo-noClip"], seeds=[0, 1, 2]),
     # round 1 of revisions
     "r1_real": dict(scenarios=["pacs", "officehome", "c100_swap", "c100_rot", "pacs_qs"],
-                    methods=METHODS + ["StoCFL", "FedCCFA", "FedDAG-C", "DisCo-noAttach"],
+                    methods=METHODS + ["StoCFL", "StoCFL-W", "FedCCFA", "FedDAG-C", "DisCo-noAttach"],
                     seeds=[0, 1, 2, 3, 4]),
     "r1_femnist": dict(scenarios=["femnist"],
                        methods=["FedAvg", "Local", "FedAvg-FT", "IFCA", "FeSEM", "MTCFL", "FL+HC", "DisCo",
-                                "StoCFL", "FedCCFA", "FedDAG-C", "DisCo-noAttach"],
+                                "StoCFL", "StoCFL-W", "FedCCFA", "FedDAG-C", "DisCo-noAttach"],
                        seeds=[0, 1, 2, 3, 4]),
 }
 FEMNIST_K = [1, 3, 5]      # IFCA / FeSEM / FL+HC have no true K on natural writers
@@ -90,7 +90,7 @@ def run_one(scen, method, seed, device, pretrained=True, size=112, out_dir=RESUL
     base = method
     if method in VARIANTS:
         cfg.update(VARIANTS[method])
-        base = "DisCo"
+        base = cfg.pop("_base", "DisCo")
     cfg.update(extra or {})
     t0 = time.time()
     out = ALGORITHMS[base](fed, tr, cfg)

@@ -67,7 +67,7 @@ def run_disco(fed, tr, cfg, return_details=False):
     sigs = [client_signature(tr, w_ref, c, sketch, scfg, rng) for c in fed.clients]
     t_sig = time.time() - t0
     t0 = time.time()
-    res = disco_cluster(sigs, tau=cfg.get("tau", 0.8), disattenuate=cfg.get("disattenuate", True),
+    res = disco_cluster(sigs, tau=cfg.get("tau", 0.9), disattenuate=cfg.get("disattenuate", True),
                         lam=cfg.get("lam", 0.5), mode=cfg.get("linkage", "min"),
                         order=cfg.get("order", "evidence"), attach=cfg.get("attach", True))
     t_srv = time.time() - t0
