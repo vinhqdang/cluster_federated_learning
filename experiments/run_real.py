@@ -122,6 +122,7 @@ if __name__ == "__main__":
     ap.add_argument("--no-pretrained", action="store_true")
     ap.add_argument("--out", default=RESULTS)
     ap.add_argument("--shard", default="0/1", help="i/n: run every n-th job starting at i")
+    ap.add_argument("--reverse", action="store_true", help="run the selected jobs in reverse order")
     a = ap.parse_args()
     s = SUITES[a.suite]
     jobs = [(sc, m, sd) for sc, sd, m in itertools.product(s["scenarios"], s["seeds"], s["methods"])]
@@ -133,6 +134,8 @@ if __name__ == "__main__":
         jobs = [j for j in jobs if str(j[2]) in a.seeds.split(",")]
     i, n = map(int, a.shard.split("/"))
     jobs = jobs[i::n]
+    if a.reverse:
+        jobs = jobs[::-1]
     print(f"{len(jobs)} jobs on {a.device}", flush=True)
     for scen, method, seed in jobs:
         try:
