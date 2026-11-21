@@ -107,6 +107,11 @@ SUITES = {
     "r1_ablation": dict(scenarios=["rot", "swap", "rot_qs", "mixed_qs", "label"],
                         methods=["DisCo-noDisatt", "DisCo-noClass", "DisCo-mean", "DisCo-linkorder",
                                  "DisCo-noClip"], seeds=[0, 1, 2]),
+    "r1_aw": dict(scenarios=["rot", "swap", "rot_qs", "mixed_qs", "label", "minority",
+                             "mnist_rot", "mnist_swap", "svhn_rot", "svhn_swap", "cifar_rot",
+                             "cifar_swap"], methods=["DisCo-AW"], seeds=[0, 1, 2, 3, 4]),
+    "r1_aw_sweeps": dict(scenarios=["angle15", "angle30", "angle45", "perm2", "perm8", "rot_part30",
+                                    "swap_part30", "rot_n200"], methods=["DisCo-AW"], seeds=[0, 1, 2]),
 }
 
 VARIANTS = {
@@ -118,6 +123,8 @@ VARIANTS = {
     "DisCo-T30": dict(warmup=30),
     "DisCo-full": dict(sig="full"),
     "DisCo-noAttach": dict(attach=False),
+    # adaptive warm-up: FedAvg until the training loss plateaus (5% over 5 rounds), 10..30 rounds
+    "DisCo-AW": dict(adaptive_warmup=True),
     # StoCFL with its gradient representation computed at the warm-up model
     "StoCFL-W": dict(_base="StoCFL", stocfl_warmup="warmup"),
 }
@@ -290,7 +297,7 @@ def run_one(job):
                 "assign": np.asarray(out["assign"]).tolist(), "true": fed.true_labels.tolist(),
                 "extra": {k: v for k, v in out.items() if k in
                           ("n_confident", "flags", "time_signature_s", "time_server_s",
-                           "extra_download_floats")},
+                           "extra_download_floats", "warmup_used", "warmup_losses")},
                 "config": {k: v for k, v in cfg.items()}})
     os.makedirs(RESULTS, exist_ok=True)
     with open(path, "w") as f:

@@ -50,10 +50,40 @@ def run_oracle(fed, tr, cfg):
     return {"assign": assign, "models": models, "cluster_floats": 0}
 
 
+def _adaptive_warmup(tr, fed, w, t_min=10, t_max=30, window=5, rel=0.05):
+    """FedAvg until the training loss of the global model stops decreasing.
+
+    After every round each client reports the loss of the current global model on
+    its own training data (one scalar, no labels of groups); the server averages
+    them with data-size weights. From round ``t_min`` on, warm-up stops as soon as
+    the loss has decreased by less than ``rel`` (relative) over the last ``window``
+    rounds, and at the latest after ``t_max`` rounds. Returns (w, rounds used, losses)."""
+    n = np.array([c.n for c in fed.clients], float)
+    losses = []
+    for t in range(1, t_max + 1):
+        w = _fedavg_rounds(tr, fed, w, 1)
+        L = np.array([tr.evaluate(w, c.x, c.y)[1] for c in fed.clients])
+        losses.append(float((n * L).sum() / n.sum()))
+        if t >= t_min and t > window:
+            old = losses[-1 - window]
+            if old <= 0 or (old - losses[-1]) / old < rel:
+                return w, t, losses
+    return w, t_max, losses
+
+
 def run_disco(fed, tr, cfg, return_details=False):
     """DisCo-CFL: warm-up FedAvg -> one-shot signatures -> calibrated clustering
-    -> per-cluster FedAvg from the reference model."""
-    w_ref = _fedavg_rounds(tr, fed, tr.get(), cfg["warmup"])
+    -> per-cluster FedAvg from the reference model.
+
+    cfg["adaptive_warmup"] (variant DisCo-AW): the warm-up length is chosen by
+    _adaptive_warmup instead of the fixed cfg["warmup"]; the remaining rounds of the
+    budget are used for cluster training."""
+    if cfg.get("adaptive_warmup"):
+        w_ref, t_used, wl = _adaptive_warmup(tr, fed, tr.get(), **cfg.get("aw_args", {}))
+        cfg = dict(cfg, warmup=t_used)
+    else:
+        w_ref = _fedavg_rounds(tr, fed, tr.get(), cfg["warmup"])
+        wl = None
     scfg = SignatureConfig(sketch_dim=cfg.get("sketch_dim", 1024),
                            class_conditional=cfg.get("class_conditional", True),
                            clip=cfg.get("clip", 0.5),
@@ -75,6 +105,7 @@ def run_disco(fed, tr, cfg, return_details=False):
     models = _train_clusters(tr, fed, w_ref, assign, cfg["rounds"] - cfg["warmup"])
     floats = sum(2 * len(s) * scfg.sketch_dim for s in sigs)
     out = {"assign": assign, "models": models, "cluster_floats": floats,
+           "warmup_used": int(cfg["warmup"]), "warmup_losses": wl,
            "time_signature_s": t_sig, "time_server_s": t_srv,
            "n_confident": sum(c["verdict"] == "confident" for c in res.certificates),
            "flags": res.flags, "sim": res.sim, "result": res}
