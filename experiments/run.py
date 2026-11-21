@@ -316,6 +316,7 @@ if __name__ == "__main__":
     ap.add_argument("--seeds", default=None, help="comma-separated seed filter")
     ap.add_argument("--out", default=None, help="results directory")
     ap.add_argument("--shard", default="0/1", help="i/n: run every n-th job starting at i")
+    ap.add_argument("--reverse", action="store_true", help="run the selected jobs in reverse order")
     a = ap.parse_args()
     if a.out:
         RESULTS = a.out
@@ -335,6 +336,8 @@ if __name__ == "__main__":
         jobs = [j for j in jobs if j[2] in keep]
     i, n = map(int, a.shard.split("/"))
     jobs = jobs[i::n]
+    if a.reverse:
+        jobs = jobs[::-1]
     print(f"{len(jobs)} jobs, {a.workers} workers -> {RESULTS}", flush=True)
     with Pool(a.workers) as p:
         for _ in p.imap_unordered(run_one, jobs):
