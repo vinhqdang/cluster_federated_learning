@@ -10,10 +10,12 @@ from collections import defaultdict
 import numpy as np
 
 ROOT = os.path.join(os.path.dirname(__file__), "..")
-RAW = os.path.join(ROOT, "results", "raw_real")
+RAW = os.path.join(ROOT, "results", "r1", "raw_real")
 sys.path.insert(0, os.path.dirname(__file__))
 
-ORDER = ["FedAvg", "Local", "FedAvg-FT", "IFCA", "FeSEM", "MTCFL", "FL+HC", "PACFL", "DisCo", "Oracle"]
+ORDER = ["FedAvg", "Local", "FedAvg-FT", "IFCA", "FeSEM", "MTCFL", "FL+HC", "PACFL",
+         "StoCFL", "StoCFL-W", "FedCCFA", "FedDAG-C", "DisCo-noAttach", "DisCo", "Oracle"]
+VARIANT_ONLY = ("DisCo", "Oracle", "DisCo-noAttach")   # not compared as baselines in the tests
 NAMES = {"pacs": "PACS (4 domains, 7 classes)", "pacs_qs": "PACS + quantity skew",
          "officehome": "Office-Home (4 domains, 65 classes)",
          "c100_rot": "CIFAR-100, rotations", "c100_swap": "CIFAR-100, label swaps",
@@ -80,7 +82,7 @@ def significance(rows, scenarios):
     by = {(r["scenario"], r["method"], r["seed"]): r for r in rows if r["scenario"] in scenarios}
     out = []
     for m in ORDER:
-        if m in ("DisCo", "Oracle"):
+        if m in VARIANT_ONLY:
             continue
         for key, lab in [("pc_acc_mean", "Acc"), ("pc_acc_concept_mean", "Concept"), ("pc_worst_group_acc", "Worst-grp")]:
             d = [by[k][key] - by[(k[0], m, k[2])][key] for k in by
@@ -139,7 +141,8 @@ def ablation_table(rows, name, scenario="c100_swap", seed=0):
     by = {r["method"]: r for r in rows if r["scenario"] == scenario and r["seed"] == seed}
     names = [("DisCo", "DisCo-CFL (full)"), ("DisCo-noDisatt", "no disattenuation (raw cosine)"),
              ("DisCo-noClass", "no class conditioning"), ("DisCo-mean", "mean instead of bottleneck linkage"),
-             ("DisCo-linkorder", "linkage-ordered merging"), ("DisCo-noClip", "no per-sample clipping")]
+             ("DisCo-linkorder", "linkage-ordered merging"), ("DisCo-noClip", "no per-sample clipping"),
+             ("DisCo-noAttach", "no attachment stage")]
     lines = []
     for key, lab in names:
         r = by.get(key)

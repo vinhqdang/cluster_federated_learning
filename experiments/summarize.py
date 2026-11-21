@@ -10,17 +10,24 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.join(HERE, "..")
-RAW = os.path.join(ROOT, "results", "raw")
+# same resolution as experiments/run.py
+RAW = os.environ.get("DISCO_RESULTS", os.path.join(ROOT, "results", "r1", "raw"))
+CL = os.path.join(ROOT, "results", "r1", "clustering")
+THEORY = os.path.join(ROOT, "results", "theory")
 TAB = os.path.join(ROOT, "results", "tables")
 FIG = os.path.join(ROOT, "results", "figures")
+
+# default similarity threshold of DisCo-CFL (dashed line in the tau figure)
+TAU_DEFAULT = 0.9
 
 # categorical palette (fixed order); DisCo always slot 1
 C1, C2, C3, C4, C5, C6, C7, C8 = ("#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4",
                                   "#008300", "#4a3aa7", "#e34948")
 INK, INK2, GRID = "#0b0b0b", "#52514e", "#e4e3df"
 
-METHOD_ORDER = ["FedAvg", "Local", "FedAvg-FT", "IFCA", "FeSEM", "MTCFL", "FL+HC", "PACFL", "DisCo", "DisCo-T30",
-                "Oracle"]
+METHOD_ORDER = ["FedAvg", "Local", "FedAvg-FT", "IFCA", "FeSEM", "MTCFL", "FL+HC", "PACFL",
+                "StoCFL", "StoCFL-W", "FedCCFA", "FedDAG-C", "DisCo-noAttach",
+                "DisCo", "DisCo-T30", "Oracle"]
 ABLATION_ORDER = ["DisCo", "DisCo-noDisatt", "DisCo-noClass", "DisCo-mean", "DisCo-linkorder", "DisCo-noClip"]
 SCEN_NAMES = {"rot": "Rotation", "swap": "Label swap", "rot_qs": "Rotation + QS",
               "mixed_qs": "Mixed + QS", "label": "Label skew only", "minority": "Minority groups",
@@ -123,8 +130,8 @@ def figures():
     plt.rcParams.update({"font.size": 9, "axes.labelcolor": INK, "axes.titlesize": 9,
                          "savefig.bbox": "tight", "figure.dpi": 150})
     os.makedirs(FIG, exist_ok=True)
-    th = os.path.join(ROOT, "results", "theory")
-    cl = os.path.join(ROOT, "results", "clustering")
+    th = THEORY
+    cl = CL
 
     # --- theory: estimation bias / rmse
     f = os.path.join(th, "estimation.json")
@@ -205,7 +212,7 @@ def figures():
                           and r.get("lam", 0.5) == 0.5]
                     y.append(np.mean([(1.0 if r["k"] == 1 else 0.0) if s == "label" else r["ari"] for r in rr]))
                 ax.plot(taus, y, "-o", color=col, lw=2, ms=3, label=SCEN_NAMES[s])
-            ax.axvline(0.8, color=INK2, lw=0.8, ls="--")
+            ax.axvline(TAU_DEFAULT, color=INK2, lw=0.8, ls="--")
             ax.set_xlabel("threshold τ")
             ax.set_title(title, color=INK)
             _style(ax)
@@ -271,7 +278,7 @@ def figures():
 
 
 def study_tables():
-    cl = os.path.join(ROOT, "results", "clustering")
+    cl = CL
     out = []
     f = os.path.join(cl, "minority.json")
     if os.path.exists(f):
@@ -331,7 +338,7 @@ def study_tables():
     f = os.path.join(cl, "dp.json")
     if os.path.exists(f):
         rows = json.load(open(f))
-        out.append("\n### Differential privacy (ARI, mean over 3 seeds)\n")
+        out.append(f"\n### Differential privacy (ARI, mean over {_n_seeds(rows)} seeds)\n")
         out.append("| Scenario | samples/client | σ | ε (δ=1e-5) | DisCo | raw-cosine ablation |")
         out.append("|---|---|---|---|---|---|")
         for s in ["rot", "swap"]:
@@ -351,6 +358,77 @@ def study_tables():
     return text
 
 
+def _n_seeds(rows):
+    return len({r["seed"] for r in rows})
+
+
+def _write_tabular(name, head, body):
+    os.makedirs(os.path.join(ROOT, "paper"), exist_ok=True)
+    open(os.path.join(ROOT, "paper", f"table_{name}.tex"), "w").write(
+        head + "\n".join(body) + "\n\\bottomrule\n\\end{tabular}\n")
+
+
+def edge_table(rows, r_min_ref=0.02):
+    """Edge cases (edge.json): ARI, conflict-merge rate, K and low-evidence clients at the
+    reference floor r_min, averaged over scenarios and seeds. Also prints the largest ARI
+    change across the r_min values, per (scenario, variant, seed, m) group."""
+    groups = defaultdict(dict)
+    for r in rows:
+        groups[(r["scenario"], r["variant"], r["seed"], r["m"])][r["r_min"]] = r["ari"]
+    spreads = [max(v.values()) - min(v.values()) for v in groups.values() if len(v) > 1]
+    r_mins = sorted({r["r_min"] for r in rows})
+    if spreads:
+        print(f"edge: max |ARI(r_min) - ARI(r_min')| over r_min={r_mins}: {max(spreads):.4f} "
+              f"({len(spreads)} groups)")
+    else:
+        print("edge: no r_min pairs to compare")
+    names = [("base", "Default federation"), ("alpha0.1", r"Extreme label skew ($\alpha=0.1$)"),
+             ("size100", "Small clients (100 samples)")]
+    body = []
+    for v, lab in names:
+        block = []
+        for m in (2, 4, 8, 16):
+            rr = [r for r in rows if r["variant"] == v and r["m"] == m and r["r_min"] == r_min_ref]
+            if not rr:
+                continue
+            block.append(f"{lab} & {m} & {np.mean([r['ari'] for r in rr]):.2f} & "
+                         f"{100 * np.mean([r['conflict_merge_rate'] for r in rr]):.1f} & "
+                         f"{np.mean([r['k'] for r in rr]):.1f} & "
+                         f"{np.mean([r['n_low_evidence'] for r in rr]):.1f} \\\\")
+            lab = ""
+        if block:
+            body += block + [r"\midrule"]
+    head = ("\\scriptsize\n\\setlength{\\tabcolsep}{4pt}\n\\begin{tabular}{llcccc}\n\\toprule\n"
+            "Federation & $m$ & ARI & Conflict\\% & $K$ & Low-evidence clients \\\\\n\\midrule\n")
+    _write_tabular("edge", head, body[:-1])
+    return "\n".join(body)
+
+
+def support_table(rows):
+    """Class-support disclosure (support.json): plain vs. padded signatures, averaged over
+    scenarios and seeds for each (sigma, samples per client)."""
+    body = []
+    for sg in sorted({r["sigma"] for r in rows}):
+        for n in sorted({r["mean_size"] for r in rows}):
+            rr = [r for r in rows if r["sigma"] == sg and r["mean_size"] == n]
+            plain = [r for r in rr if r["signature"] == "plain"]
+            padded = [r for r in rr if r["signature"] == "padded"]
+            if not plain or not padded:
+                continue
+            eps = rr[0]["epsilon"]
+            eps_s = "$\\infty$" if not np.isfinite(eps) else f"{eps:.2f}"
+            body.append(f"{sg:g} & {n} & {eps_s} & "
+                        f"{np.mean([r['ari'] for r in plain]):.2f} & {np.mean([r['ari'] for r in padded]):.2f} & "
+                        f"{100 * np.mean([r['support_acc'] for r in plain]):.1f} & "
+                        f"{100 * np.mean([r['support_acc'] for r in padded]):.1f} & "
+                        f"{100 * np.mean([r['support_fpr'] for r in padded]):.1f} \\\\")
+    head = ("\\scriptsize\n\\setlength{\\tabcolsep}{3pt}\n\\begin{tabular}{cccccccc}\n\\toprule\n"
+            "$\\sigma$ & Samples/client & $\\varepsilon$ & ARI plain & ARI padded & "
+            "Support acc.\\ plain (\\%) & Support acc.\\ padded (\\%) & Support FPR padded (\\%) \\\\\n\\midrule\n")
+    _write_tabular("support", head, body)
+    return "\n".join(body)
+
+
 def sweep_table(rows):
     """Compact table of the robustness sweeps: DisCo-CFL vs. the best baseline."""
     by = defaultdict(list)
@@ -361,7 +439,8 @@ def sweep_table(rows):
                 ("Groups", "$K=2$", "perm2"), ("Groups", "$K=4$", "swap"), ("Groups", "$K=8$", "perm8"),
                 ("Participation 30\\%", "rotation", "rot_part30"), ("Participation 30\\%", "label swap", "swap_part30"),
                 ("Scale", "$N=200$", "rot_n200")]
-    base = ["FedAvg", "Local", "FedAvg-FT", "IFCA", "FeSEM", "MTCFL", "FL+HC", "PACFL"]
+    base = ["FedAvg", "Local", "FedAvg-FT", "IFCA", "FeSEM", "MTCFL", "FL+HC", "PACFL",
+            "StoCFL", "StoCFL-W", "FedCCFA", "FedDAG-C"]
     mean = lambda sc, m, k: float(np.mean([r[k] for r in by[(sc, m)]]))
     tex = []
     for grp, lab, sc in settings:
@@ -395,7 +474,7 @@ def significance(rows, scenarios, name, reference="DisCo",
     (scenario, seed) pairs, plus the win/tie/loss count."""
     from scipy.stats import wilcoxon
     by = {(r["scenario"], r["method"], r["seed"]): r for r in rows}
-    baselines = [m for m in METHOD_ORDER if m not in (reference, "DisCo-T30", "Oracle")]
+    baselines = [m for m in METHOD_ORDER if m not in (reference, "DisCo-T30", "DisCo-noAttach", "Oracle")]
     lines = [f"\n### Paired Wilcoxon signed-rank tests, {reference} vs. baseline ({name})\n",
              "| Baseline | pairs | " + " | ".join(f"{t} W/T/L | {t} p" for _, t in metrics) + " |",
              "|---|---|" + "---|---|" * len(metrics)]
@@ -451,4 +530,10 @@ if __name__ == "__main__":
                "rot_part30", "swap_part30", "rot_n200"]
     print(significance(rows, concept, "all"))
     print(sweep_table(rows))
+    f = os.path.join(CL, "edge.json")
+    if os.path.exists(f):
+        print(edge_table(json.load(open(f))))
+    f = os.path.join(CL, "support.json")
+    if os.path.exists(f):
+        print(support_table(json.load(open(f))))
     figures()
