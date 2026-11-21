@@ -109,7 +109,8 @@ def main_tables(rows, scenarios, name, methods_allowed=None):
     open(os.path.join(TAB, f"{name}.tex"), "w").write("\n".join(tex[:-1]) + "\n")
     head = ("\\scriptsize\n\\setlength{\\tabcolsep}{3.2pt}\n\\begin{tabular}{l" + "c" * len(cols) + "}\n\\toprule\n"
             "Method & " + " & ".join(c[1].replace("%", "\\%") for c in cols) + " \\\\\n\\midrule\n")
-    paper = os.path.join(ROOT, "paper", f"table_{name}.tex")
+    # superseded in the paper by the confidence-interval tables of stats_r1.py
+    paper = os.path.join(TAB, f"paper_table_{name}.tex")
     open(paper, "w").write(head + "\n".join(tex[:-1]) + "\n\\bottomrule\n\\end{tabular}\n")
     return "\n".join(md)
 
@@ -504,7 +505,7 @@ def significance(rows, scenarios, name, reference="DisCo",
             "\\multicolumn{2}{c}{Worst-group accuracy} \\\\\n"
             "\\cmidrule(lr){3-4}\\cmidrule(lr){5-6}\\cmidrule(lr){7-8}\n"
             "Baseline & pairs & W/T/L & $p$ & W/T/L & $p$ & W/T/L & $p$ \\\\\n\\midrule\n")
-    open(os.path.join(ROOT, "paper", f"table_signif_{name}.tex"), "w").write(
+    open(os.path.join(TAB, f"paper_table_signif_{name}.tex"), "w").write(
         head + "\n".join(tex) + "\n\\bottomrule\n\\end{tabular}\n")
     return "\n".join(lines)
 
