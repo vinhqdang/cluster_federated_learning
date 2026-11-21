@@ -9,36 +9,35 @@ A clustered federated learning method has to settle three questions: which signa
 
 \paragraph{What else is expected of a grouping decision.} Privacy, fairness and explanations have mostly been studied around the clustering step rather than inside it. Differentially private training clips and perturbs sample or client contributions~\citep{mcmahan2018dpfedavg,abadi2016dpsgd}, secure aggregation hides individual updates~\citep{bonawitz2017secagg} and sketching reduces communication~\citep{rothchild2020fetchsgd}; we apply clipping, sketching and the Gaussian mechanism to the clustering signal itself. Fairness in FL usually means similar accuracy across clients~\citep{li2020qffl,mohri2019afl,li2021ditto}; \citet{mehrabi2021bias} give a broader view of bias. In CFL, unfairness appears earlier, in the grouping: a small group can be absorbed by a larger one, and a small client can be isolated because its statistics are noisy. Explanations that let an affected party understand and contest an automated decision~\citep{wachter2018counterfactual,doshivelez2017interpretable} have, to our knowledge, not been provided for client grouping, and the survey notes that evaluation specific to clustering is rare~\citep[Sec.~4.5.3]{benali2026survey}.
 
+\paragraph{Harmonising the data instead of grouping clients.} A different response to non-IID data is to make the client distributions alike before training. CRFed~\citep{chen2024crfed} uses a diffusion model to translate client data towards a common distribution and then trains one global model, which reduces confusion between conflicting local optima. Harmonisation and clustering make opposite assumptions about concept shift. Harmonisation treats differences in $\cP(X)$ as nuisance to be removed, which suits feature shift such as different scanners or styles. When $\cP(Y\mid X)$ differs, for example when two groups label the same input differently, no translation of the inputs can reconcile the groups, and separate models are required. CRFed also needs a generative model of the inputs and its training, which DisCo-CFL avoids. The two approaches can be combined: harmonisation within a concept cluster could reduce the remaining feature shift. We do not compare with CRFed experimentally, because its target, one global model after input translation, differs from ours.
+
 \paragraph{Alternatives to clustering.} Two other families address heterogeneity without clustering. Single-model methods correct client drift~\citep{li2020fedprox,karimireddy2020scaffold}, and personalised FL~\citep{tan2022pflsurvey} adapts one model per client through meta-learning~\citep{fallah2020perfedavg}, regularisation~\citep{tdinh2020pfedme,li2021ditto}, shared representations~\citep{collins2021fedrep} or class prototypes~\citep{tan2022fedproto}. They assume one distribution with local deviations, whereas CFL assumes a few distinct distributions~\citep{benali2026survey}, and we include FedAvg with local fine-tuning as the representative personalisation baseline. Label skew has its own remedies inside a single model, such as logit calibration~\citep{zhang2022fedlc}, in the spirit of label-shift correction~\citep{lipton2018labelshift} and logit adjustment~\citep{menon2021logit}. DisCo-CFL uses the same Bayes argument at inference, within a concept cluster (Proposition~\ref{prop:pc}).
 
-\paragraph{Positioning.} Table~\ref{tab:position} compares representative methods on the properties this paper targets. The entries for other methods summarise what their papers and the survey~\citep[Tables~3 and~5]{benali2026survey} report; ``--'' means that we could not find the property claimed. SA-compat.: compatible with secure aggregation. To our knowledge, DisCo-CFL is the first CFL method that combines (i) a similarity that is invariant to label and quantity skew by construction and calibrated across sample sizes and privacy noise, (ii) an automatic $K$ from a threshold with a fixed meaning, (iii) recovery guarantees independent of group size together with a matching lower bound, machine-checked in Lean~4, and (iv) explanations, certificates and an audit trail of the grouping decision.
+\paragraph{Positioning.} Table~\ref{tab:position} compares representative methods on the properties this paper targets. The entries for other methods summarise what their papers and the survey~\citep[Tables~3 and~5]{benali2026survey} report; ``--'' means that we could not find the property claimed. SA-compat.: compatible with secure aggregation. To our knowledge, DisCo-CFL is the first CFL method that combines (i) a similarity that is invariant to label and quantity skew at a fixed reference model and calibrated across sample sizes and privacy noise, (ii) a number of clusters set by one threshold whose population meaning is fixed, (iii) recovery guarantees for the merging stage that do not depend on group size, together with a lower bound, with the deterministic core checked in Lean~4, and (iv) explanations, certificates and an audit trail of the grouping decision. The table also shows what it costs: the class support of each client is revealed, and the guarantees need assumptions that we check in Section~\ref{sec:exp}.
 
 \begin{tableorg}[!htbp]
 \centering
-\caption{Positioning of DisCo-CFL. S/C/M: server-side, client-side, metadata-based. Shared: what the server clusters on. $K$: fixed (given), threshold (implicit in another hyperparameter) or calibrated (fixed-meaning threshold). LS-inv.: invariant to label skew by design. QS: explicit treatment of quantity skew. Priv.: formal privacy mechanism for the clustering signal. Expl./Cert.: explanations or certificates of the grouping. Theory: main guarantee.}\label{tab:position}
+\caption{Positioning of DisCo-CFL. Cat.: server-side (S), client-side (C) or metadata-based (M). Signal: what the server clusters on. $K$ rule: how the number of clusters is determined (given: $K$ is an input). Assumptions: main assumptions of the method's guarantee (``--'': no clustering guarantee). Privacy scope: formal mechanism for the clustering signal and what it protects (SA: compatible with secure aggregation). Communication: extra upload per client for clustering, in floats ($d$: model size, $C$: classes, $p$: sketch size, $r$: subspace rank, $D$: input dimension), plus extra downloads per round. Entries for other methods summarise their papers and the survey~\citep[Tables~3 and~5]{benali2026survey}.}\label{tab:position}
 \scriptsize
-\setlength{\tabcolsep}{2.6pt}
+\setlength{\tabcolsep}{2.4pt}
 \resizebox{\textwidth}{!}{%
-\begin{tabular}{llllcccccl}
+\begin{tabular}{lllllll}
 \toprule
-Method & Cat. & Shared & $K$ & LS-inv. & QS & Priv. & Expl. & Cert. & Theory \\
+Method & Cat. & Signal & $K$ rule & Assumptions of the guarantee & Privacy scope & Communication \\
 \midrule
-CFL/MTCFL~\citep{sattler2021cfl} & S & updates & threshold & -- & -- & SA-compat. & -- & -- & bipartition exists \\
-FL+HC~\citep{briggs2020flhc} & S & updates & threshold & -- & -- & -- & -- & -- & -- \\
-FlexCFL~\citep{duan2021flexcfl} & S & updates (SVD) & fixed & -- & -- & -- & -- & -- & -- \\
-FeSEM~\citep{long2023fesem} & S & weights & fixed & -- & -- & -- & -- & -- & -- \\
-StoCFL~\citep{zeng2025stocfl} & S & frozen-model grads & threshold & -- & -- & -- & -- & -- & -- \\
-IFCA~\citep{ghosh2020ifca} & C & losses (local) & fixed & -- & -- & -- & -- & -- & convergence \\
-FedEM~\citep{marfoq2021fedem} & C & mixture weights & fixed & -- & -- & -- & -- & -- & convergence \\
-FedRC~\citep{guo2024fedrc} & C & losses (local) & fixed & -- & -- & -- & -- & -- & -- \\
-k-FED~\citep{dennis2021kfed} & M & data centroids & fixed & -- & -- & -- & -- & -- & one-shot recovery \\
-PACFL~\citep{vahidian2023pacfl} & M & data subspaces & threshold & -- & -- & -- & -- & -- & -- \\
-pp-CFL~\citep{luo2024ppcfl} & M & noisy label dists. & COPRA & -- & -- & DP & -- & -- & -- \\
-CORNFLQS~\citep{benali2025cornflqs} & S+C & weights + losses & iterative & -- & \checkmark & -- & -- & -- & -- \\
-FedCCFA~\citep{chen2024fedccfa} & S & class classifiers & DBSCAN & partial & -- & -- & -- & -- & -- \\
-FedDAG~\citep{pramanik2026feddag} & S+M & grads + class subspaces & selected & partial & weights & -- & -- & -- & -- \\
+CFL/MTCFL~\citep{sattler2021cfl} & S & update cosines & bipartition thresholds & stationary joint objective & SA-compatible & $d$ per round \\
+FL+HC~\citep{briggs2020flhc} & S & updates after warm-up & distance threshold & -- & none & $d$ once \\
+FeSEM~\citep{long2023fesem} & S & local weights & given & -- & none & $d$ per round \\
+StoCFL~\citep{zeng2025stocfl} & S & whole-model gradient at anchor & cosine threshold & -- & none & $d$ once \\
+IFCA~\citep{ghosh2020ifca} & C & local losses of $K$ models & given & separated linear models, good init. & none & $(K-1)d$ download per round \\
+FedRC~\citep{guo2024fedrc} & C & local losses & given & -- & none & $(K-1)d$ download per round \\
+PACFL~\citep{vahidian2023pacfl} & M & raw-data subspaces & proximity threshold & -- & none & $rD$ once \\
+pp-CFL~\citep{luo2024ppcfl} & M & noisy label distributions & community detection & -- & DP on label distribution & $C$ once \\
+CORNFLQS~\citep{benali2025cornflqs} & S+C & weights + losses & iterative & -- & none & $d$ per round \\
+FedCCFA~\citep{chen2024fedccfa} & S & per-class classifier rows & DBSCAN radius & -- & none & classifier per round \\
+FedDAG~\citep{pramanik2026feddag} & S+M & gradients + class-wise data subspaces & selected by index & -- & none & $d$ + class subspaces \\
 \midrule
-\textbf{DisCo-CFL} & S & class-cond.\ grad.\ sketches & calibrated & \checkmark & \checkmark & DP & \checkmark & \checkmark & recovery + lower bound (Lean) \\
+\textbf{DisCo-CFL} & S & class-conditional gradient sketches, split halves & calibrated threshold $\tau$ & sub-Gaussian signatures, fixed $w$, separation $\Delta>1-\tau$, coverage, evidence & DP for same-label records given $w$; class support revealed & $2p|S_i|\le2pC$ once \\
 \bottomrule
 \end{tabular}}
 \end{tableorg}
