@@ -1,7 +1,7 @@
 """Zip only the files that main.tex really uses (flat, as Springer requires)."""
 import os, re, zipfile, shutil
 HERE = os.path.dirname(os.path.abspath(__file__))
-OUT = os.path.join(HERE, "..", "submission_mlj")
+OUT = os.environ.get("PKG_OUT", os.path.join(HERE, "..", "submission_mlj", "r1"))
 used = {"main.tex", "sn-jnl.cls", "sn-apacite.bst", "refs.bib", "main.bbl"}
 todo = ["main.tex"]
 seen = set()
