@@ -86,11 +86,11 @@ SCEN_NAMES = {
 }
 
 METHOD_ORDER = ["DisCo", "DisCo-noAttach", "FedAvg", "Local", "FedAvg-FT", "IFCA", "FeSEM",
-                "MTCFL", "FL+HC", "PACFL", "StoCFL", "FedCCFA", "FedDAG-C", "Oracle"]
+                "MTCFL", "FL+HC", "PACFL", "StoCFL", "StoCFL-W", "FedCCFA", "FedDAG-C", "Oracle"]
 FAIL_METHODS = ["DisCo", "DisCo-noAttach", "IFCA", "FeSEM", "MTCFL", "FL+HC",
-                "PACFL", "StoCFL", "FedCCFA", "FedDAG-C"]
+                "PACFL", "StoCFL", "StoCFL-W", "FedCCFA", "FedDAG-C"]
 HIER_BASELINES = ["FedAvg", "Local", "FedAvg-FT", "IFCA", "FeSEM", "MTCFL", "FL+HC",
-                  "PACFL", "StoCFL", "FedCCFA", "FedDAG-C"]
+                  "PACFL", "StoCFL", "StoCFL-W", "FedCCFA", "FedDAG-C"]
 DECOMP_METHODS = ["FedAvg", "IFCA", "FeSEM", "FL+HC", "PACFL", "MTCFL", "StoCFL",
                   "FedDAG-C", "DisCo", "DisCo-noAttach", "Oracle"]
 
