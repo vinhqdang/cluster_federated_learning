@@ -17,7 +17,10 @@ main_part = body[start:main_end]
 app_part = body[app_start + len(r"\appendix"):].split(r"\end{document}")[0]
 abstract = re.search(r"\\begin\{abstract\}(.*?)\\end\{abstract\}", body, re.S).group(1).strip()
 
-WIDE = {"table_main_a.tex", "table_main_b.tex", "table_other_a.tex", "table_other_b.tex"}
+WIDE = {"table_main_a.tex", "table_main_b.tex", "table_other_a.tex", "table_other_b.tex",
+        "table_r1_ci_main_a.tex", "table_r1_ci_main_b.tex", "table_r1_ci_other.tex",
+        "table_r1_ci_real.tex", "table_r1_hier.tex", "table_r1_diag.tex", "table_r1_decomp.tex",
+        "table_support.tex", "table_real_domains.tex", "table_real_c100.tex"}
 
 
 def flat(s):
@@ -26,7 +29,8 @@ def flat(s):
     # original float environment instead
     def fix_table(m):
         blk = m.group(0)
-        if "resizebox" in blk or "table_sweeps" in blk or "table_main_" in blk or "table_other_" in blk \
+        if "resizebox" in blk or "table_sweeps" in blk or "table_main_" in blk or "table_other_" in blk or "table_r1_" in blk \
+                or "table_support" in blk or "table_real_" in blk \
                 or "Variant" in blk:
             blk = blk.replace("\\begin{table}", "\\begin{tableorg}", 1).replace("\\end{table}", "\\end{tableorg}")
             if "Variant" in blk and "resizebox" not in blk:
