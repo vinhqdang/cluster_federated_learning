@@ -333,6 +333,222 @@ def job_support(args):
     return rows
 
 
+def _replay(fcfg, seed):
+    """Replays the sampling of discocfl.data.make_federation with the same rng calls in
+    the same order. The raw sample indices of a client do not depend on its group, so
+    the draws can be re-transformed with any group. Returns (draws, data, groups) where
+    draws[i] = (group index, train indices, test indices)."""
+    import inspect
+    from discocfl.data import _draw, _sample_sizes, load_dataset, make_federation, make_groups
+    kw = {k: p.default for k, p in inspect.signature(make_federation).parameters.items()}
+    kw.pop("seed", None)
+    kw.update(fcfg)
+    rng = np.random.default_rng(seed)
+    data = load_dataset(kw["dataset"])
+    xtr, ytr, xte, yte = data
+    C = int(ytr.max()) + 1
+    gs = make_groups(kw["groups"], C) if isinstance(kw["groups"], str) else kw["groups"]
+    counts = kw["group_counts"] or [kw["clients_per_group"]] * len(gs)
+    ytr_np, yte_np = ytr.numpy(), yte.numpy()
+    tr_pools = [np.where(ytr_np == c)[0] for c in range(C)]
+    te_pools = [np.where(yte_np == c)[0] for c in range(C)]
+    sizes = _sample_sizes(rng, sum(counts), kw["mean_size"], kw["quantity_sigma"], kw["min_size"])
+    draws = []
+    for g, cnt in enumerate(counts):
+        for _ in range(cnt):
+            cid = len(draws)
+            if kw["alpha"] is None:
+                prop = np.full(C, 1.0 / C)
+            else:
+                prop = rng.dirichlet(np.full(C, kw["alpha"]))
+            itr = _draw(rng, tr_pools, prop, int(sizes[cid]))
+            ite = _draw(rng, te_pools, prop, kw["test_size"])
+            draws.append((g, itr, ite))
+    return draws, data, gs
+
+
+def _build_clients(draws, data, gs, assign):
+    """Clients from the raw draws, transformed with the group assign[i] of each client."""
+    from discocfl.data import Client
+    xtr, ytr, xte, yte = data
+    out = []
+    for cid, (_, itr, ite) in enumerate(draws):
+        grp = gs[assign[cid]]
+        x, y = grp.apply(xtr[itr], ytr[itr])
+        xt, yt = grp.apply(xte[ite], yte[ite])
+        out.append(Client(cid, int(assign[cid]), x, y, xt, yt))
+    return out
+
+
+def _same_client(c, d):
+    import torch
+    return c.group == d.group and torch.equal(c.x, d.x) and torch.equal(c.y, d.y) \
+        and torch.equal(c.x_test, d.x_test) and torch.equal(c.y_test, d.y_test)
+
+
+def _same_sig(s, t):
+    import torch
+    return s.keys() == t.keys() and all(
+        torch.equal(s[c][0], t[c][0]) and torch.equal(s[c][1], t[c][1]) and s[c][2] == t[c][2]
+        for c in s)
+
+
+def _keyed_signatures(clients, tr, w, seed, **kw):
+    """Signatures with one rng stream per client (stream key (seed + 7, index)), so that a
+    client whose data are unchanged gets an identical signature in every call."""
+    from discocfl.disco import CountSketch, SignatureConfig, client_signature
+    scfg = SignatureConfig(seed=seed, **kw)
+    sk = CountSketch(tr.dim, scfg.sketch_dim, seed=seed)
+    return [client_signature(tr, w, c, sk, scfg, np.random.default_rng([seed + 7, i]))
+            for i, c in enumerate(clients)]
+
+
+def job_drift(args):
+    scen, seed, q = args
+    _setup()
+    from sklearn.metrics import adjusted_rand_score
+    from run import SCENARIOS
+    from discocfl.disco import client_to_cluster_jk, compute_similarity, disco_cluster
+    TAU = 0.9
+    cfg = base(**SCENARIOS[scen])
+    fed, tr, w = prepare(cfg, seed)
+    N, G = len(fed.clients), len(fed.groups)
+    g0 = fed.true_labels
+    draws, data, gs = _replay(cfg, seed)
+    orig = [c.group for c in fed.clients]
+    rebuilt = _build_clients(draws, data, gs, orig)
+    assert all(_same_client(c, d) for c, d in zip(fed.clients, rebuilt)), "replay mismatch"
+
+    # drift: round(q N) clients move to a different group, chosen uniformly
+    rng = np.random.default_rng(seed + 100)
+    n_drift = int(round(q * N))
+    chosen = rng.choice(N, n_drift, replace=False)
+    new = list(orig)
+    for i in chosen:
+        others = [k for k in range(G) if k != orig[i]]
+        new[i] = int(rng.choice(others))
+    drifted = np.zeros(N, dtype=bool)
+    drifted[chosen] = True
+    clients1 = _build_clients(draws, data, gs, new)
+    for i in np.where(~drifted)[0]:
+        assert _same_client(fed.clients[i], clients1[i]), "unchanged client altered"
+
+    # clustering before drift; signatures of all clients at the same reference model
+    sigs0 = _keyed_signatures(fed.clients, tr, w, seed)
+    sigs1 = _keyed_signatures(clients1, tr, w, seed)
+    for i in np.where(~drifted)[0]:
+        assert _same_sig(sigs0[i], sigs1[i]), "unchanged signature altered"
+    r0 = disco_cluster(sigs0, tau=TAU)
+    lab0 = r0.labels
+    ari0 = float(adjusted_rand_score(g0, lab0))
+    sim1 = compute_similarity(sigs1)
+
+    # majority true group of each pre-drift cluster, over its unchanged members
+    maj = {}
+    for k in np.unique(lab0):
+        mem = np.where((lab0 == k) & ~drifted)[0]
+        if len(mem) == 0:
+            mem = np.where(lab0 == k)[0]
+        maj[int(k)] = int(np.bincount(g0[mem]).argmax())
+
+    # newcomer test applied to every client
+    flagged = np.zeros(N, dtype=bool)
+    reassigned = -np.ones(N, dtype=int)
+    n_undefined = 0
+    for i in range(N):
+        own = int(lab0[i])
+        s_own = client_to_cluster_jk(sim1, i, np.where(lab0 == own)[0])["s"]
+        if np.isnan(s_own):
+            n_undefined += 1
+        flagged[i] = bool(s_own < TAU)          # NaN (no evidence) is not flagged
+        if flagged[i]:
+            best, arg = -np.inf, -1
+            for k in np.unique(lab0):
+                s = client_to_cluster_jk(sim1, i, np.where(lab0 == k)[0])["s"]
+                if not np.isnan(s) and s > best:
+                    best, arg = s, int(k)
+            if arg >= 0 and best >= TAU:
+                reassigned[i] = arg
+
+    # supplementary (not the pre-registered measure): the same flag, but the cluster
+    # members are restricted to unchanged clients, to separate the effect of drifted
+    # members (whose new signatures point to another concept) from the test itself
+    flagged_alt = np.zeros(N, dtype=bool)
+    for i in range(N):
+        mem = np.where((lab0 == lab0[i]) & ~drifted)[0]
+        flagged_alt[i] = bool(client_to_cluster_jk(sim1, i, mem)["s"] < TAU)
+
+    reassign_ok = [reassigned[i] >= 0 and maj[int(reassigned[i])] == new[i] for i in chosen]
+    return [dict(scenario=scen, seed=seed, q=q, n_drift=int(n_drift), n_clients=N,
+                 detection_rate=float(flagged[drifted].mean()),
+                 false_alarm_rate=float(flagged[~drifted].mean()),
+                 reassign_correct=float(np.mean(reassign_ok)),
+                 reassign_rate=float(np.mean(reassigned[drifted] >= 0)),
+                 detection_rate_unchanged_members=float(flagged_alt[drifted].mean()),
+                 false_alarm_rate_unchanged_members=float(flagged_alt[~drifted].mean()),
+                 ari_pre=ari0, k_pre=int(len(np.unique(lab0))), n_undefined=int(n_undefined))]
+
+
+def job_byz(args):
+    scen, seed, m, attack = args
+    _setup()
+    import torch
+    from run import SCENARIOS
+    from discocfl.data import Federation
+    from discocfl.disco import disco_cluster
+    fed, tr, w = prepare(base(**SCENARIOS[scen]), seed)
+    N = len(fed.clients)
+    g = fed.true_labels
+    sigs = signatures(fed, tr, w, seed)
+    rng = np.random.default_rng(seed + 200)
+    bad = np.sort(rng.choice(N, m, replace=False))
+    honest = np.setdiff1d(np.arange(N), bad)
+    gen = torch.Generator().manual_seed(int(rng.integers(2 ** 31 - 1)))
+    forged = list(sigs)
+    for i in bad:
+        h = sigs[i]
+        if attack == "random":
+            # two independent Gaussian vectors per class, rescaled to the norms of the
+            # client's honest half-vectors (a for the first half, b for the second)
+            def fake(ref):
+                v = torch.randn(ref.numel(), generator=gen)
+                return v * (ref.norm() / v.norm().clamp_min(1e-12))
+            forged[i] = {c: (fake(a), fake(b), n) for c, (a, b, n) in h.items()}
+        elif attack == "mimic":
+            cands = [j for j in honest if g[j] != g[i]]
+            j = cands[int(rng.integers(len(cands)))]
+            forged[i] = {c: (a.clone(), b.clone(), n) for c, (a, b, n) in sigs[j].items()}
+        elif attack == "flip":
+            forged[i] = {c: (-a, -b, n) for c, (a, b, n) in h.items()}
+        else:
+            raise ValueError(attack)
+
+    r = disco_cluster(forged)
+    lab = r.labels
+    sub = Federation(clients=[fed.clients[i] for i in honest], groups=fed.groups,
+                     group_test=fed.group_test, num_classes=fed.num_classes,
+                     in_shape=fed.in_shape, dataset=fed.dataset)
+    hs = cluster_scores(sub, lab[honest])
+    sizes = np.bincount(lab[lab >= 0])
+    flagged = set(r.flags["low_evidence"]) | set(r.flags["anomalous"])
+    fates = []
+    for i in bad:
+        if sizes[lab[i]] == 1:
+            f = "isolated"
+        elif int(i) in flagged:
+            f = "flagged"
+        elif np.any(lab[honest] == lab[i]):
+            f = "merged"
+        else:
+            f = "other"                          # cluster made of malicious clients only
+        fates.append(f)
+    cnt = {k: fates.count(k) for k in ("isolated", "flagged", "merged", "other")}
+    return [dict(scenario=scen, seed=seed, m=m, attack=attack, honest_ari=hs["ari"],
+                 honest_conflict_merge_rate=hs["conflict_merge_rate"], honest_k=hs["k"],
+                 n_isolated=cnt["isolated"], n_flagged=cnt["flagged"], n_merged=cnt["merged"],
+                 n_other=cnt["other"], fates=fates, malicious=[int(i) for i in bad])]
+
+
 STUDIES = {
     "tau": (job_tau, lambda: [(s, sd) for s in ["rot", "swap", "rot_qs", "mixed_qs", "label", "minority"]
                               for sd in range(3)]),
@@ -347,6 +563,10 @@ STUDIES = {
     "support": (job_support, lambda: [(s, n, sd, sg) for s in ["rot", "swap"] for n in [400, 1500]
                                       for sd in range(3) for sg in [0.5, 1.0, 2.0]]),
     "scale": (job_scale, lambda: [(n, 0) for n in [40, 80, 160, 320]]),
+    "drift": (job_drift, lambda: [(s, sd, q) for s in ["rot", "swap"] for sd in range(3)
+                                  for q in [0.1, 0.2]]),
+    "byz": (job_byz, lambda: [(s, sd, m, a) for s in ["rot", "swap"] for sd in range(3)
+                              for m in [1, 2, 4] for a in ["random", "mimic", "flip"]]),
 }
 
 

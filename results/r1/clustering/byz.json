@@ -1,0 +1,1172 @@
+[
+ {
+  "scenario": "rot",
+  "seed": 0,
+  "m": 1,
+  "attack": "random",
+  "honest_ari": 0.9318578916715201,
+  "honest_conflict_merge_rate": 0.017543859649122806,
+  "honest_k": 4,
+  "n_isolated": 0,
+  "n_flagged": 1,
+  "n_merged": 0,
+  "n_other": 0,
+  "fates": [
+   "flagged"
+  ],
+  "malicious": [
+   1
+  ]
+ },
+ {
+  "scenario": "rot",
+  "seed": 0,
+  "m": 1,
+  "attack": "mimic",
+  "honest_ari": 0.9318578916715201,
+  "honest_conflict_merge_rate": 0.017543859649122806,
+  "honest_k": 4,
+  "n_isolated": 0,
+  "n_flagged": 0,
+  "n_merged": 1,
+  "n_other": 0,
+  "fates": [
+   "merged"
+  ],
+  "malicious": [
+   1
+  ]
+ },
+ {
+  "scenario": "rot",
+  "seed": 0,
+  "m": 1,
+  "attack": "flip",
+  "honest_ari": 0.9318578916715201,
+  "honest_conflict_merge_rate": 0.017543859649122806,
+  "honest_k": 4,
+  "n_isolated": 1,
+  "n_flagged": 0,
+  "n_merged": 0,
+  "n_other": 0,
+  "fates": [
+   "isolated"
+  ],
+  "malicious": [
+   1
+  ]
+ },
+ {
+  "scenario": "rot",
+  "seed": 0,
+  "m": 2,
+  "attack": "random",
+  "honest_ari": 0.9319663218776862,
+  "honest_conflict_merge_rate": 0.0166358595194085,
+  "honest_k": 4,
+  "n_isolated": 0,
+  "n_flagged": 2,
+  "n_merged": 0,
+  "n_other": 0,
+  "fates": [
+   "flagged",
+   "flagged"
+  ],
+  "malicious": [
+   1,
+   25
+  ]
+ },
+ {
+  "scenario": "rot",
+  "seed": 0,
+  "m": 2,
+  "attack": "mimic",
+  "honest_ari": 0.9319663218776862,
+  "honest_conflict_merge_rate": 0.0166358595194085,
+  "honest_k": 4,
+  "n_isolated": 0,
+  "n_flagged": 0,
+  "n_merged": 2,
+  "n_other": 0,
+  "fates": [
+   "merged",
+   "merged"
+  ],
+  "malicious": [
+   1,
+   25
+  ]
+ },
+ {
+  "scenario": "rot",
+  "seed": 0,
+  "m": 2,
+  "attack": "flip",
+  "honest_ari": 0.9319663218776862,
+  "honest_conflict_merge_rate": 0.0166358595194085,
+  "honest_k": 4,
+  "n_isolated": 2,
+  "n_flagged": 0,
+  "n_merged": 0,
+  "n_other": 0,
+  "fates": [
+   "isolated",
+   "isolated"
+  ],
+  "malicious": [
+   1,
+   25
+  ]
+ },
+ {
+  "scenario": "rot",
+  "seed": 0,
+  "m": 4,
+  "attack": "random",
+  "honest_ari": 1.0,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 0,
+  "n_flagged": 4,
+  "n_merged": 0,
+  "n_other": 0,
+  "fates": [
+   "flagged",
+   "flagged",
+   "flagged",
+   "flagged"
+  ],
+  "malicious": [
+   1,
+   9,
+   24,
+   26
+  ]
+ },
+ {
+  "scenario": "rot",
+  "seed": 0,
+  "m": 4,
+  "attack": "mimic",
+  "honest_ari": 1.0,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 0,
+  "n_flagged": 0,
+  "n_merged": 4,
+  "n_other": 0,
+  "fates": [
+   "merged",
+   "merged",
+   "merged",
+   "merged"
+  ],
+  "malicious": [
+   1,
+   9,
+   24,
+   26
+  ]
+ },
+ {
+  "scenario": "rot",
+  "seed": 0,
+  "m": 4,
+  "attack": "flip",
+  "honest_ari": 1.0,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 0,
+  "n_flagged": 0,
+  "n_merged": 0,
+  "n_other": 4,
+  "fates": [
+   "other",
+   "other",
+   "other",
+   "other"
+  ],
+  "malicious": [
+   1,
+   9,
+   24,
+   26
+  ]
+ },
+ {
+  "scenario": "rot",
+  "seed": 1,
+  "m": 1,
+  "attack": "random",
+  "honest_ari": 0.8504818153559217,
+  "honest_conflict_merge_rate": 0.007017543859649123,
+  "honest_k": 5,
+  "n_isolated": 1,
+  "n_flagged": 0,
+  "n_merged": 0,
+  "n_other": 0,
+  "fates": [
+   "isolated"
+  ],
+  "malicious": [
+   11
+  ]
+ },
+ {
+  "scenario": "rot",
+  "seed": 1,
+  "m": 1,
+  "attack": "mimic",
+  "honest_ari": 1.0,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 0,
+  "n_flagged": 0,
+  "n_merged": 1,
+  "n_other": 0,
+  "fates": [
+   "merged"
+  ],
+  "malicious": [
+   11
+  ]
+ },
+ {
+  "scenario": "rot",
+  "seed": 1,
+  "m": 1,
+  "attack": "flip",
+  "honest_ari": 0.8504818153559217,
+  "honest_conflict_merge_rate": 0.007017543859649123,
+  "honest_k": 5,
+  "n_isolated": 1,
+  "n_flagged": 0,
+  "n_merged": 0,
+  "n_other": 0,
+  "fates": [
+   "isolated"
+  ],
+  "malicious": [
+   11
+  ]
+ },
+ {
+  "scenario": "rot",
+  "seed": 1,
+  "m": 2,
+  "attack": "random",
+  "honest_ari": 0.8416791950965653,
+  "honest_conflict_merge_rate": 0.0073937153419593345,
+  "honest_k": 5,
+  "n_isolated": 0,
+  "n_flagged": 2,
+  "n_merged": 0,
+  "n_other": 0,
+  "fates": [
+   "flagged",
+   "flagged"
+  ],
+  "malicious": [
+   11,
+   39
+  ]
+ },
+ {
+  "scenario": "rot",
+  "seed": 1,
+  "m": 2,
+  "attack": "mimic",
+  "honest_ari": 0.8416791950965653,
+  "honest_conflict_merge_rate": 0.0073937153419593345,
+  "honest_k": 5,
+  "n_isolated": 0,
+  "n_flagged": 0,
+  "n_merged": 2,
+  "n_other": 0,
+  "fates": [
+   "merged",
+   "merged"
+  ],
+  "malicious": [
+   11,
+   39
+  ]
+ },
+ {
+  "scenario": "rot",
+  "seed": 1,
+  "m": 2,
+  "attack": "flip",
+  "honest_ari": 0.8416791950965653,
+  "honest_conflict_merge_rate": 0.0073937153419593345,
+  "honest_k": 5,
+  "n_isolated": 2,
+  "n_flagged": 0,
+  "n_merged": 0,
+  "n_other": 0,
+  "fates": [
+   "isolated",
+   "isolated"
+  ],
+  "malicious": [
+   11,
+   39
+  ]
+ },
+ {
+  "scenario": "rot",
+  "seed": 1,
+  "m": 4,
+  "attack": "random",
+  "honest_ari": 0.8469945355191257,
+  "honest_conflict_merge_rate": 0.00823045267489712,
+  "honest_k": 5,
+  "n_isolated": 0,
+  "n_flagged": 4,
+  "n_merged": 0,
+  "n_other": 0,
+  "fates": [
+   "flagged",
+   "flagged",
+   "flagged",
+   "flagged"
+  ],
+  "malicious": [
+   5,
+   11,
+   21,
+   37
+  ]
+ },
+ {
+  "scenario": "rot",
+  "seed": 1,
+  "m": 4,
+  "attack": "mimic",
+  "honest_ari": 0.8469945355191257,
+  "honest_conflict_merge_rate": 0.00823045267489712,
+  "honest_k": 5,
+  "n_isolated": 0,
+  "n_flagged": 0,
+  "n_merged": 4,
+  "n_other": 0,
+  "fates": [
+   "merged",
+   "merged",
+   "merged",
+   "merged"
+  ],
+  "malicious": [
+   5,
+   11,
+   21,
+   37
+  ]
+ },
+ {
+  "scenario": "rot",
+  "seed": 1,
+  "m": 4,
+  "attack": "flip",
+  "honest_ari": 0.8469945355191257,
+  "honest_conflict_merge_rate": 0.00823045267489712,
+  "honest_k": 5,
+  "n_isolated": 4,
+  "n_flagged": 0,
+  "n_merged": 0,
+  "n_other": 0,
+  "fates": [
+   "isolated",
+   "isolated",
+   "isolated",
+   "isolated"
+  ],
+  "malicious": [
+   5,
+   11,
+   21,
+   37
+  ]
+ },
+ {
+  "scenario": "rot",
+  "seed": 2,
+  "m": 1,
+  "attack": "random",
+  "honest_ari": 1.0,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 0,
+  "n_flagged": 1,
+  "n_merged": 0,
+  "n_other": 0,
+  "fates": [
+   "flagged"
+  ],
+  "malicious": [
+   7
+  ]
+ },
+ {
+  "scenario": "rot",
+  "seed": 2,
+  "m": 1,
+  "attack": "mimic",
+  "honest_ari": 1.0,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 0,
+  "n_flagged": 0,
+  "n_merged": 1,
+  "n_other": 0,
+  "fates": [
+   "merged"
+  ],
+  "malicious": [
+   7
+  ]
+ },
+ {
+  "scenario": "rot",
+  "seed": 2,
+  "m": 1,
+  "attack": "flip",
+  "honest_ari": 1.0,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 1,
+  "n_flagged": 0,
+  "n_merged": 0,
+  "n_other": 0,
+  "fates": [
+   "isolated"
+  ],
+  "malicious": [
+   7
+  ]
+ },
+ {
+  "scenario": "rot",
+  "seed": 2,
+  "m": 2,
+  "attack": "random",
+  "honest_ari": 1.0,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 0,
+  "n_flagged": 2,
+  "n_merged": 0,
+  "n_other": 0,
+  "fates": [
+   "flagged",
+   "flagged"
+  ],
+  "malicious": [
+   7,
+   13
+  ]
+ },
+ {
+  "scenario": "rot",
+  "seed": 2,
+  "m": 2,
+  "attack": "mimic",
+  "honest_ari": 0.9278085849250359,
+  "honest_conflict_merge_rate": 0.0166358595194085,
+  "honest_k": 4,
+  "n_isolated": 0,
+  "n_flagged": 0,
+  "n_merged": 2,
+  "n_other": 0,
+  "fates": [
+   "merged",
+   "merged"
+  ],
+  "malicious": [
+   7,
+   13
+  ]
+ },
+ {
+  "scenario": "rot",
+  "seed": 2,
+  "m": 2,
+  "attack": "flip",
+  "honest_ari": 1.0,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 2,
+  "n_flagged": 0,
+  "n_merged": 0,
+  "n_other": 0,
+  "fates": [
+   "isolated",
+   "isolated"
+  ],
+  "malicious": [
+   7,
+   13
+  ]
+ },
+ {
+  "scenario": "rot",
+  "seed": 2,
+  "m": 4,
+  "attack": "random",
+  "honest_ari": 1.0,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 0,
+  "n_flagged": 4,
+  "n_merged": 0,
+  "n_other": 0,
+  "fates": [
+   "flagged",
+   "flagged",
+   "flagged",
+   "flagged"
+  ],
+  "malicious": [
+   6,
+   13,
+   16,
+   17
+  ]
+ },
+ {
+  "scenario": "rot",
+  "seed": 2,
+  "m": 4,
+  "attack": "mimic",
+  "honest_ari": 1.0,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 0,
+  "n_flagged": 0,
+  "n_merged": 4,
+  "n_other": 0,
+  "fates": [
+   "merged",
+   "merged",
+   "merged",
+   "merged"
+  ],
+  "malicious": [
+   6,
+   13,
+   16,
+   17
+  ]
+ },
+ {
+  "scenario": "rot",
+  "seed": 2,
+  "m": 4,
+  "attack": "flip",
+  "honest_ari": 1.0,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 1,
+  "n_flagged": 0,
+  "n_merged": 0,
+  "n_other": 3,
+  "fates": [
+   "isolated",
+   "other",
+   "other",
+   "other"
+  ],
+  "malicious": [
+   6,
+   13,
+   16,
+   17
+  ]
+ },
+ {
+  "scenario": "swap",
+  "seed": 0,
+  "m": 1,
+  "attack": "random",
+  "honest_ari": 1.0,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 0,
+  "n_flagged": 1,
+  "n_merged": 0,
+  "n_other": 0,
+  "fates": [
+   "flagged"
+  ],
+  "malicious": [
+   1
+  ]
+ },
+ {
+  "scenario": "swap",
+  "seed": 0,
+  "m": 1,
+  "attack": "mimic",
+  "honest_ari": 1.0,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 0,
+  "n_flagged": 0,
+  "n_merged": 1,
+  "n_other": 0,
+  "fates": [
+   "merged"
+  ],
+  "malicious": [
+   1
+  ]
+ },
+ {
+  "scenario": "swap",
+  "seed": 0,
+  "m": 1,
+  "attack": "flip",
+  "honest_ari": 1.0,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 1,
+  "n_flagged": 0,
+  "n_merged": 0,
+  "n_other": 0,
+  "fates": [
+   "isolated"
+  ],
+  "malicious": [
+   1
+  ]
+ },
+ {
+  "scenario": "swap",
+  "seed": 0,
+  "m": 2,
+  "attack": "random",
+  "honest_ari": 1.0,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 0,
+  "n_flagged": 2,
+  "n_merged": 0,
+  "n_other": 0,
+  "fates": [
+   "flagged",
+   "flagged"
+  ],
+  "malicious": [
+   1,
+   25
+  ]
+ },
+ {
+  "scenario": "swap",
+  "seed": 0,
+  "m": 2,
+  "attack": "mimic",
+  "honest_ari": 1.0,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 0,
+  "n_flagged": 0,
+  "n_merged": 2,
+  "n_other": 0,
+  "fates": [
+   "merged",
+   "merged"
+  ],
+  "malicious": [
+   1,
+   25
+  ]
+ },
+ {
+  "scenario": "swap",
+  "seed": 0,
+  "m": 2,
+  "attack": "flip",
+  "honest_ari": 1.0,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 2,
+  "n_flagged": 0,
+  "n_merged": 0,
+  "n_other": 0,
+  "fates": [
+   "isolated",
+   "isolated"
+  ],
+  "malicious": [
+   1,
+   25
+  ]
+ },
+ {
+  "scenario": "swap",
+  "seed": 0,
+  "m": 4,
+  "attack": "random",
+  "honest_ari": 1.0,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 0,
+  "n_flagged": 4,
+  "n_merged": 0,
+  "n_other": 0,
+  "fates": [
+   "flagged",
+   "flagged",
+   "flagged",
+   "flagged"
+  ],
+  "malicious": [
+   1,
+   9,
+   24,
+   26
+  ]
+ },
+ {
+  "scenario": "swap",
+  "seed": 0,
+  "m": 4,
+  "attack": "mimic",
+  "honest_ari": 1.0,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 0,
+  "n_flagged": 0,
+  "n_merged": 4,
+  "n_other": 0,
+  "fates": [
+   "merged",
+   "merged",
+   "merged",
+   "merged"
+  ],
+  "malicious": [
+   1,
+   9,
+   24,
+   26
+  ]
+ },
+ {
+  "scenario": "swap",
+  "seed": 0,
+  "m": 4,
+  "attack": "flip",
+  "honest_ari": 1.0,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 0,
+  "n_flagged": 0,
+  "n_merged": 0,
+  "n_other": 4,
+  "fates": [
+   "other",
+   "other",
+   "other",
+   "other"
+  ],
+  "malicious": [
+   1,
+   9,
+   24,
+   26
+  ]
+ },
+ {
+  "scenario": "swap",
+  "seed": 1,
+  "m": 1,
+  "attack": "random",
+  "honest_ari": 1.0,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 1,
+  "n_flagged": 0,
+  "n_merged": 0,
+  "n_other": 0,
+  "fates": [
+   "isolated"
+  ],
+  "malicious": [
+   11
+  ]
+ },
+ {
+  "scenario": "swap",
+  "seed": 1,
+  "m": 1,
+  "attack": "mimic",
+  "honest_ari": 1.0,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 0,
+  "n_flagged": 0,
+  "n_merged": 1,
+  "n_other": 0,
+  "fates": [
+   "merged"
+  ],
+  "malicious": [
+   11
+  ]
+ },
+ {
+  "scenario": "swap",
+  "seed": 1,
+  "m": 1,
+  "attack": "flip",
+  "honest_ari": 1.0,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 1,
+  "n_flagged": 0,
+  "n_merged": 0,
+  "n_other": 0,
+  "fates": [
+   "isolated"
+  ],
+  "malicious": [
+   11
+  ]
+ },
+ {
+  "scenario": "swap",
+  "seed": 1,
+  "m": 2,
+  "attack": "random",
+  "honest_ari": 1.0,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 0,
+  "n_flagged": 2,
+  "n_merged": 0,
+  "n_other": 0,
+  "fates": [
+   "flagged",
+   "flagged"
+  ],
+  "malicious": [
+   11,
+   39
+  ]
+ },
+ {
+  "scenario": "swap",
+  "seed": 1,
+  "m": 2,
+  "attack": "mimic",
+  "honest_ari": 1.0,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 0,
+  "n_flagged": 0,
+  "n_merged": 2,
+  "n_other": 0,
+  "fates": [
+   "merged",
+   "merged"
+  ],
+  "malicious": [
+   11,
+   39
+  ]
+ },
+ {
+  "scenario": "swap",
+  "seed": 1,
+  "m": 2,
+  "attack": "flip",
+  "honest_ari": 1.0,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 2,
+  "n_flagged": 0,
+  "n_merged": 0,
+  "n_other": 0,
+  "fates": [
+   "isolated",
+   "isolated"
+  ],
+  "malicious": [
+   11,
+   39
+  ]
+ },
+ {
+  "scenario": "swap",
+  "seed": 1,
+  "m": 4,
+  "attack": "random",
+  "honest_ari": 1.0,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 0,
+  "n_flagged": 4,
+  "n_merged": 0,
+  "n_other": 0,
+  "fates": [
+   "flagged",
+   "flagged",
+   "flagged",
+   "flagged"
+  ],
+  "malicious": [
+   5,
+   11,
+   21,
+   37
+  ]
+ },
+ {
+  "scenario": "swap",
+  "seed": 1,
+  "m": 4,
+  "attack": "mimic",
+  "honest_ari": 1.0,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 0,
+  "n_flagged": 0,
+  "n_merged": 4,
+  "n_other": 0,
+  "fates": [
+   "merged",
+   "merged",
+   "merged",
+   "merged"
+  ],
+  "malicious": [
+   5,
+   11,
+   21,
+   37
+  ]
+ },
+ {
+  "scenario": "swap",
+  "seed": 1,
+  "m": 4,
+  "attack": "flip",
+  "honest_ari": 1.0,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 4,
+  "n_flagged": 0,
+  "n_merged": 0,
+  "n_other": 0,
+  "fates": [
+   "isolated",
+   "isolated",
+   "isolated",
+   "isolated"
+  ],
+  "malicious": [
+   5,
+   11,
+   21,
+   37
+  ]
+ },
+ {
+  "scenario": "swap",
+  "seed": 2,
+  "m": 1,
+  "attack": "random",
+  "honest_ari": 0.9315789473684211,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 0,
+  "n_flagged": 1,
+  "n_merged": 0,
+  "n_other": 0,
+  "fates": [
+   "flagged"
+  ],
+  "malicious": [
+   7
+  ]
+ },
+ {
+  "scenario": "swap",
+  "seed": 2,
+  "m": 1,
+  "attack": "mimic",
+  "honest_ari": 1.0,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 0,
+  "n_flagged": 0,
+  "n_merged": 1,
+  "n_other": 0,
+  "fates": [
+   "merged"
+  ],
+  "malicious": [
+   7
+  ]
+ },
+ {
+  "scenario": "swap",
+  "seed": 2,
+  "m": 1,
+  "attack": "flip",
+  "honest_ari": 0.9315789473684211,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 1,
+  "n_flagged": 0,
+  "n_merged": 0,
+  "n_other": 0,
+  "fates": [
+   "isolated"
+  ],
+  "malicious": [
+   7
+  ]
+ },
+ {
+  "scenario": "swap",
+  "seed": 2,
+  "m": 2,
+  "attack": "random",
+  "honest_ari": 0.9278085849250359,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 0,
+  "n_flagged": 2,
+  "n_merged": 0,
+  "n_other": 0,
+  "fates": [
+   "flagged",
+   "flagged"
+  ],
+  "malicious": [
+   7,
+   13
+  ]
+ },
+ {
+  "scenario": "swap",
+  "seed": 2,
+  "m": 2,
+  "attack": "mimic",
+  "honest_ari": 0.9278085849250359,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 0,
+  "n_flagged": 0,
+  "n_merged": 2,
+  "n_other": 0,
+  "fates": [
+   "merged",
+   "merged"
+  ],
+  "malicious": [
+   7,
+   13
+  ]
+ },
+ {
+  "scenario": "swap",
+  "seed": 2,
+  "m": 2,
+  "attack": "flip",
+  "honest_ari": 0.9278085849250359,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 0,
+  "n_flagged": 0,
+  "n_merged": 0,
+  "n_other": 2,
+  "fates": [
+   "other",
+   "other"
+  ],
+  "malicious": [
+   7,
+   13
+  ]
+ },
+ {
+  "scenario": "swap",
+  "seed": 2,
+  "m": 4,
+  "attack": "random",
+  "honest_ari": 0.9201419698314108,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 0,
+  "n_flagged": 4,
+  "n_merged": 0,
+  "n_other": 0,
+  "fates": [
+   "flagged",
+   "flagged",
+   "flagged",
+   "flagged"
+  ],
+  "malicious": [
+   6,
+   13,
+   16,
+   17
+  ]
+ },
+ {
+  "scenario": "swap",
+  "seed": 2,
+  "m": 4,
+  "attack": "mimic",
+  "honest_ari": 1.0,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 0,
+  "n_flagged": 0,
+  "n_merged": 4,
+  "n_other": 0,
+  "fates": [
+   "merged",
+   "merged",
+   "merged",
+   "merged"
+  ],
+  "malicious": [
+   6,
+   13,
+   16,
+   17
+  ]
+ },
+ {
+  "scenario": "swap",
+  "seed": 2,
+  "m": 4,
+  "attack": "flip",
+  "honest_ari": 0.9201419698314108,
+  "honest_conflict_merge_rate": 0.0,
+  "honest_k": 4,
+  "n_isolated": 1,
+  "n_flagged": 0,
+  "n_merged": 0,
+  "n_other": 3,
+  "fates": [
+   "isolated",
+   "other",
+   "other",
+   "other"
+  ],
+  "malicious": [
+   6,
+   13,
+   16,
+   17
+  ]
+ }
+]

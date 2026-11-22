@@ -510,6 +510,65 @@ def significance(rows, scenarios, name, reference="DisCo",
     return "\n".join(lines)
 
 
+def drift_table(rows):
+    """Concept drift after clustering (drift.json): detection rate, false-alarm rate and
+    reassignment accuracy, means over seeds, for each scenario and drift fraction q."""
+    body = []
+    for sc in ["rot", "swap"]:
+        block = []
+        for q in sorted({r["q"] for r in rows}):
+            rr = [r for r in rows if r["scenario"] == sc and r["q"] == q]
+            if not rr:
+                continue
+            block.append(f"{SCEN_NAMES[sc]} & {q:g} & "
+                         f"{100 * np.mean([r['detection_rate'] for r in rr]):.1f} & "
+                         f"{100 * np.mean([r['false_alarm_rate'] for r in rr]):.1f} & "
+                         f"{100 * np.mean([r['reassign_correct'] for r in rr]):.1f} \\\\")
+        if block:
+            if body:
+                body.append(r"\midrule")
+            body += block
+    head = ("\\scriptsize\n\\setlength{\\tabcolsep}{4pt}\n\\begin{tabular}{llccc}\n\\toprule\n"
+            "Scenario & $q$ & Detection (\\%) & False alarm (\\%) & Reassigned correctly (\\%) \\\\\n"
+            "\\midrule\n")
+    _write_tabular("drift", head, body)
+    return "\n".join(body)
+
+
+def byz_table(rows):
+    """Malicious clients (byz.json): honest ARI and conflict-merge rate, and the mean number
+    of malicious clients per fate, averaged over scenarios and seeds for each attack and m."""
+    has_other = any(r["n_other"] for r in rows)
+    names = {"random": "Random vectors", "mimic": "Mimicry", "flip": "Sign flip"}
+    body = []
+    for a in ["random", "mimic", "flip"]:
+        block = []
+        for m in [1, 2, 4]:
+            rr = [r for r in rows if r["attack"] == a and r["m"] == m]
+            if not rr:
+                continue
+            cells = [names[a] if m == 1 else "", str(m),
+                     f"{np.mean([r['honest_ari'] for r in rr]):.2f}",
+                     f"{100 * np.mean([r['honest_conflict_merge_rate'] for r in rr]):.1f}",
+                     f"{np.mean([r['n_isolated'] for r in rr]):.2f}",
+                     f"{np.mean([r['n_flagged'] for r in rr]):.2f}",
+                     f"{np.mean([r['n_merged'] for r in rr]):.2f}"]
+            if has_other:
+                cells.append(f"{np.mean([r['n_other'] for r in rr]):.2f}")
+            block.append(" & ".join(cells) + " \\\\")
+        if block:
+            if body:
+                body.append(r"\midrule")
+            body += block
+    cols = "llcccccc" if has_other else "llccccc"
+    other = " & Other" if has_other else ""
+    head = (f"\\scriptsize\n\\setlength{{\\tabcolsep}}{{4pt}}\n\\begin{{tabular}}{{{cols}}}\n\\toprule\n"
+            "Attack & $m$ & Honest ARI & Honest conflict\\% & Isolated & Flagged & Merged" + other +
+            " \\\\\n\\midrule\n")
+    _write_tabular("byz", head, body)
+    return "\n".join(body)
+
+
 if __name__ == "__main__":
     rows = load_raw()
     base = [m for m in METHOD_ORDER if m != "DisCo-T30"]
@@ -537,4 +596,10 @@ if __name__ == "__main__":
     f = os.path.join(CL, "support.json")
     if os.path.exists(f):
         print(support_table(json.load(open(f))))
+    f = os.path.join(CL, "drift.json")
+    if os.path.exists(f):
+        print(drift_table(json.load(open(f))))
+    f = os.path.join(CL, "byz.json")
+    if os.path.exists(f):
+        print(byz_table(json.load(open(f))))
     figures()
