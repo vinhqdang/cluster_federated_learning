@@ -92,6 +92,6 @@ Table~\ref{tab:cost} reports wall-clock time per run and the floats each client 
 
 \begin{table}[!htbp]
 \centering
-\caption{Cost per run: mean wall-clock time (minutes; one CPU core for the small CNN, one GPU for the realistic benchmarks) and floats uploaded per client for the clustering signal.}\label{tab:cost}
+\caption{Cost per run: mean wall-clock time (minutes; one CPU core for the small CNN, one GPU for the realistic benchmarks) and floats uploaded per client for the clustering signal. DisCo-AS: label-free warm-up (Section~\ref{sec:warmup}); DisCo-full: signature from the gradient of the whole layer-4 block (realistic benchmarks); DisCo-linkorder, DisCo-mean, DisCo-noClass, DisCo-noClip and DisCo-noDisatt: the ablation variants of Table~\ref{tab:abl} (linkage-ordered merging, mean linkage, without class conditioning, without clipping, without disattenuation).}\label{tab:cost}
 \input{table_r1_cost.tex}
 \end{table}
