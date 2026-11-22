@@ -615,7 +615,7 @@ def hier_table_tex(header, body):
 def build_cost_table(runs):
     """Build the cost table: wall-clock minutes and upload floats per client."""
     present = {r.get("method") for r in runs if r.get("method")}
-    methods = [m for m in METHOD_ORDER if m in present] + sorted(present - set(METHOD_ORDER))
+    methods = [m for m in METHOD_ORDER if m in present] + sorted(present - set(METHOD_ORDER) - {"DisCo-L02"})
     main_set, real_set = set(SMALL_MAIN), set(REAL_GROUP)
     header = [["Method", "Time, small-CNN main (min)", "Time, realistic (min)",
                "Upload floats / client"]]
@@ -779,21 +779,28 @@ def main(argv=None):
     print(text, end="")
 
 
-def split_main_table(n_first=3):
-    """Split paper/table_r1_ci_main.tex after the first ``n_first`` scenario blocks
-    into table_r1_ci_main_a.tex and table_r1_ci_main_b.tex (one page each)."""
-    path = os.path.join(PAPER_DIR, "table_r1_ci_main.tex")
+def split_table(stem, per_part=3):
+    """Split paper/<stem>.tex into parts of at most ``per_part`` scenario blocks
+    (<stem>_a.tex, <stem>_b.tex, ...), each of which fits on one page."""
+    path = os.path.join(PAPER_DIR, f"{stem}.tex")
     if not os.path.exists(path):
         return
     t = open(path).read().split("\n")
     idx = [i for i, l in enumerate(t) if l.startswith("\\multicolumn{8}{l}{\\textit")]
-    if len(idx) <= n_first:
+    if len(idx) <= per_part:
         return
     end = max(i for i, l in enumerate(t) if l.startswith("\\bottomrule"))
     head, foot = t[:idx[0]], t[end:]
-    for suffix, body in (("a", t[idx[0]:idx[n_first]]), ("b", t[idx[n_first]:end])):
-        with open(os.path.join(PAPER_DIR, f"table_r1_ci_main_{suffix}.tex"), "w") as f:
-            f.write("\n".join(head + body + foot) + "\n")
+    starts = idx[::per_part] + [end]
+    for k in range(len(starts) - 1):
+        with open(os.path.join(PAPER_DIR, f"{stem}_{'abcdefgh'[k]}.tex"), "w") as f:
+            f.write("\n".join(head + t[starts[k]:starts[k + 1]] + foot) + "\n")
+
+
+def split_main_table():
+    """Split the per-dataset tables that do not fit on one page."""
+    for stem in ("table_r1_ci_main", "table_r1_ci_other", "table_r1_ci_real", "table_r1_ci_extra"):
+        split_table(stem)
 
 
 if __name__ == "__main__":

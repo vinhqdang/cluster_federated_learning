@@ -4,7 +4,19 @@ To test the scope stated above on data not used so far, we ran seven further sce
 \begin{tableorg}[!htbp]
 \centering
 \caption{Additional pre-registered benchmarks (40 clients, 5 seeds; columns as in Table~\ref{tab:main}). CIFAR-10 (ResNet): pretrained ResNet-18 as in Section~\ref{sec:real}. PACFL and FedDAG-C need image inputs and are not run on AG News.}\label{tab:extra}
-\input{table_r1_ci_extra.tex}
+\input{table_r1_ci_extra_a.tex}
+\end{tableorg}
+
+\begin{tableorg}[!htbp]
+\centering
+\noindent\textit{Table~\ref{tab:extra} (continued).}\par\smallskip
+\input{table_r1_ci_extra_b.tex}
+\end{tableorg}
+
+\begin{tableorg}[!htbp]
+\centering
+\noindent\textit{Table~\ref{tab:extra} (continued).}\par\smallskip
+\input{table_r1_ci_extra_c.tex}
 \end{tableorg}
 
 \paragraph{Outcomes of the pre-registered hypotheses.} Of the three hypotheses of success, H-A1 (CIFAR-10 label swaps with the pretrained network) holds, and H-B1 (AG News) and H-C1 (all four KMNIST and EMNIST scenarios) fail; at the level of scenarios, four of the six predicted recoveries occur. The predicted failure on CIFAR-10 rotations occurs. (i) On CIFAR-10 with label swaps and the pretrained network, DisCo-CFL recovers the groups (ARI $0.99$, $\hat\Delta=0.34$) and equals the oracle (88.3\%), against 86.2\% for the best baseline (MTCFL); the best baseline ARI is $0.64$ (FL+HC, given $K$). This is consistent with the diagnosis of the small-CNN failure on CIFAR-10: with an informative reference model the same label-swap groups are recovered. The comparison changes both the architecture and the pretraining, and the image size, so it does not isolate the reference model as the cause. (ii) On CIFAR-10 rotations the pretrained features do not separate the groups ($\hat\Delta=0.02$) and DisCo-CFL fails (ARI $0.07$), as predicted from rotated CIFAR-100; its accuracy is 0.5 points below the best baseline (PACFL, given $K$). (iii) On KMNIST (rotations and label swaps) and EMNIST rotations, DisCo-CFL recovers the groups (ARI $0.95$--$0.98$) and is within $0.3$ points of the oracle. (iv) Two predictions fail. On EMNIST label swaps ARI is $0.56$: the groups are separated ($\hat\Delta=0.32$), but with 47 classes the per-class signatures are noisy, the smallest pooled linkage within a true group is $0.88<\tau$, and DisCo-CFL over-splits (5.6 clusters, 2.2\% of the conflicting pairs merged). Its accuracy (83.7\%) is still the highest among non-oracle methods, 1.1 points below the oracle. On AG News ARI is $0.79$, just below the pre-registered $0.8$; the separation is small ($\hat\Delta=0.13$, as on Office-Home), and in three of the five seeds two groups are merged into one ($K=3$, ARI $0.62$--$0.70$), while the other two seeds recover the groups (ARI $0.93$ and $1.00$). DisCo-CFL is 2.2 points below the oracle in accuracy, and two baselines are more accurate: FedCCFA (90.6\% against 89.4\%, but with a 9-point lower concept accuracy) and MTCFL (90.5\%).

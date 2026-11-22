@@ -6,7 +6,13 @@ The experiments above use small CNNs trained from scratch on images with synthet
 \begin{tableorg}[!htbp]
 \centering
 \caption{PACS, PACS with quantity skew, Office-Home and CIFAR-100 (40 clients, 5 seeds; DisCo-T30: 3 seeds). Columns as in Table~\ref{tab:main}; IFCA, FeSEM, FL+HC, PACFL and FedDAG-C receive the true $K=4$. The last block repeats FEMNIST (Table~\ref{tab:real_femnist}); there ARI is computed against a single group and is not meaningful.}\label{tab:real}
-\input{table_r1_ci_real.tex}
+\input{table_r1_ci_real_a.tex}
+\end{tableorg}
+
+\begin{tableorg}[!htbp]
+\centering
+\noindent\textit{Table~\ref{tab:real} (continued).}\par\smallskip
+\input{table_r1_ci_real_b.tex}
 \end{tableorg}
 
 \paragraph{Where DisCo-CFL works.} On PACS (Table~\ref{tab:real}) DisCo-CFL recovers the domains in most runs (ARI $0.94\pm0.11$, 1.7\% of the conflicting pairs merged) and matches the Oracle in accuracy (93.3\% against 93.4\%), concept accuracy and worst-group accuracy. The best baselines, PACFL and FL+HC, reach 91.4--91.5\% with ARI at most $0.30$, and FedAvg 90.9\%. With quantity skew (PACS + QS) the picture is the same: 92.6\% against 92.7\% for the Oracle and 90.6\% for the best baseline (PACFL), ARI $0.88$. With label-swap groups on CIFAR-100, DisCo-CFL finds the groups without being told $K$ (ARI $0.96$, 0.7\% conflicting merges) and reaches 57.8\% (Oracle 58.1\%), against 55.8\% for FL+HC, the best baseline, and 53.9\% for FedAvg. The estimated separation is $\hat\Delta=0.21$ on PACS and $0.33$ on CIFAR-100 label swaps (Table~\ref{tab:diag}).
