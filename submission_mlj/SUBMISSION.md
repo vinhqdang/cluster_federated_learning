@@ -27,7 +27,7 @@
 
 ## Revision 1 (major revision, decision received 20 November 2026; recommended deadline 20 January 2027)
 
-Submission ID 0be006c7-a304-4145-9451-f6289c9e780d. Status: ready to submit. Title unchanged (no reviewer asked to change it).
+Submission ID 0be006c7-a304-4145-9451-f6289c9e780d. Status: SUBMITTED on 22 November 2026 (revision 1). Awaiting the editor's decision. Title unchanged (no reviewer asked to change it).
 
 Files to upload (all in `submission_mlj/r1/`):
 
@@ -35,6 +35,7 @@ Files to upload (all in `submission_mlj/r1/`):
 |---|---|
 | Revised manuscript (PDF, 72 pages) | `r1/manuscript.pdf` |
 | LaTeX source (flat folder; compiles standalone with pdflatex + bibtex) | `r1/manuscript_source.zip` |
+| Cover letter (1 page, to Prof. Tongliang Liu) | `r1/cover_letter.pdf` (source `r1/cover_letter.tex`) |
 | Response to reviewers (9 pages) | `r1/response_letter.pdf` (source `r1/response_letter.tex`) |
 | Manuscript with changes marked against the submitted version (commit 0f79ff2) | `r1/manuscript_marked.pdf` (built by `r1/make_diff.sh`) |
 
@@ -57,4 +58,7 @@ What changed:
 - Changed conclusions: DisCo-CFL fails on SVHN and CIFAR-10 with the 10-round warm-up (up to 17 points below the oracle); it equals FedAvg on FEMNIST; PACS succeeds; certificates cannot detect a reference model that does not separate the groups.
 - Colab compute used: about 59 compute units.
 - Pipeline: `experiments/stats_r1.py`, `experiments/table_as.py`, `experiments/table_round3.py`, `experiments/summarize.py`, `summarize_real.py`, `paper_mlj/build.py`, `paper_mlj/package.py`.
-- Still to do by the author: upload the four files above in the journal system before 20 January 2027.
+- Submitted by the author on 22 November 2026: revised manuscript, LaTeX source, response letter, marked-up manuscript and cover letter. Title and keywords unchanged; abstract updated on the submission site to the revised version.
+- Not mentioned in the manuscript (author's decision): the local-training error that was fixed; it is stated in the response letter only.
+- Open options if a later round asks: change the title to "DisCo-CFL: Clustered Federated Learning with Calibrated Class-Conditional Gradient Signatures"; extend the certificate check to the realistic benchmarks; re-tune the MTCFL and FeSEM thresholds on the current pilot runs.
+- Weak points a reviewer may still raise: certificates cannot detect a reference model that does not separate the groups; nominal coverage of the certificate intervals is not achieved; baselines MTCFL and FeSEM were not re-tuned; three of 92 references are the author's own work.
