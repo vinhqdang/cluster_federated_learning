@@ -1,4 +1,5 @@
 {\scriptsize
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{l c c c}
 \toprule
 Method & Time, small-CNN main (min) & Time, realistic (min) & Upload floats / client \\
@@ -19,6 +20,7 @@ StoCFL-W & 12.5 & 1.7 & 2.0e6 \\
 FedCCFA & 5.2 & 5.8 & 5.9e5 \\
 FedDAG-C & 7.9 & 1.5 & 5.8e4 \\
 Oracle & 7.2 & 1.4 & 0 \\
+DisCo-AS & 7.2 & -- & 1.5e4 \\
 DisCo-full & -- & 1.8 & 3.7e4 \\
 DisCo-linkorder & 6.3 & 1.1 & 1.8e4 \\
 DisCo-mean & 6.0 & 1.2 & 1.8e4 \\
@@ -26,5 +28,5 @@ DisCo-noClass & 6.0 & 1.1 & 2.0e3 \\
 DisCo-noClip & 5.9 & 1.2 & 1.8e4 \\
 DisCo-noDisatt & 6.0 & 1.1 & 1.8e4 \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 }
