@@ -1,0 +1,41 @@
+\documentclass[10.5pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue!50!black}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.7em}
+\pagestyle{empty}
+\begin{document}
+\begin{flushright}
+Quang-Vinh Dang\\ British University Vietnam\\ Hung Yen, Vietnam\\ \href{mailto:vinh.dq4@buv.edu.vn}{vinh.dq4@buv.edu.vn}\\ ORCID: 0000-0002-3877-8024\\[0.6em]
+\today
+\end{flushright}
+
+Prof.\ Tongliang Liu\\
+Editor, \emph{Machine Learning}, Springer
+
+Dear Prof.\ Liu,
+
+Please find enclosed the revised version of the manuscript \emph{``DisCo-CFL: Calibrated, Fair and Explainable Clustered Federated Learning via Disattenuated Class-Conditional Gradient Signatures''} (submission ID 0be006c7-a304-4145-9451-f6289c9e780d), together with a point-by-point response to the two reviewers and a version of the manuscript with all changes marked.
+
+I thank you and the reviewers for the careful and constructive reports. Every comment has been addressed, and the revision follows your request to report the results accurately, to restrict the conclusions to what the evidence supports, and to state the limitations fully. The main changes are:
+\begin{itemize}\setlength{\itemsep}{2pt}
+\item The abstract, introduction, theory and conclusion now state the conditions of every guarantee: the recovery theorem covers the merging stage only, its evidence condition does not hold at the default shrinkage (the complete pipeline with a shrinkage that satisfies it gives the same results), and the privacy guarantee is conditional on the reference model.
+\item All experiments were rerun with five seeds, the closest methods (StoCFL, FedCCFA and the clustering stage of FedDAG) were added as baselines, and the results are reported per dataset with confidence intervals, failure rates, hierarchical statistics, held-out comparisons and a cost table.
+\item The evaluation now covers eleven datasets, including four not used to develop the method (KMNIST, EMNIST, CIFAR-10 with a pretrained network, and AG News text), whose hypotheses were fixed before the runs. Successes and failures are reported, and a separation diagnostic shows that the failures occur where the condition of the theory does not hold.
+\item New studies address the reviewers' remaining questions: the dependence on the reference model, the calibration of the certificate standard errors, a label-free rule for the warm-up length, concept drift, malicious clients and the disclosure of class support.
+\item The experiments section has been rewritten around the questions it answers.
+\end{itemize}
+
+The manuscript is original, has not been published, and is not under consideration elsewhere. The code, raw results and Lean~4 project are available at \url{https://github.com/vinhqdang/cluster_federated_learning}. The author has no competing interests, and no funding was received for this work.
+
+Thank you for considering the revised manuscript.
+
+Sincerely,\\[1.2em]
+Quang-Vinh Dang\\
+British University Vietnam
+\end{document}
