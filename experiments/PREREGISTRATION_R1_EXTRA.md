@@ -52,5 +52,5 @@ We therefore standardise every embedding dimension with the training-set statist
 choose the learning rate among {0.01, 0.05, 0.1} with FedAvg on a single-concept AG News
 federation (40 clients, seed 0, 50 rounds), the same procedure as for PACS. Accuracy after
 10/20/50 rounds: lr 0.01: 0.699/0.793/0.859; lr 0.05: 0.857/0.874/0.889; lr 0.1:
-0.874/0.884/0.895. We use lr 0.1. No DisCo-CFL or baseline run on AG News was looked at
-before this choice.
+0.874/0.884/0.895. We use lr 0.1. Apart from 3-round smoke tests that only checked that the code runs, no DisCo-CFL or
+baseline run on AG News was made before this choice.
