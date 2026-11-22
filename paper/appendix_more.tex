@@ -87,3 +87,8 @@ Table~\ref{tab:sweeps} varies one factor at a time on Fashion-MNIST: the strengt
 
 \paragraph{Number of clients.} With 200 clients of 200 samples each, DisCo-CFL reaches ARI $0.88$ with 2.9\% of the conflicting pairs merged. Accuracy is 86.5\% against 87.2\% for the Oracle and 85.2\% for the best baseline (IFCA, given $K$); concept accuracy is $2.5$ points above the best baseline.
 
+\begin{table}[!htbp]
+\centering
+\caption{Failure rates per dataset (\%): fraction of runs with ARI below $0.5$ in the scenarios with more than one group. FMNIST: Fashion-MNIST, including the robustness sweeps; (R): pretrained ResNet-18. Runs per cell: 10 per dataset with two scenarios (5 seeds each), 5 for Office-Home and AG News, and 49 for Fashion-MNIST (five main scenarios with 5 seeds, eight sweeps with 3; 25 for DisCo-noAttach, which is not run on the sweeps). ``--'': not run (PACFL and FedDAG-C need image inputs).}\label{tab:failure_ds}
+\input{table_r1_failure_ds.tex}
+\end{table}

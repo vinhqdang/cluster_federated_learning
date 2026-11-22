@@ -23,7 +23,7 @@ WIDE = {"table_main_a.tex", "table_main_b.tex", "table_other_a.tex", "table_othe
         "table_support.tex", "table_r1_ci_extra.tex", "table_r1_ci_other_a.tex", "table_r1_ci_other_b.tex",
         "table_r1_ci_real_a.tex", "table_r1_ci_real_b.tex", "table_r1_ci_extra_a.tex",
         "table_r1_ci_extra_b.tex", "table_r1_ci_extra_c.tex", "table_r1_hier_heldout.tex", "table_r1_cost.tex",
-        "table_l02.tex", "table_certgrid.tex", "table_refmodel.tex"}
+        "table_l02.tex", "table_certgrid.tex", "table_refmodel.tex", "table_r1_failure_ds.tex"}
 
 
 def flat(s):
