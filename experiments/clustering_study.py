@@ -617,6 +617,10 @@ STUDIES = {
                                   for q in [0.1, 0.2]]),
     "byz": (job_byz, lambda: [(s, sd, m, a) for s in ["rot", "swap"] for sd in range(3)
                               for m in [1, 2, 4] for a in ["random", "mimic", "flip"]]),
+    # certificates and explanations on the other small-CNN datasets, including the failures (exploratory)
+    "explain_ext": (job_explain, lambda: [(s, sd) for s in ["mnist_rot", "mnist_swap", "kmnist_rot", "kmnist_swap",
+                                                            "emnist_rot", "emnist_swap", "svhn_rot", "svhn_swap",
+                                                            "cifar_rot", "cifar_swap"] for sd in range(3)]),
     "refmodel": (job_refmodel, lambda: [(s, sd) for s in ["rot", "swap", "mixed_qs", "label",
                                                           "mnist_rot", "mnist_swap"] for sd in range(3)]),
 }

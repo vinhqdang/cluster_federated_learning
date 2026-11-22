@@ -113,6 +113,13 @@ REF = "DisCo"
 TIE_PP = 0.05          # W/T/L tie band, in percentage points (see report)
 BOOT_B = 10000
 ARI_FAIL = 0.5
+# per-dataset failure rates (multi-group scenarios of each dataset; the FMNIST column includes the sweeps)
+GROUPS_FAIL_DS = {"FMNIST": SMALL_MAIN + SMALL_SWEEP, "MNIST": ["mnist_rot", "mnist_swap"],
+                  "KMNIST": ["kmnist_rot", "kmnist_swap"], "EMNIST": ["emnist_rot", "emnist_swap"],
+                  "SVHN": ["svhn_rot", "svhn_swap"], "CIFAR-10": ["cifar_rot", "cifar_swap"],
+                  "PACS": ["pacs", "pacs_qs"], "Office-Home": ["officehome"],
+                  "CIFAR-100 (R)": ["c100_swap", "c100_rot"], "CIFAR-10 (R)": ["c10r_rot", "c10r_swap"],
+                  "AG News": ["agnews_swap"]}
 
 
 # ---------------------------------------------------------------------------
@@ -470,6 +477,19 @@ def build_failure_table(runs):
     return "Failure rates (k_true > 1, ARI < 0.5)", header, body
 
 
+def build_failure_ds_table(runs):
+    """Failure rates per dataset: rows are methods, columns are datasets (percent; runs in the caption)."""
+    header = [["Method"] + list(GROUPS_FAIL_DS.keys())]
+    body = []
+    for m in FAIL_METHODS:
+        row = [m]
+        for scen in GROUPS_FAIL_DS.values():
+            f, n = failure_stats(runs, scen, m)
+            row.append("--" if n == 0 else f"{100.0 * f / n:.0f}")
+        body.append(("row", row))
+    return "Failure rates per dataset (k_true > 1, ARI < 0.5)", header, body
+
+
 # ---------------------------------------------------------------------------
 # Table 3: hierarchical comparison
 # ---------------------------------------------------------------------------
@@ -710,6 +730,7 @@ def build_diag_table(runs):
 
 TABLE_COLSPECS = {
     "table_r1_failure": "l c c c c c",
+    "table_r1_failure_ds": "l c c c c c c c c c c c",
     "table_r1_cost": "l c c c",
     "table_r1_decomp": "l l c c c c c",
     "table_r1_diag": "l r " + "c " * 10 + "c",
@@ -754,6 +775,8 @@ def run(heldout):
     if not heldout:
         title, header, body = build_failure_table(runs)
         emit("table_r1_failure", title, header, body, summary)
+        title, header, body = build_failure_ds_table(runs)
+        emit("table_r1_failure_ds", title, header, body, summary)
         title, header, body = build_cost_table(runs)
         emit("table_r1_cost", title, header, body, summary)
         title, header, body = build_decomp_table(runs)
