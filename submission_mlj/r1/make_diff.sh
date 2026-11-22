@@ -10,6 +10,7 @@ cp paper_mlj/*.tex paper_mlj/*.bib paper_mlj/*.bst paper_mlj/*.cls paper_mlj/*.p
 rm -f "$TMP"/old/paper_mlj/*.bbl "$TMP"/new/*.bbl "$TMP"/new/main.pdf
 cd "$TMP/new"
 latexdiff --flatten --math-markup=whole --disable-citation-markup \
+  --config="PICTUREENV=(?:picture|DIFnomarkup|tabular)[\w\d*@]*" \
   "$TMP/old/paper_mlj/main.tex" main.tex > diff_main.tex
 # latexdiff marks up the arguments of \cmidrule in new tables; restore them
 python3 - <<'PY'
