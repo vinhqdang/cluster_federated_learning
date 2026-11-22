@@ -1,2 +1,17 @@
+The experiments answer five questions.
+\begin{enumerate}[label=(Q\arabic*),leftmargin=*,itemsep=1pt]
+\item \emph{Recovery and accuracy.} Does DisCo-CFL recover the concept groups without being told their number, is it more accurate than the alternatives, does it treat small groups fairly, and how robust is it to the strength of the shift, the number of groups, partial participation and scale? We answer this in three groups of experiments (Table~\ref{tab:scenarios}): small CNNs trained from scratch on image datasets with synthetic concept groups (Section~\ref{sec:small}); a pretrained ResNet-18 on natural domain shift and on CIFAR-100, and FEMNIST writers without ground-truth groups with the small CNN (Section~\ref{sec:real}); and four further datasets, including text, that test the scope of the method on data not used to develop it (Section~\ref{sec:extra}).
+\item \emph{Failures and theory.} When does DisCo-CFL fail, and does the separation condition of Theorem~\ref{thm:rec} predict it? Section~\ref{sec:sep} relates every outcome to the estimated separation and checks that the results hold under the shrinkage that the theorem covers.
+\item \emph{Reference model.} Can the main cause of failure, a reference model that does not yet separate the groups, be removed without labels? Section~\ref{sec:warmup} evaluates a label-free rule for the length of the warm-up.
+\item \emph{Beyond accuracy.} What do the explanations and certificates deliver, and how does the clustering behave when the reference model is trained on other clients, when concepts drift, when some clients are malicious and under privacy noise (Section~\ref{sec:fat-exp})?
+\item \emph{Design and cost.} Which components matter, how sensitive is the method to its constants, and what does it cost (Section~\ref{sec:sens-cost})?
+\end{enumerate}
+Section~\ref{sec:setup} describes the benchmarks, the baselines, the metrics and the statistical protocol for all of them.
+
 \input{exp_setup.tex}
 \input{exp_results.tex}
+\input{exp_real.tex}
+\input{exp_extra.tex}
+\input{exp_theory.tex}
+\input{exp_warmup.tex}
+\input{exp_fat.tex}

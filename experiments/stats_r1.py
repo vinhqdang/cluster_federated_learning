@@ -567,7 +567,7 @@ HIER_SECTIONS = [
     ("(a) Small-CNN benchmarks (main, other, sweep scenarios pooled)",
      SMALL_MAIN + SMALL_OTHER + SMALL_SWEEP),
     ("(b) Realistic benchmarks", REAL_GROUP),
-    ("(c) Additional pre-registered benchmarks", EXTRA_GROUP),
+    ("(c) Additional benchmarks", EXTRA_GROUP),
 ]
 HIER_METRICS = [("Accuracy", "pc_acc_mean"),
                 ("Concept acc.", "pc_acc_concept_mean"),

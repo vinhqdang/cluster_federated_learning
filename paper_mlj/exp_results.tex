@@ -1,4 +1,4 @@
-\subsection{Small CNNs: performance, fairness and clustering quality}\label{sec:small}
+\subsection{Small CNNs trained from scratch}\label{sec:small}
 \paragraph{Main results.}
 Table~\ref{tab:main} reports Fashion-MNIST results for all methods with five seeds: means with 95\% $t$-intervals over seeds. Accuracy is \emph{with} the prior correction~\eqref{eq:pc}, applied identically to every method. Table~\ref{tab:failure} gives failure rates, Table~\ref{tab:hier} the hierarchical comparison over scenarios, and Table~\ref{tab:diag} the separation and coverage diagnostics of Section~\ref{sec:theory} for every scenario.
 
@@ -48,13 +48,13 @@ $m$ & recall & ARI & conflict\% & recall & ARI & conflict\% \\
 
 \begin{tableorg}[!htbp]
 \centering
-\caption{Failure rates: fraction of runs with ARI below $0.5$ in scenarios with more than one group (number of runs in parentheses). Main: the five Fashion-MNIST concept-shift scenarios; Other: MNIST, SVHN, CIFAR-10; Sweep: the robustness sweeps; Real: PACS, Office-Home, CIFAR-100; Extra: the pre-registered benchmarks of Section~\ref{sec:extra}. DisCo-noAttach is not run on the sweeps, and PACFL and FedDAG-C are not run on AG News, so their rates in these columns are over fewer scenarios.}\label{tab:failure}
+\caption{Failure rates: fraction of runs with ARI below $0.5$ in scenarios with more than one group (number of runs in parentheses). Main: the five Fashion-MNIST concept-shift scenarios; Other: MNIST, SVHN, CIFAR-10; Sweep: the robustness sweeps; Real: PACS, Office-Home, CIFAR-100; Extra: the additional benchmarks of Section~\ref{sec:extra}. DisCo-noAttach is not run on the sweeps, and PACFL and FedDAG-C are not run on AG News, so their rates in these columns are over fewer scenarios.}\label{tab:failure}
 \input{table_r1_failure.tex}
 \end{tableorg}
 
 \begin{tableorg}[!htbp]
 \centering
-\caption{Hierarchical comparison of DisCo-CFL with each baseline (percentage points). $\Delta$: mean difference with a 95\% hierarchical-bootstrap interval (scenarios, then seeds within scenarios; $10^4$ replicates). Parts: (a) small CNNs, (b) realistic benchmarks, (c) pre-registered additional benchmarks. W/T/L and $p$: wins, ties ($|\Delta|<0.05$) and losses over scenario-level means, and the one-sided Wilcoxon signed-rank test on them. Each row uses the scenarios in which both methods were run, which W/T/L counts: Local and FedAvg-FT were not run on the sweeps (11 instead of 19 scenarios in part a), and PACFL and FedDAG-C not on AG News, so rows are over different subsets of scenarios.}\label{tab:hier}
+\caption{Hierarchical comparison of DisCo-CFL with each baseline (percentage points). $\Delta$: mean difference with a 95\% hierarchical-bootstrap interval (scenarios, then seeds within scenarios; $10^4$ replicates). Parts: (a) small CNNs, (b) realistic benchmarks, (c) additional benchmarks. W/T/L and $p$: wins, ties ($|\Delta|<0.05$) and losses over scenario-level means, and the one-sided Wilcoxon signed-rank test on them. Each row uses the scenarios in which both methods were run, which W/T/L counts: Local and FedAvg-FT were not run on the sweeps (11 instead of 19 scenarios in part a), and PACFL and FedDAG-C not on AG News, so rows are over different subsets of scenarios.}\label{tab:hier}
 \input{table_r1_hier.tex}
 \end{tableorg}
 
@@ -70,10 +70,6 @@ $m$ & recall & ARI & conflict\% & recall & ARI & conflict\% \\
 \input{table_r1_diag.tex}
 \end{tableorg}
 
-\input{exp_datasets.tex}
 \paragraph{Robustness sweeps.}\label{sec:sweeps} Varying one factor at a time on Fashion-MNIST (Table~\ref{tab:sweeps} in Appendix~\ref{app:more}), DisCo-CFL recovers rotation groups from $30^\circ$ on and merges the $15^\circ$ groups, whose separation ($\hat\Delta=0.06$) is below $1-\tau$; finds $K=2$, $4$ and $8$ label-permutation groups (ARI $1.00$, $0.97$ and $0.79$); and keeps recovering the groups with 30\% client participation (ARI $0.93$--$0.98$) and with 200 clients (ARI $0.88$). In every setting its accuracy is within $0.7$ points of the Oracle.
 
-\input{exp_real.tex}
-\input{exp_extra.tex}
-
-\input{exp_fat.tex}
+\input{exp_datasets.tex}
