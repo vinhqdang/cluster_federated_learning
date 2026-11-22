@@ -92,3 +92,9 @@ Table~\ref{tab:sweeps} varies one factor at a time on Fashion-MNIST: the strengt
 \caption{Failure rates per dataset (\%): fraction of runs with ARI below $0.5$ in the scenarios with more than one group. FMNIST: Fashion-MNIST, including the robustness sweeps; (R): pretrained ResNet-18. Runs per cell: 10 per dataset with two scenarios (5 seeds each), 5 for Office-Home and AG News, and 49 for Fashion-MNIST (five main scenarios with 5 seeds, eight sweeps with 3; 25 for DisCo-noAttach, which is not run on the sweeps). ``--'': not run (PACFL and FedDAG-C need image inputs).}\label{tab:failure_ds}
 \input{table_r1_failure_ds.tex}
 \end{table}
+
+\begin{table}[!htbp]
+\centering
+\caption{Assignment certificates on the other small-CNN datasets (exploratory; clustering step at the 10-round reference model, 3 seeds, 40 clients each). A certificate is correct when the client shares its cluster with no conflicting client. On SVHN every certificate is confident, so there is no uncertain one (``--'').}\label{tab:cert_ext}
+\input{table_cert_ext.tex}
+\end{table}
