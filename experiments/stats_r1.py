@@ -50,6 +50,9 @@ SMALL_SWEEP = ["angle15", "angle30", "angle45", "perm2", "perm8",
 REAL = ["pacs", "pacs_qs", "officehome", "c100_swap", "c100_rot"]
 FEMNIST = ["femnist"]
 REAL_GROUP = REAL + FEMNIST
+# pre-registered additional benchmarks (experiments/PREREGISTRATION_R1_EXTRA.md)
+EXTRA_GROUP = ["kmnist_rot", "kmnist_swap", "emnist_rot", "emnist_swap",
+               "c10r_rot", "c10r_swap", "agnews_swap"]
 
 DEV_RUNS = {("rot", 0), ("swap", 0), ("mixed_qs", 0), ("label", 0), ("pacs", 0)}
 
@@ -83,6 +86,13 @@ SCEN_NAMES = {
     "c100_swap": "CIFAR-100 label swaps",
     "c100_rot": "CIFAR-100 rotations",
     "femnist": "FEMNIST",
+    "kmnist_rot": "KMNIST rotation",
+    "kmnist_swap": "KMNIST label swap",
+    "emnist_rot": "EMNIST rotation",
+    "emnist_swap": "EMNIST label swap",
+    "c10r_rot": "CIFAR-10 (ResNet) rotation",
+    "c10r_swap": "CIFAR-10 (ResNet) label swap",
+    "agnews_swap": "AG News label swap",
 }
 
 METHOD_ORDER = ["DisCo", "DisCo-noAttach", "DisCo-T30", "FedAvg", "Local", "FedAvg-FT", "IFCA", "FeSEM",
@@ -94,8 +104,9 @@ HIER_BASELINES = ["FedAvg", "Local", "FedAvg-FT", "IFCA", "FeSEM", "MTCFL", "FL+
 DECOMP_METHODS = ["FedAvg", "IFCA", "FeSEM", "FL+HC", "PACFL", "MTCFL", "StoCFL",
                   "FedDAG-C", "DisCo", "DisCo-noAttach", "Oracle"]
 
-GROUPS_CI = {"main": SMALL_MAIN, "other": SMALL_OTHER, "real": REAL_GROUP}
-GROUPS_FAIL = {"Main": SMALL_MAIN, "Other": SMALL_OTHER, "Sweep": SMALL_SWEEP, "Real": REAL_GROUP}
+GROUPS_CI = {"main": SMALL_MAIN, "other": SMALL_OTHER, "real": REAL_GROUP, "extra": EXTRA_GROUP}
+GROUPS_FAIL = {"Main": SMALL_MAIN, "Other": SMALL_OTHER, "Sweep": SMALL_SWEEP, "Real": REAL_GROUP,
+               "Extra": EXTRA_GROUP}
 GROUPS_DECOMP = {"main": SMALL_MAIN, "other": SMALL_OTHER, "real": REAL_GROUP}
 
 REF = "DisCo"
@@ -555,6 +566,7 @@ HIER_SECTIONS = [
     ("(a) Small-CNN benchmarks (main, other, sweep scenarios pooled)",
      SMALL_MAIN + SMALL_OTHER + SMALL_SWEEP),
     ("(b) Realistic benchmarks", REAL_GROUP),
+    ("(c) Additional pre-registered benchmarks", EXTRA_GROUP),
 ]
 HIER_METRICS = [("Accuracy", "pc_acc_mean"),
                 ("Concept acc.", "pc_acc_concept_mean"),
@@ -674,7 +686,7 @@ def build_diag_table(runs):
                "ARI (Otsu)", "ARI (DisCo)", "Conflict merge (%)", "Conflict attach (%)",
                "n attached"]]
     body = []
-    scen_list = [s for s in SMALL_MAIN + SMALL_OTHER + SMALL_SWEEP + REAL_GROUP
+    scen_list = [s for s in SMALL_MAIN + SMALL_OTHER + SMALL_SWEEP + REAL_GROUP + EXTRA_GROUP
                  if any(r.get("scenario") == s for r in drs)]
     for s in scen_list:
         srs = [r for r in drs if r.get("scenario") == s]
@@ -696,7 +708,7 @@ def build_diag_table(runs):
 # ---------------------------------------------------------------------------
 
 TABLE_COLSPECS = {
-    "table_r1_failure": "l c c c c",
+    "table_r1_failure": "l c c c c c",
     "table_r1_cost": "l c c c",
     "table_r1_decomp": "l l c c c c c",
     "table_r1_diag": "l r " + "c " * 10 + "c",

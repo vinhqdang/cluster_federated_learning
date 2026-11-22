@@ -44,5 +44,6 @@ What changed:
 - Five seeds, 95% intervals, failure rates, hierarchical bootstrap, held-out comparison, cost table, separation diagnostics, edge-case and class-support studies.
 - Changed conclusions: DisCo-CFL fails on SVHN and CIFAR-10 with the 10-round warm-up (up to 17 points below the oracle); it no longer over-splits FEMNIST (it equals FedAvg there); PACS now succeeds.
 - Pipeline: `experiments/stats_r1.py` (statistics tables), `experiments/summarize.py` and `summarize_real.py` (other tables and figures), `paper_mlj/build.py` and `paper_mlj/package.py` (journal version, writes to `submission_mlj/r1/`).
-- Colab compute used for the rerun: about 44 compute units.
+- Colab compute used for the rerun: about 44 compute units; the pre-registered additional benchmarks (515 runs) used about 15 more.
+- Additional benchmarks: pre-registered in `experiments/PREREGISTRATION_R1_EXTRA.md` (KMNIST, EMNIST, CIFAR-10 with a pretrained network, AG News); all outcomes reported in Section 5.4.
 - Still to do by the author: upload the four files above in the journal system before the deadline.
