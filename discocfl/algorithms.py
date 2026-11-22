@@ -71,19 +71,48 @@ def _adaptive_warmup(tr, fed, w, t_min=10, t_max=30, window=5, rel=0.05):
     return w, t_max, losses
 
 
-def run_disco(fed, tr, cfg, return_details=False):
-    """DisCo-CFL: warm-up FedAvg -> one-shot signatures -> calibrated clustering
-    -> per-cluster FedAvg from the reference model.
+def _stable_warmup(tr, fed, w, sig_fn, cluster_fn, checkpoints=(10, 15, 20, 25, 30),
+                   loss_frac=0.75, ari_min=0.9):
+    """Label-free stable warm-up (variant DisCo-AS).
 
-    cfg["adaptive_warmup"] (variant DisCo-AW): the warm-up length is chosen by
-    _adaptive_warmup instead of the fixed cfg["warmup"]; the remaining rounds of the
-    budget are used for cluster training."""
-    if cfg.get("adaptive_warmup"):
-        w_ref, t_used, wl = _adaptive_warmup(tr, fed, tr.get(), **cfg.get("aw_args", {}))
-        cfg = dict(cfg, warmup=t_used)
-    else:
-        w_ref = _fedavg_rounds(tr, fed, tr.get(), cfg["warmup"])
-        wl = None
+    FedAvg is continued up to each checkpoint (checkpoints are total rounds). At a
+    checkpoint the data-weighted training loss of the global model is computed. The
+    learning condition is loss <= loss_frac * log(C). If it holds, the DisCo partition
+    is computed from sig_fn(w) and cluster_fn(sigs). Warm-up stops at the first
+    checkpoint where the learning condition holds at this and at the previous
+    checkpoint and the partitions of the two agree (adjusted Rand index >= ari_min);
+    at the last checkpoint it stops regardless.
+    Returns (w, t_used, record) with record = [{t, loss, learned, ari_prev, k}, ...]."""
+    from sklearn.metrics import adjusted_rand_score
+
+    n = np.array([c.n for c in fed.clients], float)
+    thresh = loss_frac * float(np.log(fed.num_classes))
+    record = []
+    t_prev_ck, prev_labels, prev_learned = 0, None, False
+    for idx, ck in enumerate(checkpoints):
+        w = _fedavg_rounds(tr, fed, w, ck - t_prev_ck)
+        t_prev_ck = ck
+        L = np.array([tr.evaluate(w, c.x, c.y)[1] for c in fed.clients])
+        loss = float((n * L).sum() / n.sum())
+        learned = loss <= thresh
+        labels, ari_prev = None, None
+        if learned:
+            labels = np.asarray(cluster_fn(sig_fn(w)))
+            if prev_learned and prev_labels is not None:
+                ari_prev = float(adjusted_rand_score(prev_labels, labels))
+        record.append({"t": int(ck), "loss": loss, "learned": bool(learned),
+                       "ari_prev": ari_prev,
+                       "k": None if labels is None else int(len(np.unique(labels)))})
+        if idx == len(checkpoints) - 1:
+            break
+        if learned and prev_learned and ari_prev is not None and ari_prev >= ari_min:
+            break
+        prev_learned, prev_labels = learned, labels
+    return w, int(ck), record
+
+
+def _signature_setup(tr, cfg):
+    """Signature configuration and count sketch used by DisCo-CFL."""
     scfg = SignatureConfig(sketch_dim=cfg.get("sketch_dim", 1024),
                            class_conditional=cfg.get("class_conditional", True),
                            clip=cfg.get("clip", 0.5),
@@ -92,14 +121,50 @@ def run_disco(fed, tr, cfg, return_details=False):
                            seed=cfg["seed"])
     sketch = CountSketch(tr.head_dim if scfg.mode == "head" else tr.dim, scfg.sketch_dim,
                          seed=cfg["seed"], device=tr.device)
-    rng = np.random.default_rng(cfg["seed"] + 7)
+    return scfg, sketch
+
+
+def _cluster_signatures(sigs, cfg):
+    """DisCo calibrated clustering of the signatures (the result object)."""
+    return disco_cluster(sigs, tau=cfg.get("tau", 0.9), disattenuate=cfg.get("disattenuate", True),
+                         lam=cfg.get("lam", 0.5), mode=cfg.get("linkage", "min"),
+                         order=cfg.get("order", "evidence"), attach=cfg.get("attach", True))
+
+
+def run_disco(fed, tr, cfg, return_details=False):
+    """DisCo-CFL: warm-up FedAvg -> one-shot signatures -> calibrated clustering
+    -> per-cluster FedAvg from the reference model.
+
+    cfg["adaptive_warmup"] (variant DisCo-AW): the warm-up length is chosen by
+    _adaptive_warmup instead of the fixed cfg["warmup"]; the remaining rounds of the
+    budget are used for cluster training.
+
+    cfg["stable_warmup"] (variant DisCo-AS): the warm-up length is chosen by
+    _stable_warmup (checkpoints, learning condition and partition stability)."""
+    scfg, sketch = _signature_setup(tr, cfg)
+
+    def sig_fn(w):
+        rng = np.random.default_rng(cfg["seed"] + 7)
+        return [client_signature(tr, w, c, sketch, scfg, rng) for c in fed.clients]
+
+    def cluster_fn(sigs):
+        return _cluster_signatures(sigs, cfg).labels
+
+    wl = None
+    stable_record = None
+    if cfg.get("adaptive_warmup"):
+        w_ref, t_used, wl = _adaptive_warmup(tr, fed, tr.get(), **cfg.get("aw_args", {}))
+        cfg = dict(cfg, warmup=t_used)
+    elif cfg.get("stable_warmup"):
+        w_ref, t_used, stable_record = _stable_warmup(tr, fed, tr.get(), sig_fn, cluster_fn)
+        cfg = dict(cfg, warmup=t_used)
+    else:
+        w_ref = _fedavg_rounds(tr, fed, tr.get(), cfg["warmup"])
     t0 = time.time()
-    sigs = [client_signature(tr, w_ref, c, sketch, scfg, rng) for c in fed.clients]
+    sigs = sig_fn(w_ref)
     t_sig = time.time() - t0
     t0 = time.time()
-    res = disco_cluster(sigs, tau=cfg.get("tau", 0.9), disattenuate=cfg.get("disattenuate", True),
-                        lam=cfg.get("lam", 0.5), mode=cfg.get("linkage", "min"),
-                        order=cfg.get("order", "evidence"), attach=cfg.get("attach", True))
+    res = _cluster_signatures(sigs, cfg)
     t_srv = time.time() - t0
     assign = res.labels
     models = _train_clusters(tr, fed, w_ref, assign, cfg["rounds"] - cfg["warmup"])
@@ -109,6 +174,8 @@ def run_disco(fed, tr, cfg, return_details=False):
            "time_signature_s": t_sig, "time_server_s": t_srv,
            "n_confident": sum(c["verdict"] == "confident" for c in res.certificates),
            "flags": res.flags, "sim": res.sim, "result": res}
+    if stable_record is not None:
+        out["warmup_record"] = stable_record
     if return_details:
         out.update({"signatures": sigs, "w_ref": w_ref, "sketch": sketch})
     return out
