@@ -261,6 +261,7 @@ def to_tex(text):
         text = text.replace(ch, rep)
     # Use a math minus for negative numbers that are not part of a name.
     text = re.sub(r"(?<![\w])-(?=\d)", r"$-$", text)
+    text = re.sub(r"(?<![$\\])<(?=\d)", r"$<$", text)
     return text
 
 

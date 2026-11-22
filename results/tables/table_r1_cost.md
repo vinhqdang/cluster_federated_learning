@@ -18,6 +18,7 @@
 | FedCCFA | 5.2 | 5.8 | 5.9e5 |
 | FedDAG-C | 7.9 | 1.5 | 5.8e4 |
 | Oracle | 7.2 | 1.4 | 0 |
+| DisCo-AS | 7.2 | -- | 1.5e4 |
 | DisCo-full | -- | 1.8 | 3.7e4 |
 | DisCo-linkorder | 6.3 | 1.1 | 1.8e4 |
 | DisCo-mean | 6.0 | 1.2 | 1.8e4 |

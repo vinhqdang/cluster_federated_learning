@@ -48,13 +48,13 @@ $m$ & recall & ARI & conflict\% & recall & ARI & conflict\% \\
 
 \begin{table}[!htbp]
 \centering
-\caption{Failure rates: fraction of runs with ARI below $0.5$ in scenarios with more than one group (number of runs in parentheses). Main: the five Fashion-MNIST concept-shift scenarios; Other: MNIST, SVHN, CIFAR-10; Sweep: the robustness sweeps; Real: PACS, Office-Home, CIFAR-100; Extra: the pre-registered benchmarks of Section~\ref{sec:extra}.}\label{tab:failure}
+\caption{Failure rates: fraction of runs with ARI below $0.5$ in scenarios with more than one group (number of runs in parentheses). Main: the five Fashion-MNIST concept-shift scenarios; Other: MNIST, SVHN, CIFAR-10; Sweep: the robustness sweeps; Real: PACS, Office-Home, CIFAR-100; Extra: the pre-registered benchmarks of Section~\ref{sec:extra}. DisCo-noAttach is not run on the sweeps, and PACFL and FedDAG-C are not run on AG News, so their rates in these columns are over fewer scenarios.}\label{tab:failure}
 \input{table_r1_failure.tex}
 \end{table}
 
 \begin{table}[!htbp]
 \centering
-\caption{Hierarchical comparison of DisCo-CFL with each baseline (percentage points). $\Delta$: mean difference with a 95\% hierarchical-bootstrap interval (scenarios, then seeds within scenarios; $10^4$ replicates). Parts: (a) small CNNs, (b) realistic benchmarks, (c) pre-registered additional benchmarks. W/T/L and $p$: wins, ties ($|\Delta|<0.05$) and losses over scenario-level means, and the one-sided Wilcoxon signed-rank test on them.}\label{tab:hier}
+\caption{Hierarchical comparison of DisCo-CFL with each baseline (percentage points). $\Delta$: mean difference with a 95\% hierarchical-bootstrap interval (scenarios, then seeds within scenarios; $10^4$ replicates). Parts: (a) small CNNs, (b) realistic benchmarks, (c) pre-registered additional benchmarks. W/T/L and $p$: wins, ties ($|\Delta|<0.05$) and losses over scenario-level means, and the one-sided Wilcoxon signed-rank test on them. Each row uses the scenarios in which both methods were run, which W/T/L counts: Local and FedAvg-FT were not run on the sweeps (11 instead of 19 scenarios in part a), and PACFL and FedDAG-C not on AG News, so rows are over different subsets of scenarios.}\label{tab:hier}
 \input{table_r1_hier.tex}
 \end{table}
 
