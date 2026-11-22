@@ -33,7 +33,7 @@ Files to upload (all in `submission_mlj/r1/`):
 
 | Item in the submission system | File |
 |---|---|
-| Revised manuscript (PDF, 71 pages) | `r1/manuscript.pdf` |
+| Revised manuscript (PDF, 72 pages) | `r1/manuscript.pdf` |
 | LaTeX source (flat folder; compiles standalone with pdflatex + bibtex) | `r1/manuscript_source.zip` |
 | Response to reviewers (9 pages) | `r1/response_letter.pdf` (source `r1/response_letter.tex`) |
 | Manuscript with changes marked against the submitted version (commit 0f79ff2) | `r1/manuscript_marked.pdf` (built by `r1/make_diff.sh`) |
@@ -44,7 +44,7 @@ Checks done before submission:
 - Numbers in the abstract, introduction, discussion, conclusion and letter were checked against the generated tables; all tables and figures are cited in the text; all abbreviations are defined at first use.
 - The manuscript is self-contained: no references to code, files or the repository outside the Code availability statement.
 - Abstract: 250 words.
-- References: full author lists (style shows up to 20 authors); DOIs verified against Crossref/DataCite for 56 of 89 references; the other 33 are venues without DOIs (NeurIPS, ICML, ICLR, AISTATS, MLSys, KDD, JMLR, technical reports).
+- References: full author lists (style shows up to 20 authors); DOIs verified against Crossref/DataCite for 59 of 92 references (including three related works of the author in Section 2 and 5.7); the other 33 are venues without DOIs (NeurIPS, ICML, ICLR, AISTATS, MLSys, KDD, JMLR, technical reports).
 
 What changed:
 
