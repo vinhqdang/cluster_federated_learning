@@ -42,3 +42,15 @@ only), StoCFL, StoCFL-W, FedCCFA, FedDAG-C (image benchmarks only), DisCo-CFL,
 DisCo-noAttach, Oracle. Five seeds (0-4). Metrics, failure rate, diagnostics and the
 hierarchical statistics are computed exactly as for the existing benchmarks, and the new
 scenarios enter the pooled hierarchical comparison as a separate block.
+
+## Amendment (before any AG News run with the methods)
+
+The text model is new, so it has no learning rate from the earlier benchmarks. Smoke tests
+showed that a classifier on unit-norm sentence embeddings does not train with SGD
+(coordinates of order 0.05; FedAvg stays at the majority-class accuracy for 20 rounds).
+We therefore standardise every embedding dimension with the training-set statistics and
+choose the learning rate among {0.01, 0.05, 0.1} with FedAvg on a single-concept AG News
+federation (40 clients, seed 0, 50 rounds), the same procedure as for PACS. Accuracy after
+10/20/50 rounds: lr 0.01: 0.699/0.793/0.859; lr 0.05: 0.857/0.874/0.889; lr 0.1:
+0.874/0.884/0.895. We use lr 0.1. No DisCo-CFL or baseline run on AG News was looked at
+before this choice.

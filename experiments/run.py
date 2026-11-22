@@ -42,6 +42,11 @@ SCENARIOS = {
     "cifar_swap": dict(dataset="cifar10", groups="swap", mean_size=500),
     "svhn_rot": dict(dataset="svhn", groups="rotation", mean_size=500),
     "svhn_swap": dict(dataset="svhn", groups="swap", mean_size=500),
+    # additional small-CNN benchmarks (revision, pre-registered in PREREGISTRATION_R1_EXTRA.md)
+    "kmnist_rot": dict(dataset="kmnist", groups="rotation"),
+    "kmnist_swap": dict(dataset="kmnist", groups="swap"),
+    "emnist_rot": dict(dataset="emnist", groups="rotation"),
+    "emnist_swap": dict(dataset="emnist", groups="swap"),
     # heterogeneity strength: 4 groups rotated by 0, a, 2a, 3a degrees
     "angle15": dict(groups="angle15"),
     "angle30": dict(groups="angle30"),
@@ -101,6 +106,8 @@ SUITES = {
                                     "cifar_swap"],
                          methods=METHODS + NEW_BASELINES + NEW_R1 + ["DisCo-noAttach", "DisCo-T30"],
                          seeds=[0, 1, 2, 3, 4]),
+    "r1_extra": dict(scenarios=["kmnist_rot", "kmnist_swap", "emnist_rot", "emnist_swap"],
+                     methods=METHODS + NEW_BASELINES + NEW_R1 + ["DisCo-noAttach"], seeds=[0, 1, 2, 3, 4]),
     "r1_sweeps": dict(scenarios=["angle15", "angle30", "angle45", "perm2", "perm8", "rot_part30",
                                  "swap_part30", "rot_n200"],
                       methods=SWEEP + ["MTCFL"] + NEW_R1, seeds=[0, 1, 2]),

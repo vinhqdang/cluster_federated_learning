@@ -24,16 +24,31 @@ class SmallCNN(nn.Module):
         return self.fc2(x)
 
 
+class MLPHead(nn.Module):
+    """Two-layer classifier on fixed sentence embeddings (text benchmark)."""
+
+    def __init__(self, in_dim, num_classes, hidden=128):
+        super().__init__()
+        self.features = nn.Sequential(nn.Linear(in_dim, hidden), nn.ReLU())
+        self.fc = nn.Linear(hidden, num_classes)
+
+    def forward(self, x):
+        return self.fc(self.features(x))
+
+
 class Trainer:
     """Holds one model instance and moves flat parameter vectors in and out."""
 
     def __init__(self, fed, lr=0.05, batch_size=32, local_epochs=1, seed=0,
                  arch="smallcnn", device="cpu", pretrained=True):
-        c, h, _ = fed.in_shape
-        torch.manual_seed(seed)
         self.kind, self.pretrained = arch, pretrained
+        if arch == "mlp":                 # 1-d inputs (embedding vectors)
+            self.arch = (fed.in_shape[0], fed.num_classes)
+        else:
+            c, h, _ = fed.in_shape
+            self.arch = (c, fed.num_classes, h)
+        torch.manual_seed(seed)
         self.device = torch.device(device)
-        self.arch = (c, fed.num_classes, h)
         self.model = self._build().to(self.device)
         self.lr, self.bs, self.epochs = lr, batch_size, local_epochs
         self.rng = np.random.default_rng(seed + 12345)
@@ -43,6 +58,8 @@ class Trainer:
         if self.kind == "l4":
             from .models import L4Head
             return L4Head(self.arch[1], self.pretrained)
+        if self.kind == "mlp":
+            return MLPHead(*self.arch)
         return SmallCNN(*self.arch)
 
     @property

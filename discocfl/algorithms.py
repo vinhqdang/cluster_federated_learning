@@ -88,7 +88,7 @@ def run_disco(fed, tr, cfg, return_details=False):
                            class_conditional=cfg.get("class_conditional", True),
                            clip=cfg.get("clip", 0.5),
                            dp_sigma=cfg.get("dp_sigma", 0.0), dp_clip=cfg.get("dp_clip", 0.5),
-                           mode=cfg.get("sig", "head" if tr.kind == "l4" else "full"),
+                           mode=cfg.get("sig", "head" if tr.kind in ("l4", "mlp") else "full"),
                            seed=cfg["seed"])
     sketch = CountSketch(tr.head_dim if scfg.mode == "head" else tr.dim, scfg.sketch_dim,
                          seed=cfg["seed"], device=tr.device)

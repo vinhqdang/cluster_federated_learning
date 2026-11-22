@@ -183,6 +183,82 @@ def make_cifar100_federation(groups="rotation", device="cpu", pretrained=True, s
 
 
 # ---------------------------------------------------------------------------
+# CIFAR-10 (raw uint8, upsampled to 96 px) -> same protocol as CIFAR-100
+# ---------------------------------------------------------------------------
+def _load_cifar10_raw(size=96):
+    import torch.nn.functional as F
+    # reuse the CIFAR-10 reader of data.py (extracts the local tar.gz if needed)
+    xtr, ytr, xte, yte = D._load_cifar10(ROOT)
+
+    def up(x):
+        raw = torch.from_numpy(np.ascontiguousarray(x))
+        out = torch.empty(len(raw), 3, size, size, dtype=torch.uint8)
+        for s0 in range(0, len(raw), 1000):       # chunked, as for CIFAR-100
+            chunk = F.interpolate(raw[s0:s0 + 1000].float(), size=size, mode="bilinear", align_corners=False)
+            out[s0:s0 + 1000] = chunk.round().clamp(0, 255).to(torch.uint8)
+        return out
+
+    return up(xtr), torch.from_numpy(ytr.astype(np.int64)), up(xte), torch.from_numpy(yte.astype(np.int64))
+
+
+D.RAW_LOADERS["cifar10r"] = _load_cifar10_raw
+
+
+def make_cifar10r_federation(groups="rotation", device="cpu", pretrained=True, seed=0, **kw):
+    fed = D.make_federation(dataset="cifar10r", groups=groups, seed=seed, **kw)
+    return featurize_federation(fed, _backbone(device, pretrained), device)
+
+
+# ---------------------------------------------------------------------------
+# AG News (text): frozen all-MiniLM-L6-v2 embeddings, no featurisation
+# ---------------------------------------------------------------------------
+AGNEWS_ENCODER = "sentence-transformers/all-MiniLM-L6-v2"
+
+
+def _load_agnews_raw(n_train=30000, n_test=5000, seed=0):
+    """Random subset (fixed seed) of the AG News train and test sets, every text embedded
+    once with the frozen encoder (mean-pooled, L2-normalised) and cached in DATA_ROOT."""
+    import pyarrow.parquet as pq
+    cache = os.path.join(ROOT, "agnews_emb.npz")
+    if not os.path.exists(cache):
+        from sentence_transformers import SentenceTransformer
+        local = os.path.join(ROOT, "models", os.path.basename(AGNEWS_ENCODER))
+        enc = SentenceTransformer(local if os.path.isdir(local) else AGNEWS_ENCODER, device="cpu")
+        rng = np.random.default_rng(seed)
+        out = {}
+        for split, n in (("train", n_train), ("test", n_test)):
+            tab = pq.read_table(os.path.join(ROOT, "agnews", f"{split}-00000-of-00001.parquet")).to_pydict()
+            idx = rng.choice(len(tab["label"]), n, replace=False)
+            texts = [tab["text"][i] for i in idx]
+            out[f"x_{split}"] = enc.encode(texts, batch_size=128, normalize_embeddings=True,
+                                           convert_to_numpy=True).astype(np.float32)
+            out[f"y_{split}"] = np.array([tab["label"][i] for i in idx], dtype=np.int64)
+        np.savez(cache + ".tmp.npz", **out)
+        os.replace(cache + ".tmp.npz", cache)
+    z = np.load(cache)
+    # standardise every embedding dimension with the training statistics (unit-norm
+    # 384-d embeddings have coordinates of order 0.05, too small for SGD to train)
+    mu, sd = z["x_train"].mean(0), z["x_train"].std(0) + 1e-6
+    xtr, xte = (z["x_train"] - mu) / sd, (z["x_test"] - mu) / sd
+    return (torch.from_numpy(xtr.astype(np.float32)), torch.from_numpy(z["y_train"]),
+            torch.from_numpy(xte.astype(np.float32)), torch.from_numpy(z["y_test"]))
+
+
+D.RAW_LOADERS["agnews"] = _load_agnews_raw
+
+
+def make_agnews_federation(device="cpu", seed=0, **kw):
+    """Embedding vectors are used as they are (no featurisation); tensors go to ``device``."""
+    fed = D.make_federation(dataset="agnews", seed=seed, **kw)
+    for c in fed.clients:
+        c.x, c.x_test = c.x.to(device), c.x_test.to(device)
+        c.y, c.y_test = c.y.to(device), c.y_test.to(device)
+    fed.group_test = [(gx.to(device), gy.to(device)) for gx, gy in fed.group_test]
+    fed.in_shape = tuple(fed.clients[0].x.shape[1:])
+    return fed
+
+
+# ---------------------------------------------------------------------------
 # FEMNIST: natural writers, no ground-truth groups
 # ---------------------------------------------------------------------------
 def make_femnist_federation(n_writers=100, min_samples=150, max_samples=400, seed=0, device="cpu"):

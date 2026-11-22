@@ -26,6 +26,8 @@ _MEAN_STD = {
     "fmnist": ((0.2860,), (0.3530,)),
     "cifar10": ((0.4914, 0.4822, 0.4465), (0.2470, 0.2435, 0.2616)),
     "svhn": ((0.4377, 0.4438, 0.4728), (0.1980, 0.2010, 0.1970)),
+    "kmnist": ((0.1918,), (0.3483,)),
+    "emnist": ((0.1751,), (0.3332,)),
 }
 
 
@@ -95,6 +97,26 @@ def _load_svhn(root):
     return xtr, ytr, xte, yte
 
 
+def _load_torchvision_idx(name):
+    """KMNIST / EMNIST (balanced split) through torchvision, downloaded into DATA_ROOT.
+    EMNIST images are stored transposed relative to MNIST, so they are transposed back."""
+    import torchvision
+    if name == "kmnist":
+        tr = torchvision.datasets.KMNIST(DATA_ROOT, train=True, download=True)
+        te = torchvision.datasets.KMNIST(DATA_ROOT, train=False, download=True)
+    else:
+        tr = torchvision.datasets.EMNIST(DATA_ROOT, split="balanced", train=True, download=True)
+        te = torchvision.datasets.EMNIST(DATA_ROOT, split="balanced", train=False, download=True)
+
+    def images(ds):
+        x = ds.data.numpy()
+        if name == "emnist":
+            x = np.transpose(x, (0, 2, 1))
+        return x[:, None]
+
+    return images(tr), tr.targets.numpy(), images(te), te.targets.numpy()
+
+
 _CACHE: dict = {}
 
 
@@ -116,6 +138,8 @@ def load_dataset(name: str):
         xtr, ytr, xte, yte = _load_cifar10(DATA_ROOT)
     elif name == "svhn":
         xtr, ytr, xte, yte = _load_svhn(DATA_ROOT)
+    elif name in ("kmnist", "emnist"):
+        xtr, ytr, xte, yte = _load_torchvision_idx(name)
     else:
         raise ValueError(name)
     mean, std = _MEAN_STD[name]
@@ -201,6 +225,8 @@ def make_groups(kind: str, num_classes: int = 10):
         return [Group(0), Group(0, p), Group(2), Group(2, p)]
     if kind == "single":
         return [Group()]
+    if kind == "swap4":                   # 4 classes (text): identity and three different swaps
+        return [Group(perm=p) for p in ([0, 1, 2, 3], [1, 0, 2, 3], [0, 1, 3, 2], [2, 1, 0, 3])]
     if kind.startswith("angle"):          # angleXX: 4 groups rotated by 0, X, 2X, 3X degrees
         a = float(kind[5:])
         return [Group(angle=k * a) for k in range(4)]

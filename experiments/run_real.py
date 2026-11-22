@@ -31,10 +31,17 @@ SCENARIOS = {
                        alpha=0.3),
     "c100_rot": dict(kind="c100", groups="rotation", clients_per_group=10, mean_size=300, alpha=0.5),
     "c100_swap": dict(kind="c100", groups="bigswap4", clients_per_group=10, mean_size=300, alpha=0.5),
+    # additional benchmarks (revision, pre-registered in PREREGISTRATION_R1_EXTRA.md)
+    "c10r_rot": dict(kind="c10r", groups="rotation", clients_per_group=10, mean_size=300, alpha=0.5),
+    "c10r_swap": dict(kind="c10r", groups="swap", clients_per_group=10, mean_size=300, alpha=0.5),
+    "agnews_swap": dict(kind="agnews", groups="swap4", clients_per_group=10, mean_size=300, alpha=0.5),
     "femnist": dict(kind="femnist", n_writers=100),
 }
 TRAIN = dict(rounds=50, warmup=10, lr=0.01, batch_size=64, local_epochs=1)
 FEMNIST_TRAIN = dict(rounds=50, warmup=10, lr=0.05, batch_size=32, local_epochs=1)
+# lr 0.1 instead of 0.01: in the quick FedAvg check the MLP head stayed at the majority-class
+# accuracy for 50 rounds at lr 0.01 (single-concept federation), but learned at lr 0.1
+AGNEWS_TRAIN = dict(TRAIN, lr=0.1)
 
 METHODS = ["FedAvg", "Local", "FedAvg-FT", "IFCA", "FeSEM", "MTCFL", "FL+HC", "PACFL", "DisCo", "Oracle"]
 SUITES = {
@@ -51,6 +58,10 @@ SUITES = {
     "r1_real": dict(scenarios=["pacs", "officehome", "c100_swap", "c100_rot", "pacs_qs"],
                     methods=METHODS + ["StoCFL", "StoCFL-W", "FedCCFA", "FedDAG-C", "DisCo-noAttach"],
                     seeds=[0, 1, 2, 3, 4]),
+    # round 1 of revisions, additional benchmarks
+    "r1_extra_real": dict(scenarios=["c10r_rot", "c10r_swap", "agnews_swap"],
+                          methods=METHODS + ["StoCFL", "StoCFL-W", "FedCCFA", "FedDAG-C", "DisCo-noAttach"],
+                          seeds=[0, 1, 2, 3, 4]),
     "r1_femnist": dict(scenarios=["femnist"],
                        methods=["FedAvg", "Local", "FedAvg-FT", "IFCA", "FeSEM", "MTCFL", "FL+HC", "DisCo",
                                 "StoCFL", "StoCFL-W", "FedCCFA", "FedDAG-C", "DisCo-noAttach"],
@@ -69,6 +80,10 @@ def build(scen, seed, device, pretrained, size):
                                         pretrained=pretrained, **c), "l4", TRAIN
     if kind == "c100":
         return R.make_cifar100_federation(device=device, pretrained=pretrained, seed=seed, **c), "l4", TRAIN
+    if kind == "c10r":
+        return R.make_cifar10r_federation(device=device, pretrained=pretrained, seed=seed, **c), "l4", TRAIN
+    if kind == "agnews":
+        return R.make_agnews_federation(device=device, seed=seed, **c), "mlp", AGNEWS_TRAIN
     return R.make_femnist_federation(seed=seed, device=device, **c), "smallcnn", FEMNIST_TRAIN
 
 
@@ -111,6 +126,17 @@ def run_one(scen, method, seed, device, pretrained=True, size=112, out_dir=RESUL
     return path
 
 
+# image-only baselines are not run on the text scenario
+IMAGE_ONLY = {"PACFL", "FedDAG-C"}
+TEXT_SCENARIOS = {"agnews_swap"}
+
+
+def jobs_for(suite):
+    s = SUITES[suite]
+    jobs = [(sc, m, sd) for sc, sd, m in itertools.product(s["scenarios"], s["seeds"], s["methods"])]
+    return [j for j in jobs if not (j[0] in TEXT_SCENARIOS and j[1] in IMAGE_ONLY)]
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--suite", default="real")
@@ -124,8 +150,7 @@ if __name__ == "__main__":
     ap.add_argument("--shard", default="0/1", help="i/n: run every n-th job starting at i")
     ap.add_argument("--reverse", action="store_true", help="run the selected jobs in reverse order")
     a = ap.parse_args()
-    s = SUITES[a.suite]
-    jobs = [(sc, m, sd) for sc, sd, m in itertools.product(s["scenarios"], s["seeds"], s["methods"])]
+    jobs = jobs_for(a.suite)
     if a.only:
         jobs = [j for j in jobs if j[0] in a.only.split(",")]
     if a.methods:
