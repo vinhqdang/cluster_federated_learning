@@ -71,7 +71,8 @@ $m$ & recall & ARI & conflict\% & recall & ARI & conflict\% \\
 \end{tableorg}
 
 \input{exp_datasets.tex}
-\input{exp_sweeps.tex}
+\paragraph{Robustness sweeps.}\label{sec:sweeps} Varying one factor at a time on Fashion-MNIST (Table~\ref{tab:sweeps} in Appendix~\ref{app:more}), DisCo-CFL recovers rotation groups from $30^\circ$ on and merges the $15^\circ$ groups, whose separation ($\hat\Delta=0.06$) is below $1-\tau$; finds $K=2$, $4$ and $8$ label-permutation groups (ARI $1.00$, $0.97$ and $0.79$); and keeps recovering the groups with 30\% client participation (ARI $0.93$--$0.98$) and with 200 clients (ARI $0.88$). In every setting its accuracy is within $0.7$ points of the Oracle.
+
 \input{exp_real.tex}
 \input{exp_extra.tex}
 
