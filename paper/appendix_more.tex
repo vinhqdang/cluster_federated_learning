@@ -1,0 +1,71 @@
+\subsection{Further experimental results}\label{app:more}
+
+\paragraph{Edge cases.} Table~\ref{tab:edge} varies the minimum class size $m$ in three federations. The default $m=4$ is best or close to best. A larger $m$ discards classes and hence evidence, and the effect is strongest with small clients ($m=16$: ARI $0.28$, 30\% of the conflicting pairs merged), because clients then report few classes and share few discriminative ones. With extreme label skew ($\alpha=0.1$) and with small clients, ARI falls to $0.71$ and $0.66$ at the default, with 3.5\% and 9.3\% conflicting merges. Under extreme label skew these are the coverage failures anticipated in Remark~\ref{rem:scope}(d); with small clients the main cause is the smaller separation at a reference model trained on less data, as in the sample-size study. The table averages the four scenarios, including the label-only one, which explains $K<4$ for the default federation. The reliability floor $r_{\min}$ has no measurable effect between $0$ and $0.2$: over the 144 combinations of scenario, federation, seed and $m$, changing $r_{\min}$ changes ARI by at most $0.017$.
+
+\begin{table}[!htbp]
+\centering
+\caption{Edge cases: minimum class size $m$ in three federations (Rotation, Label swap, \emph{Mixed + QS} and label-only scenarios, 3 seeds, $r_{\min}=0.02$).}\label{tab:edge}
+\input{table_edge.tex}
+\end{table}
+
+
+
+\paragraph{Theory in practice.}
+Figure~\ref{fig:theory} validates the theory on synthetic signatures with known ground truth ($p=512$, noise of effective rank 16). The disattenuated similarity is nearly unbiased for every half size $h$, whereas the raw cosine is biased by up to $-0.37$. Safety and maximality are reached with probability 1 once $h\ge64$ for all separations $\Delta\in[0.2,0.7]$, and exact recovery is reached under full class support. The required $h$ grows as $\Delta$ shrinks. Recovery of a minority group of 1, 2, 4 or 8 clients follows the same curve (Figure~\ref{fig:thminority} in Appendix~\ref{app:figs}), as Corollary~\ref{cor:sc} states.
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.49\linewidth]{../results/figures/theory_estimation.pdf}\hfill
+\includegraphics[width=0.49\linewidth]{../results/figures/theory_recovery.pdf}
+\caption{Synthetic validation. Left: bias of the similarity estimate. Right: probability of the guarantees of Theorem~\ref{thm:rec}.}\label{fig:theory}
+\end{figure}
+
+
+
+\begin{table}[!htbp]
+\centering
+\caption{Class-support disclosure under DP (rotation and label swap, 3 seeds). Plain: only the held classes are reported. Padded: noise vectors are sent for the other classes. Support acc.: accuracy of the server's guess ``class held iff $R_i^c>0$''; FPR: rate at which padded classes are guessed as held.}\label{tab:support}
+\input{table_support.tex}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\caption{Concept drift after clustering (Fashion-MNIST, 3 seeds): detection rate of drifted clients, false-alarm rate on unchanged clients, and share of drifted clients reassigned to the cluster of their new group, with the pre-registered test.}\label{tab:drift}
+\input{table_drift.tex}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\caption{Malicious clients (Fashion-MNIST rotation and label swap, 3 seeds each): ARI and conflict-merge rate among the honest clients, and the fate of the malicious clients (mean counts: isolated in a singleton, flagged as low-evidence or anomalous, merged into an honest cluster, or grouped only with other malicious clients).}\label{tab:byz}
+\input{table_byz.tex}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\caption{Attempted remedies for the failures: full-layer signature and 30 warm-up rounds (3 seeds).}\label{tab:real_variants}
+\input{table_real_variants.tex}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\caption{Ablation on CIFAR-100 with label-swap groups (3 seeds). Columns as in Table~\ref{tab:real_variants}.}\label{tab:real_ablation}
+\input{table_real_ablation.tex}
+\end{table}
+
+\paragraph{Robustness sweeps.}
+Table~\ref{tab:sweeps} varies one factor at a time on Fashion-MNIST: the strength of the concept shift, the number of groups, the fraction of participating clients and the number of clients. Baselines are given the true $K$ where they need it.
+
+\begin{table}[!htbp]
+\centering
+\caption{Robustness sweeps (Fashion-MNIST, 3 seeds; the $90^\circ$ row repeats the \emph{Rotation} scenario with 5 seeds). For DisCo-CFL: ARI, number of clusters, conflict-merge rate, accuracy and concept accuracy. For comparison: the best baseline on accuracy and on concept accuracy (in parentheses), and the Oracle's accuracy.}\label{tab:sweeps}
+\input{table_sweeps.tex}
+\end{table}
+
+\paragraph{Strength of the shift.} With rotations of $0,\theta,2\theta,3\theta$ degrees, DisCo-CFL separates the groups perfectly at $\theta=45^\circ$ (ARI $1.00$) and almost perfectly at $30^\circ$ (ARI $0.93$). At $15^\circ$ neighbouring concepts are so close that their class-conditional gradients agree above the threshold: the estimated separation is $\hat\Delta=0.06$, below $1-\tau=0.1$ (Table~\ref{tab:diag}), and DisCo-CFL merges them (ARI $0.52$, $K=2.7$). This is what the separation assumption predicts: the method groups what it cannot tell apart, and the diagnostic shows it. It costs little, because nearby concepts can share a model: accuracy is 88.7\% against 89.3\% for the Oracle, equal to the best baseline (PACFL, given $K$). For $\theta\ge30^\circ$ DisCo-CFL is within $0.3$ points of the Oracle; at $45^\circ$ FedDAG-C is $0.2$ points more accurate.
+
+\paragraph{Number of groups.} With $K=2$, $4$ and $8$ label-permutation groups, DisCo-CFL finds the number of groups without being told (2.0, 4.0 and 8.7 clusters). With $K=8$, recovery is incomplete (ARI $0.79$, 1.7\% of the conflicting pairs merged): with Dirichlet label skew, many clients hold few of the classes that distinguish two of the eight permutations, so coverage is weaker. Accuracy is within $0.4$ points of the Oracle for all $K$, and $0.2$--$1.0$ points above the best baseline; concept accuracy is $0.9$--$10.9$ points above the best baseline.
+
+\paragraph{Partial participation.} When only 30\% of the clients take part in each round, the warm-up model is noisier. DisCo-CFL still recovers the groups (ARI $0.93$ and $0.98$) and matches the Oracle within $0.1$ points, $0.2$--$1.6$ points above the best baseline in accuracy and $2.3$--$6.7$ points in concept accuracy.
+
+\paragraph{Number of clients.} With 200 clients of 200 samples each, DisCo-CFL reaches ARI $0.88$ with 2.9\% of the conflicting pairs merged. Accuracy is 86.5\% against 87.2\% for the Oracle and 85.2\% for the best baseline (IFCA, given $K$); concept accuracy is $2.5$ points above the best baseline.
+
