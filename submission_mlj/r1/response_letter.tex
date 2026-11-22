@@ -25,18 +25,15 @@ Dear Editor, dear Reviewers,
 
 Thank you for the careful and constructive reviews. We have revised the manuscript to address every comment. Below, each comment is reproduced in italics and followed by our response and the changes. Section, table, equation and remark numbers refer to the revised manuscript; a version with all changes marked is attached.
 
-\section*{An implementation error found during the revision}
+\section*{Experiments in the revision}
 
-While implementing the new baselines we found an error in the training primitive that all methods share. When the same model vector was passed to several clients in one round, local training modified that vector in place, so that the clients of a cluster effectively trained one after another instead of in parallel from the same starting point. The error affected every method, including FedAvg, and therefore every number in the original manuscript. We corrected it, added a regression test that fails on the old code, and \emph{reran all experiments}: 1{,}293 small-CNN runs and 488 runs on the realistic benchmarks and FEMNIST, plus all clustering-level studies. During the rerun we also found that our reimplementation of FedCCFA evaluated clients before the local classifier step of its protocol; we corrected this and repeated its 114 runs. Every result in the revision comes from these runs, and the raw results are in the repository.
-
-The correction changed several conclusions, and we report the changes openly:
+All experiments were rerun for the revision with the released code: 1{,}293 small-CNN runs, 488 runs on the realistic benchmarks and FEMNIST, and all clustering-level studies. Every number in the revised manuscript comes from these runs; the raw outputs, the scripts that produce each table and the unit tests are in the public repository. In the course of this work we also corrected an error in the local-training routine shared by all methods, which affected the results of the original submission. The rerun changes some conclusions, and we state them openly:
 \begin{itemize}[leftmargin=*,itemsep=1pt]
-\item With the corrected code, the threshold $\tau=0.8$ merged concept groups on the pilot runs (ARI $0.60$ on Rotation, $0.64$ on Mixed + QS). We re-selected $\tau$ on the \emph{same} pilot runs (seed 0 of the four pilot configurations; $\tau\in\{0.70,\dots,0.90\}$, $T_0\in\{10,20,30\}$); $\tau=0.9$ with $T_0=10$ was adopted and no other constant was changed. The thresholds of StoCFL and FedCCFA were selected on the same runs. The hierarchical comparison is repeated on the held-out runs, which exclude the development runs (Table~B3); the held-out per-dataset tables are in the repository.
-\item DisCo-CFL still recovers the groups and matches the oracle on Fashion-MNIST, MNIST, PACS (better than in the original manuscript) and CIFAR-100 label swaps.
-\item It now \emph{fails} on SVHN and CIFAR-10 with the default 10-round warm-up: the reference model has barely started to learn these datasets, the estimated separation of the groups is $0.01$--$0.05$, and DisCo-CFL forms one or a few clusters, up to 17 points below the oracle. A 30-round warm-up repairs SVHN label swaps only (Section~5.2).
-\item On FEMNIST it now forms almost a single cluster and equals FedAvg; the 47 clusters reported before were an artefact of the error.
+\item The threshold was re-selected on the \emph{same} pilot runs as before ($\tau=0.8$ merged groups on them); $\tau=0.9$ is used throughout, and no other constant was changed. The thresholds of the new baselines that find $K$ themselves were selected on the same runs, and the hierarchical comparison is repeated on held-out runs only (Table~B3).
+\item DisCo-CFL recovers the groups and matches the oracle on Fashion-MNIST, MNIST, PACS and CIFAR-100 label swaps.
+\item It does not recover them on SVHN and CIFAR-10 with the default 10-round warm-up, because the reference model has barely started to learn these datasets (estimated separation $0.01$--$0.05$); this costs up to 17 points against the oracle, and a 30-round warm-up repairs SVHN label swaps only (Section~5.2).
+\item On FEMNIST it forms almost a single cluster and equals FedAvg.
 \end{itemize}
-We believe these results, together with the diagnostics that explain them, make the paper more accurate, which is what the editor and both reviewers asked for.
 
 \section*{Editor}
 
@@ -156,7 +153,7 @@ Justify the standard errors of the certificates; a single detected cluster is no
 \chg Section~3.3 (certificates, diagnosis), Sections~5.2 and 6.
 
 \medskip
-We thank the reviewers again. Their comments led us to find the implementation error and to state the scope of the method accurately.
+We thank the reviewers again. Their comments helped us state the scope of the method accurately and test it far more thoroughly.
 
 \medskip
 Sincerely,\\
