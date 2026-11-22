@@ -549,6 +549,56 @@ def job_byz(args):
                  n_other=cnt["other"], fates=fates, malicious=[int(i) for i in bad])]
 
 
+def _subset_warmup(tr, fed, keep, rounds):
+    """FedAvg for `rounds` rounds in which only the clients in `keep` take part."""
+    import dataclasses
+    from discocfl.fl import cluster_fedavg_round
+    sub = dataclasses.replace(fed, clients=[c for c in fed.clients if c.cid in set(keep)])
+    assign = np.zeros(len(fed.clients), int)
+    models = {0: tr.get()}
+    for _ in range(rounds):
+        models = cluster_fedavg_round(tr, sub, models, assign)
+    return models[0]
+
+
+def job_refmodel(args):
+    """Dependence on the reference model (PREREGISTRATION_R1_ROUND3.md, section 2):
+    reference model from all clients, from a random half, or without group 0; all
+    clients are clustered at that model."""
+    from sklearn.metrics import adjusted_rand_score
+    from run import SCENARIOS, conflict_matrix
+    from discocfl.disco import disco_cluster
+    scen, seed = args
+    _setup()
+    fed, tr, w_full = prepare(base(**SCENARIOS[scen]), seed)
+    g = fed.true_labels
+    n = len(g)
+    rng = np.random.default_rng(seed + 991)
+    half = np.sort(rng.choice(n, n // 2, replace=False))
+    refs = {"full": (w_full, np.arange(n)), "half": (None, half)}
+    if len(np.unique(g)) > 1:
+        refs["drop_group"] = (None, np.where(g != 0)[0])
+    conf = conflict_matrix(fed)
+    rows = []
+    for name, (w, keep) in refs.items():
+        if w is None:
+            from discocfl.fl import Trainer
+            w = _subset_warmup(Trainer(fed, seed=seed), fed, keep, 10)
+        sigs = signatures(fed, tr, w, seed)
+        lab = disco_cluster(sigs).labels
+        inside = np.isin(np.arange(n), keep)
+        row = dict(scenario=scen, seed=seed, ref=name, n_train=int(len(keep)),
+                   **cluster_scores(fed, lab))
+        for part, mask in (("in", inside), ("out", ~inside)):
+            row[f"ari_{part}"] = (float(adjusted_rand_score(g[mask], lab[mask]))
+                                  if mask.sum() > 1 else None)
+        pair0 = conf & (np.equal.outer(g == 0, np.ones(n, bool)) | np.equal.outer(np.ones(n, bool), g == 0))
+        same = np.equal.outer(lab, lab) & ~np.eye(n, dtype=bool)
+        row["conflict_merge_group0"] = float((same & pair0).sum() / max(pair0.sum(), 1))
+        rows.append(row)
+    return rows
+
+
 STUDIES = {
     "tau": (job_tau, lambda: [(s, sd) for s in ["rot", "swap", "rot_qs", "mixed_qs", "label", "minority"]
                               for sd in range(3)]),
@@ -567,6 +617,8 @@ STUDIES = {
                                   for q in [0.1, 0.2]]),
     "byz": (job_byz, lambda: [(s, sd, m, a) for s in ["rot", "swap"] for sd in range(3)
                               for m in [1, 2, 4] for a in ["random", "mimic", "flip"]]),
+    "refmodel": (job_refmodel, lambda: [(s, sd) for s in ["rot", "swap", "mixed_qs", "label",
+                                                          "mnist_rot", "mnist_swap"] for sd in range(3)]),
 }
 
 

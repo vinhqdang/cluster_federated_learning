@@ -126,6 +126,13 @@ SUITES = {
                   methods=["DisCo-AS"], seeds=[0, 1, 2, 3, 4]),
     "r1_as_sweeps": dict(scenarios=["angle15", "angle30", "angle45", "perm2", "perm8", "rot_part30",
                                     "swap_part30", "rot_n200"], methods=["DisCo-AS"], seeds=[0, 1, 2]),
+    # lambda = 0.02, the shrinkage covered by Corollary 1 (PREREGISTRATION_R1_ROUND3.md, section 1)
+    "r1_l02": dict(scenarios=["rot", "swap", "rot_qs", "mixed_qs", "label", "minority", "mnist_rot",
+                              "mnist_swap", "svhn_rot", "svhn_swap", "cifar_rot", "cifar_swap",
+                              "kmnist_rot", "kmnist_swap", "emnist_rot", "emnist_swap"],
+                   methods=["DisCo-L02"], seeds=[0, 1, 2, 3, 4]),
+    "r1_l02_sweeps": dict(scenarios=["angle15", "angle30", "angle45", "perm2", "perm8", "rot_part30",
+                                     "swap_part30", "rot_n200"], methods=["DisCo-L02"], seeds=[0, 1, 2]),
 }
 
 VARIANTS = {
@@ -141,6 +148,8 @@ VARIANTS = {
     "DisCo-AW": dict(adaptive_warmup=True),
     # stable warm-up: checkpoints 10..30, learning condition and partition stability (label-free)
     "DisCo-AS": dict(stable_warmup=True),
+    # shrinkage lambda = 0.02, for which the evidence condition of Corollary 1 can hold
+    "DisCo-L02": dict(lam=0.02),
     # StoCFL with its gradient representation computed at the warm-up model
     "StoCFL-W": dict(_base="StoCFL", stocfl_warmup="warmup"),
 }
