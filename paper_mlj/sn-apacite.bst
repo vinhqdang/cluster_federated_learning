@@ -2906,8 +2906,8 @@ FUNCTION {authors.reflist.apa6}
 { 'field  :=
   'dot    :=
   field  num.names$  'numnames :=
-  numnames  #7  >
-    { #7        'format.num.names := }
+  numnames  #20  >
+    { #20       'format.num.names := }
     { numnames  'format.num.names := }
   if$
   "\begin{APACrefauthors}%"
@@ -4287,6 +4287,12 @@ FUNCTION {book}
       % (used if book is retrieved from the internet)
       %
   format.howpublished  add.period$
+  doi empty$
+    'skip$
+    { output.new.block
+      format.doi
+    }
+  if$
       %
       % format url
       %
@@ -4341,6 +4347,12 @@ FUNCTION {incollection}
   if$
   format.address.publisher.check
   format.howpublished  add.period$
+  doi empty$
+    'skip$
+    { output.new.block
+      format.doi
+    }
+  if$
   url empty$
     'skip$
     {
@@ -4389,6 +4401,12 @@ FUNCTION {inbookcollection}
   if$
   format.address.publisher.check
   format.howpublished  add.period$
+  doi empty$
+    'skip$
+    { output.new.block
+      format.doi
+    }
+  if$
   url empty$
     'skip$
     {
